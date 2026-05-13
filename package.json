@@ -1,5 +1,5 @@
 {
-	"name": "ct-ftc",
+	"name": "my-app",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -28,9 +28,5 @@
 		"tailwindcss": "^4.2.2",
 		"typescript": "^6.0.2",
 		"vite": "^8.0.7"
-	},
-	"dependencies": {
-		"npm": "^11.14.1",
-		"rundev": "^0.0.0"
 	}
 }
