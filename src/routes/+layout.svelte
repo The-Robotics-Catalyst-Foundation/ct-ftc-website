@@ -26,12 +26,12 @@
 	<div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 		<a href="/" class="flex items-center gap-3">
 			<div
-				class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 font-extrabold text-white"
+				class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 font-extrabold text-white"
 			>
 				CT
 			</div>
 			<span class="hidden font-semibold tracking-tight text-white sm:block">
-				Connecticut <span class="text-orange-400">FTC</span>
+				Connecticut <span class="text-purple-400">FTC</span>
 			</span>
 		</a>
 
@@ -46,7 +46,7 @@
 			{/each}
 			<a
 				href="#volunteer"
-				class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-400"
+				class="rounded-lg bg-purple-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-400"
 			>
 				Volunteer Now
 			</a>
@@ -62,10 +62,7 @@
 				class:rotate-45={mobileOpen}
 				class:translate-y-2={mobileOpen}
 			></span>
-			<span
-				class="block h-0.5 w-6 bg-white transition-opacity"
-				class:opacity-0={mobileOpen}
-			></span>
+			<span class="block h-0.5 w-6 bg-white transition-opacity" class:opacity-0={mobileOpen}></span>
 			<span
 				class="block h-0.5 w-6 bg-white transition-transform"
 				class:-rotate-45={mobileOpen}
@@ -90,7 +87,7 @@
 					<a
 						href="#volunteer"
 						onclick={() => (mobileOpen = false)}
-						class="inline-block rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-400"
+						class="inline-block rounded-lg bg-purple-500 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-400"
 					>
 						Volunteer Now
 					</a>
@@ -102,13 +99,13 @@
 
 {@render children()}
 
-<footer class="bg-navy border-t border-white/10 py-12 text-slate-400">
+<footer class="border-t border-white/10 bg-navy py-12 text-slate-400">
 	<div class="mx-auto max-w-7xl px-6">
 		<div class="grid gap-10 sm:grid-cols-3">
 			<div>
 				<div class="mb-3 flex items-center gap-3">
 					<div
-						class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 font-extrabold text-white text-sm"
+						class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 text-sm font-extrabold text-white"
 					>
 						CT
 					</div>
@@ -124,7 +121,7 @@
 				<h4 class="mb-3 font-semibold text-white">Quick Links</h4>
 				<ul class="space-y-2 text-sm">
 					{#each navLinks as link}
-						<li><a href={link.href} class="hover:text-white transition-colors">{link.label}</a></li>
+						<li><a href={link.href} class="transition-colors hover:text-white">{link.label}</a></li>
 					{/each}
 				</ul>
 			</div>
@@ -137,7 +134,7 @@
 							href="https://www.instagram.com"
 							target="_blank"
 							rel="noopener"
-							class="hover:text-white transition-colors">Instagram</a
+							class="transition-colors hover:text-white">Instagram</a
 						>
 					</li>
 					<li>
@@ -145,7 +142,7 @@
 							href="https://www.facebook.com"
 							target="_blank"
 							rel="noopener"
-							class="hover:text-white transition-colors">Facebook</a
+							class="transition-colors hover:text-white">Facebook</a
 						>
 					</li>
 					<li>
@@ -153,14 +150,13 @@
 							href="https://discord.com"
 							target="_blank"
 							rel="noopener"
-							class="hover:text-white transition-colors">Discord</a
+							class="transition-colors hover:text-white">Discord</a
 						>
 					</li>
 					<li class="mt-4">
 						<a
 							href="mailto:ctfirsttechchallenge@gmail.com"
-							class="hover:text-white transition-colors break-all"
-							>ctfirsttechchallenge@gmail.com</a
+							class="break-all transition-colors hover:text-white">ctfirsttechchallenge@gmail.com</a
 						>
 					</li>
 				</ul>
