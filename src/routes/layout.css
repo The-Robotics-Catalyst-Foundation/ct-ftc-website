@@ -1,3 +1,16 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+@theme {
+	--color-navy: #0f1f3d;
+	--color-navy-light: #162847;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	@apply bg-white text-slate-800;
+}
