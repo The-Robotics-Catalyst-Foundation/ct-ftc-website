@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
   pocketbase:
-    image: ghcr.io/muchobien/pocketbase:latest
+    image: ghcr.io/ivakovv/pocketbase:latest
     container_name: ct-ftc-pocketbase
     restart: unless-stopped
     environment:
