@@ -4,12 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
   pocketbase:
-    image: ghcr.io/ivakovv/pocketbase:latest
+    build:
+      context: .
+      dockerfile: Pbdockerfile
+      args:
+        PB_VERSION: 0.38.1
     container_name: ct-ftc-pocketbase
     restart: unless-stopped
     environment:
-      PB_HOST: 0.0.0.0
-      PB_PORT: 8090
       PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
       TZ: America/New_York
