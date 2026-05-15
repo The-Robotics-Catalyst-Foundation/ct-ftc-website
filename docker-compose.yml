@@ -11,10 +11,6 @@ services:
         PB_VERSION: 0.38.1
     container_name: ct-ftc-pocketbase
     restart: unless-stopped
-    environment:
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-      TZ: America/New_York
     env_file: .env
     volumes:
       - pocketbase_data:/pb_data
