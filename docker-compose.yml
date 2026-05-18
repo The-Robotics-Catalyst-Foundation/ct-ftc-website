@@ -1,0 +1,29 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+  pocketbase:
+    build:
+      context: .
+      dockerfile: Pbdockerfile
+      args:
+        PB_VERSION: 0.38.1
+    container_name: ct-ftc-pocketbase
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - pocketbase_data:/pb/pb_data
+      - pocketbase_public:/pb/pb_public
+      - pocketbase_hooks:/pb/pb_hooks
+    healthcheck:
+      test:
+        ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8080/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+volumes:
+  pocketbase_data:
+  pocketbase_public:
+  pocketbase_hooks:

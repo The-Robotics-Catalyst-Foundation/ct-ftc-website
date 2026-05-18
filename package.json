@@ -35,5 +35,6 @@
 		"lucide-svelte": "^1.0.1",
 		"pocketbase": "^0.26.9",
 		"three": "^0.184.0"
+		"@sveltejs/adapter-node": "^5.5.4"
 	}
 }
