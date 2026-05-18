@@ -30,6 +30,11 @@
 		"vite": "^8.0.7"
 	},
 	"dependencies": {
+		"@amcharts/amcharts5": "^5.17.2",
+		"@amcharts/amcharts5-geodata": "^5.1.5",
+		"lucide-svelte": "^1.0.1",
+		"pocketbase": "^0.26.9",
+		"three": "^0.184.0"
 		"three": "^0.184.0",
 		"@sveltejs/adapter-node": "^5.5.4"
 	}

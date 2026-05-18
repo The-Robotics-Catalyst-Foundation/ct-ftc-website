@@ -6,57 +6,125 @@
   ];
 </script>
 
-<footer class="bg-white border-t border-slate-200 pt-20 pb-10 px-6 mt-20">
-  <div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<footer class="bg-[#eef2f7] border-t-4 border-black pt-20 pb-10 px-6 mt-20 relative overflow-hidden">
+  <div class="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12 mb-16">
       
-      <div class="space-y-6">
+      <div class="md:col-span-4 space-y-6 text-left">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">CT</div>
-          <span class="font-black text-xl text-slate-900 italic">FTC</span>
+          <div class="w-10 h-10 bg-white border-2 border-black rounded-xl flex items-center justify-center font-mono font-black text-black shadow-skeuo-mini">
+            CT
+          </div>
+          <span class="font-black text-2xl text-black uppercase tracking-tight">FIRST Tech Challenge</span>
         </div>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          Inspiring CT students through competitive robotics. Part of the NE FIRST network.
+        <p class="text-sm font-bold text-slate-700 leading-relaxed max-w-xs">
+          Inspiring Connecticut student networks through high-caliber competitive robotics engineering. Part of the regional NE FIRST grid framework.
         </p>
-        <div class="flex gap-4">
+        
+        <div class="flex items-center gap-3 bg-[#eef2f7] shadow-neumorphic-inner px-3 py-2 rounded-xl w-max border border-slate-300/40">
           {#each socials as social}
-            <a href={social.href} class="text-slate-400 hover:text-blue-600 transition-colors" aria-label={social.name}>
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d={social.icon}/></svg>
+            <a href={social.href} class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label={social.name}>
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d={social.icon}/></svg>
             </a>
           {/each}
-          <a href="mailto:info@ctftc.org" class="text-slate-400 hover:text-blue-600 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <a href="mailto:info@ctftc.org" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label="Email Support Pipe">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           </a>
         </div>
       </div>
 
-      <div>
-        <h4 class="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Resources</h4>
-        <ul class="space-y-4 text-sm text-slate-500">
-          <li><a href="/events" class="hover:text-blue-600">Event Schedule</a></li>
-          <li><a href="/teams" class="hover:text-blue-600">Team Directory</a></li>
-          <li><a href="/volunteers" class="hover:text-blue-600">Volunteer Info</a></li>
+      <div class="md:col-span-2 text-left md:pl-4">
+        <h4 class="font-black text-black uppercase text-xs tracking-widest bg-white border border-black/10 px-2 py-1 inline-block rounded mb-6">Resources</h4>
+        <ul class="space-y-4 text-sm font-bold text-slate-600">
+          <li><a href="/events" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Event Schedule</a></li>
+          <li><a href="/teams" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Team Directory</a></li>
+          <li><a href="/volunteer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Volunteer Registry</a></li>
         </ul>
       </div>
 
-      <div>
-        <h4 class="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Affiliates</h4>
-        <ul class="space-y-4 text-sm text-slate-500">
-          <li><a href="https://nefirst.org" class="hover:text-blue-600">NE FIRST</a></li>
-          <li><a href="https://firstinspires.org" class="hover:text-blue-600">FIRST Global</a></li>
+      <div class="md:col-span-2 text-left">
+        <h4 class="font-black text-black uppercase text-xs tracking-widest bg-white border border-black/10 px-2 py-1 inline-block rounded mb-6">Affiliates</h4>
+        <ul class="space-y-4 text-sm font-bold text-slate-600">
+          <li><a href="https://nefirst.org" target="_blank" rel="noopener noreferrer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; NE FIRST</a></li>
+          <li><a href="https://firstinspires.org" target="_blank" rel="noopener noreferrer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; FIRST Global</a></li>
         </ul>
       </div>
 
-      <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-        <h4 class="font-bold text-blue-900 mb-2 text-sm">Join the Community</h4>
-        <p class="text-xs text-blue-700/70 mb-4 leading-relaxed">Stay updated on qualifiers and championship details.</p>
-        <button class="w-full bg-blue-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-all">Join Discord</button>
+      <div class="md:col-span-4 bg-[#eef2f7] shadow-neumorphic-outer border-2 border-white/60 p-6 rounded-3xl text-left relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-transparent pointer-events-none"></div>
+        <h4 class="font-black text-black uppercase tracking-tight text-base mb-1">Join the Community</h4>
+        <p class="text-xs font-semibold text-slate-600 mb-5 leading-relaxed">Stay updated on continuous regional qualifier match analytics and updates.</p>
+        
+        <button class="skeuo-button w-full bg-[#2563eb] text-white border-2 border-[#1d4ed8] py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all">
+          Join System Discord
+        </button>
       </div>
+
     </div>
 
-    <div class="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2026 CT FIRST Tech Challenge</p>
-      <a href="/contact" class="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline">Get Support</a>
+    <div class="pt-8 border-t-2 border-dashed border-black/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest">
+        © 2026 CT FIRST Tech Challenge // Core Array Online
+      </p>
+      <a href="/contact" class="text-[10px] font-mono font-black text-[#2563eb] uppercase tracking-widest bg-white border-2 border-black px-4 py-1.5 box-shadow-mini hover:translate-y-[-1px] active:translate-y-[1px] transition-all">
+        Get Support Terminal
+      </a>
     </div>
+
   </div>
 </footer>
+
+<style>
+  /* Engineering Blueprint Vector Pattern Rules */
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, #000000 1px, transparent 1px),
+      linear-gradient(to bottom, #000000 1px, transparent 1px);
+  }
+
+  /* Outward Convex Soft Neomorphic Shading Frames */
+  .shadow-neumorphic-outer {
+    box-shadow: 
+      10px 10px 24px #bdc7d4, 
+      -10px -10px 24px #ffffff,
+      inset 1px 1px 0px rgba(255,255,255,0.9);
+  }
+
+  /* Deep Recessed Inverted Channels */
+  .shadow-neumorphic-inner {
+    box-shadow: 
+      inset 4px 4px 8px #cad4e2, 
+      inset -4px -4px 8px #ffffff;
+  }
+
+  /* Mechanical Convex Switch Depress Actions */
+  .shadow-skeuo {
+    box-shadow: 
+      0px 4px 0px #1d4ed8,
+      3px 6px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-skeuo-mini {
+    box-shadow: 0px 3px 0px #000000;
+  }
+  
+  .skeuo-button:hover {
+    box-shadow: 
+      0px 3px 0px #1d4ed8,
+      1px 4px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .skeuo-button:active {
+    box-shadow: 
+      0px 0px 0px #1d4ed8,
+      0px 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Micro Flat Brutalist Block Shadows */
+  .box-shadow-mini {
+    box-shadow: 3px 3px 0px 0px #000000;
+  }
+</style>

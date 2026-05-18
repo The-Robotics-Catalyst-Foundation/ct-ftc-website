@@ -1,6 +1,7 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+		"baseUrl": ".",
 		"rewriteRelativeImportExtensions": true,
 		"allowJs": true,
 		"checkJs": true,
@@ -12,7 +13,9 @@
 		"strict": true,
 		"moduleResolution": "bundler",
 		"paths": {
-		"$lib/*": ["src/lib/*"]
+		"$lib/*": ["src/lib/*"],
+		"$components/*": ["src/lib/components/*"],
+		"$assets/*": ["src/assets/*"]
     }
 }
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

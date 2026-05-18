@@ -1,16 +1,69 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
 
 @theme {
-	--color-navy: #0f1f3d;
-	--color-navy-light: #162847;
+    /* Main Background Elements (Light Mode Base) */
+    --color-bg-main: #ffffff;
+    --color-bg-surface: #f8fafc;
+    --color-bg-surface-hover: #f1f5f9;
+
+    /* Brand Accents (Deep Royals & Electric Blues) */
+    --color-ftc-blue: #1d4ed8;       /* Primary Action/Headers */
+    --color-ftc-blue-dark: #1e40af;  /* Hover states / Deep Text */
+    --color-ftc-sky: #38bdf8;        /* Subtle boarders/indicators */
+    
+    /* Contrast Highlights (FIRST Gold/Orange alternative) */
+    --color-ftc-gold: #d97706;       /* Warm Amber for high contrast */
+
+    /* Typography Scales */
+    --color-text-main: #0f172a;      /* Slate 900 for absolute contrast */
+    --color-text-muted: #475569;     /* Slate 600 for descriptions */
+    --color-border-subtle: #e2e8f0;  /* Slate 200 for clean layouts */
+
+    /* Typography Fonts */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+    /* Custom Animation Keyframes (Updated for Light Background) */
+    --animate-spin-slow: globe-spin 40s linear infinite;
+    --animate-globe-zoom: globe-zoom 5s cubic-bezier(0.85, 0, 0.15, 1) forwards;
+    --animate-fade-in: fade-in 0.5s ease-out forwards;
 }
 
 html {
-	scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 body {
-	@apply bg-white text-slate-800;
+    /* Applies your new clean white background system globally */
+    @apply font-sans bg-bg-main text-text-main min-h-screen antialiased;
+}
+
+/* Updated map layout background gradient for the landing page hero grid */
+.bg-robotics-gradient {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* 1. Gentle spinning animation for the global map view */
+@keyframes globe-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 2. Camera tracking zoom modified to focus on light assets */
+@keyframes globe-zoom {
+  0% {
+    transform: scale(1) translate(0, 0) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.8) translate(-10%, -8%) rotate(-5deg);
+  }
+  100% {
+    transform: scale(7.5) translate(-36.5%, -23.5%) rotate(0deg);
+  }
+}
+
+/* 3. Smooth appearance for the HUD text overlay */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
