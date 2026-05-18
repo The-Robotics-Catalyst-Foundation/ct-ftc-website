@@ -1,55 +1,164 @@
 <script>
-  // You can adjust the height based on how much of the atlas you want to show
-  let iframeHeight = "800px";
+  import { onMount } from 'svelte';
+  import { fade, fly } from 'svelte/transition';
+
+  // --- SVELTE 5 STATE RUNES ---
+  let isLoaded = $state(false);
+  let scrollY = $state(0);
+  let iframeHeight = $state("850px");
+
+  // --- DERIVED PARALLAX RUNES ---
+  let parallaxHeaderY = $derived(scrollY * 0.25);
+  let consoleTilt = $derived(Math.min(scrollY * 0.05, 12));
+
+  onMount(() => {
+    setTimeout(() => isLoaded = true, 50);
+  });
 </script>
 
-<div class="max-w-7xl mx-auto px-6 py-12">
-  <header class="mb-10">
-    <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-widest">
-        Live Data
-      </span>
-    </div>
-    <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-      CT Team <span class="text-blue-600">Explorer</span>
-    </h1>
-    <p class="mt-4 text-slate-500 max-w-2xl leading-relaxed">
-      Powered by Atlas, explore real-time rankings, match history, and performance metrics for all teams within the Connecticut region.
-    </p>
-  </header>
+<svelte:window bind:scrollY />
 
-  <div class="relative group">
-    <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+<svelte:head>
+  <title>CT Team Explorer Control Deck - CT FTC</title>
+</svelte:head>
+
+<main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
+  <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none"></div>
+
+  <section class="relative pt-20 pb-12 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7]">
+    <div class="max-w-7xl mx-auto text-left space-y-6 z-10" style="transform: translateY({parallaxHeaderY}px)">
+      
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-1.5 box-shadow-flat transform -rotate-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-black animate-pulse"></span>
+          Telemetry Pipe: Active Data Frame
+        </span>
+      </div>
+      
+      <h1 class="text-5xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
+        CT Team <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-1 box-shadow-flat transform rotate-1">Explorer Console</span>
+      </h1>
+      
+      <p class="text-slate-800 text-sm md:text-lg font-bold max-w-2xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl leading-relaxed">
+        Powered by Atlas, analyze state ranking algorithms, local match history datasets, and real-time mechanics telemetry metrics for all registered clusters within the Connecticut regional matrix.
+      </p>
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 py-16 relative z-20">
     
-    <div class="relative bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/5">
-      <div class="bg-slate-50 border-b border-slate-100 px-6 py-3 flex items-center justify-between">
-        <div class="flex gap-1.5">
-          <div class="w-3 h-3 rounded-full bg-slate-300"></div>
-          <div class="w-3 h-3 rounded-full bg-slate-300"></div>
-          <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+    <div class="relative w-full bg-[#eef2f7] rounded-[3.5rem] p-5 border-2 border-white/60 shadow-neumorphic-outer transition-transform duration-300 ease-out"
+         style="transform: rotateX({consoleTilt}deg)">
+      
+      <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-4 relative overflow-hidden border border-slate-200/60 flex flex-col">
+        
+        <div class="bg-white border-2 border-black rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 box-shadow-flat bg-gradient-to-r from-white to-slate-50">
+          <div class="flex items-center gap-3">
+            <div class="flex gap-1.5">
+              <div class="w-3.5 h-3.5 rounded-full bg-[#eef2f7] shadow-inner border border-slate-300"></div>
+              <div class="w-3.5 h-3.5 rounded-full bg-[#eef2f7] shadow-inner border border-slate-300"></div>
+              <div class="w-3.5 h-3.5 rounded-full bg-[#eef2f7] shadow-inner border border-slate-300"></div>
+            </div>
+            <span class="text-[11px] font-mono font-black text-slate-400 uppercase tracking-widest pl-2">System Core Socket</span>
+          </div>
+          
+          <div class="px-4 py-1.5 bg-slate-900 text-emerald-400 font-mono text-xs font-bold rounded-lg border-2 border-black shadow-inner tracking-tight flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            atlas.robotics-catalyst.org
+          </div>
         </div>
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">atlas.robotics-catalyst.org</span>
+
+        <div class="border-4 border-black rounded-2xl overflow-hidden bg-white shadow-2xl relative z-10">
+          <iframe
+            src="https://atlas.robotics-catalyst.org/"
+            title="CT FTC Team Atlas"
+            width="100%"
+            height={iframeHeight}
+            frameborder="0"
+            allowfullscreen
+            class="w-full bg-white block" 
+          ></iframe>
+        </div>
+
       </div>
 
-      <iframe
-        src="https://atlas.robotics-catalyst.org/"
-        title="CT FTC Team Atlas"
-        width="100%"
-        height={iframeHeight}
-        frameborder="0"
-        allowfullscreen
-        class="w-full"
-      ></iframe>
-    </div>
-  </div>
+      <div class="hidden lg:block absolute top-[-30px] right-[-15px] bg-white/30 backdrop-blur-xl border border-white/70 p-5 rounded-2xl shadow-xl border-2 border-black box-shadow-flat transition-transform duration-75 pointer-events-none"
+           style="transform: translateY({-scrollY * 0.08}px) translateZ(50px)">
+        <div class="space-y-1 font-mono text-[10px] font-black text-black text-left">
+          <p class="text-[#2563eb]">📡 FRAME_PIPE: UPSTREAM</p>
+          <p>📊 MATRIX_SYNC: REALTIME</p>
+          <p class="text-emerald-600">🟢 STATUS: SECURE_LINK</p>
+        </div>
+      </div>
 
-  <div class="mt-12 p-8 bg-blue-900 rounded-[2rem] text-white flex flex-col md:flex-row items-center justify-between gap-6">
-    <div>
-      <h3 class="text-xl font-bold mb-2">Don't see your team?</h3>
-      <p class="text-blue-200 text-sm">Ensure your team information is up to date on the FIRST Dashboard to sync with regional trackers.</p>
     </div>
-    <a href="https://firstinspires.org" target="_blank" class="px-6 py-3 bg-white text-blue-900 rounded-xl font-bold text-sm hover:bg-blue-50 transition-colors">
-      Official Dashboard
-    </a>
-  </div>
-</div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 py-4 relative z-20">
+    <div class="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-12 box-shadow-flat flex flex-col md:flex-row items-center justify-between gap-8 text-left group">
+      
+      <div class="space-y-2">
+        <span class="text-xs font-black text-white bg-black border-2 border-black px-3 py-0.5 inline-block uppercase tracking-wider">Sync Discrepancy Registry</span>
+        <h3 class="text-2xl font-black text-black uppercase tracking-tight">Don't find your team node dataset?</h3>
+        <p class="text-slate-600 text-sm font-semibold max-w-xl leading-relaxed">
+          Ensure your team information registration fields are completely processed on the central <span class="text-[#2563eb]">FIRST Dashboard</span> directory to allow regional cron trackers to fetch and sync metrics.
+        </p>
+      </div>
+      
+      <a href="https://firstinspires.org" target="_blank" rel="noopener noreferrer" 
+         class="skeuo-button bg-[#facc15] text-black text-sm font-black uppercase tracking-wider px-8 py-4.5 rounded-2xl border-2 border-black shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] shrink-0 transition-all text-center min-w-[200px]">
+        Official Dashboard &rarr;
+      </a>
+      
+    </div>
+  </section>
+</main>
+
+<style>
+  /* Blueprint Background Vector Mesh Matrix Generator rules */
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, #000000 1px, transparent 1px),
+      linear-gradient(to bottom, #000000 1px, transparent 1px);
+  }
+
+  /* Tactile Soft Raised Neomorphic Chassis Shadow Layers */
+  .shadow-neumorphic-outer {
+    box-shadow: 
+      14px 14px 32px #bdc7d4, 
+      -14px -14px 32px #ffffff,
+      inset 1px 1px 0px rgba(255,255,255,0.9);
+  }
+
+  /* Deep Recessed Inverted Neomorphic Well Insets */
+  .shadow-neumorphic-inner {
+    box-shadow: 
+      inset 6px 6px 14px #cad4e2, 
+      inset -6px -6px 14px #ffffff;
+  }
+
+  /* Analog Mechanical Convex Button Press Shading offsets */
+  .shadow-skeuo {
+    box-shadow: 
+      0px 4px 0px #000000,
+      4px 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .skeuo-button:hover {
+    box-shadow: 
+      0px 3px 0px #000000,
+      2px 6px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .skeuo-button:active {
+    box-shadow: 
+      0px 0px 0px #000000,
+      0px 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Flat Brutalist Static Shadow Trims */
+  .box-shadow-flat {
+    box-shadow: 6px 6px 0px 0px #000000;
+  }
+</style>
