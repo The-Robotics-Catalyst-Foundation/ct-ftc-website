@@ -16,8 +16,7 @@ const socials = [
     icon: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' 
   }
 ];
-   let logo = "https://lh3.googleusercontent.com/sitesv/AA5AbUDcft2fe3r0v2rj-KjAjbrS_Cz5klXAvM62IfSlSrFezmc6BfIjx4gTVn_oZlYs3ghwErgOvzXYQebgDYF6wU8dCZMiBWyPw0Sa598HfR6VRzVtH8xTNyzAI_Enm4csGxwzws8yWdUnqQOQ-c_nbLF5v6KriQR4vSgWQZlQo9F-j1WJOQvmotaK2uk=w16383";
- 
+   let logo = 'src/lib/assets/ctftc.png';
 </script>
 
 <footer class="bg-[#eef2f7] border-t-4 border-black pt-20 pb-10 px-6 mt-20 relative overflow-hidden">
@@ -29,7 +28,7 @@ const socials = [
       <div class="md:col-span-4 space-y-6 text-left">
         <div class="flex items-center gap-2">
           <div class="w-10 h-10 bg-white border-2 border-black rounded-xl flex items-center justify-center font-mono font-black text-black shadow-skeuo-mini">
-            CT
+            <img src={logo} alt="CT Logo" class="w-full h-[90%] object-contain invert">
           </div>
           <span class="font-black text-2xl text-black uppercase tracking-tight">FIRST Tech Challenge</span>
         </div>

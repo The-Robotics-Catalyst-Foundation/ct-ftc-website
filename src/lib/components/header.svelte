@@ -1,8 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { fade, slide } from 'svelte/transition';
-  let logo = "https://lh3.googleusercontent.com/sitesv/AA5AbUDcft2fe3r0v2rj-KjAjbrS_Cz5klXAvM62IfSlSrFezmc6BfIjx4gTVn_oZlYs3ghwErgOvzXYQebgDYF6wU8dCZMiBWyPw0Sa598HfR6VRzVtH8xTNyzAI_Enm4csGxwzws8yWdUnqQOQ-c_nbLF5v6KriQR4vSgWQZlQo9F-j1WJOQvmotaK2uk=w16383";
-  // Svelte 5 State Rune for Mobile Control Deck Toggle
+  let logo = 'src/lib/assets/ctftc.png';
   let isMobileMenuOpen = $state(false);
 
   const navLinks = [
