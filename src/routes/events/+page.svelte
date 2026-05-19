@@ -70,7 +70,7 @@
             <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse border border-black/20"></span>
             Upcoming Tournament Pipelines
           </h2>
-          <span class="font-mono text-xs font-black opacity-40">[{futureEvents.length} LOOPS FOUND]</span>
+          <span class="font-mono text-xs font-black opacity-40">{futureEvents.length} Upcoming events</span>
         </div>
         
         <div class="space-y-6">
@@ -105,7 +105,7 @@
           {:else}
             <div class="text-center p-12 bg-[#eef2f7] shadow-neumorphic-inner border border-dashed border-slate-300 rounded-2xl">
               <span class="text-3xl block mb-2">📡</span>
-              <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">No active upcoming sync routines located inside structural data tables.</p>
+              <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">No upcoming events, check by later for updates</p>
             </div>
           {/each}
         </div>
@@ -117,8 +117,7 @@
             <span class="w-3 h-3 rounded-full bg-slate-400 border border-black/10"></span>
             Historical Match Registry
           </h2>
-          <span class="font-mono text-xs font-black opacity-30">[{pastEvents.length} CORES INDEXED]</span>
-        </div>
+         </div>
         
         <div class="space-y-4 opacity-90">
           {#each pastEvents as event}
@@ -149,7 +148,7 @@
             </div>
           {:else}
             <div class="text-center p-12 bg-[#eef2f7] shadow-neumorphic-inner border border-dashed border-slate-300 rounded-2xl">
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No archival node streams compiled inside historical data indexes.</p>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Error,  try reloading</p>
             </div>
           {/each}
         </div>

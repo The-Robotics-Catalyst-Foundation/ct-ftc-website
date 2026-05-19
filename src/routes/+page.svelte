@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
   import { fade, fly } from 'svelte/transition';
+  import Head from '$lib/components/head.svelte';
 
   // --- SVELTE 5 STATE RUNES ---
   let chartRoot = null;
@@ -124,7 +125,10 @@
 </script>
 
 <svelte:window bind:scrollY on:mousemove={handleMouseMove} />
-
+<Head 
+  title="Home" 
+  description="Connecticut FIRST Tech Challenge - Inspiring the Next Generation of Innovators and Engineers. Explore our events, teams, and volunteer opportunities to get involved in the excitement of robotics competitions across the state." 
+/>
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] font-sans perspective-container overflow-x-hidden">
   
   <section class="relative min-h-[100vh] flex items-center justify-center py-20 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#d8e2ef] overflow-hidden">
@@ -134,20 +138,14 @@
     <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-16 items-center relative z-10 w-full">
       
       <div class="lg:col-span-6 space-y-8 text-left" style="transform: translateY({parallaxHeroY}px)">
-        
-        <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-2 box-shadow-flat transform -rotate-1">
-          <span class="w-3 h-3 rounded-full bg-black {isMapLoading ? 'animate-ping' : 'animate-pulse'}"></span>
-          {#if isMapLoading}SYSTEM: SYNCING CORES...{:else}CONNECTICUT CORE INTERFACE LIVE{/if}
-        </span>
 
         <h1 class="text-5xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-          Building the Future, <br />
-          <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-2 box-shadow-flat transform rotate-1">Right Here in CT</span>
+          First Tech Challenge <br />
+          <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-2 box-shadow-flat transform rotate-1">Right Here in Connecticut</span>
         </h1>
 
         <p class="text-slate-800 text-base md:text-xl font-bold leading-relaxed max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl">
-          Welcome to the control deck of Connecticut FIRST Tech Challenge. Connecting local structural teams, telemetry pipelines, and industry mentors to forge competitive robotics excellence.
-        </p>
+         FIRST Tech Challenge is a robotics competition for students in grades 7–12 to compete head to head, by designing, building, and programming a robot to compete in an alliance format against other teams.    </p>
 
         <div class="flex flex-wrap gap-6 pt-4">
           <a href="/events" class="skeuo-button bg-[#2563eb] text-white text-sm font-black uppercase tracking-wider px-8 py-4 rounded-2xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] transition-all">
@@ -166,36 +164,10 @@
           
           <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-4 relative overflow-hidden border border-slate-200/50">
             
-            {#if isMapLoading}
-              <div class="absolute inset-0 p-8 flex flex-col justify-between items-center bg-[#eef2f7] z-20 animate-pulse rounded-[2.8rem]">
-                <div class="w-full flex justify-between items-center border-b-2 border-black/10 pb-4">
-                  <div class="flex gap-2">
-                    <div class="w-3.5 h-3.5 rounded-full bg-slate-400/50 shadow-inner"></div>
-                    <div class="w-3.5 h-3.5 rounded-full bg-slate-400/50 shadow-inner"></div>
-                    <div class="w-3.5 h-3.5 rounded-full bg-slate-400/50 shadow-inner"></div>
-                  </div>
-                  <div class="w-32 h-4 bg-slate-400/40 rounded-full"></div>
-                </div>
-                <div class="w-[70%] h-[70%] rounded-full bg-[#eef2f7] shadow-neumorphic-inner border-4 border-dashed border-slate-300/60 flex items-center justify-center animate-spin-slow"></div>
-                <div class="w-1/2 h-4 bg-slate-400/40 rounded-full"></div>
-              </div>
-            {/if}
+            
+           <iframe src="https://atlas.robotics-catalyst.org" class="w-full h-full from-x-0 to x-10 "></iframe></div>
 
-            <div id="chartdiv" class="w-full h-full min-h-[360px] lg:min-h-[420px] transition-opacity duration-700 {isMapLoading ? 'opacity-0' : 'opacity-100'}"></div>
-          </div>
-
-          {#if !isMapLoading}
-            <div class="absolute bottom-[-30px] right-[-20px] left-[40px] md:left-[100px] bg-white/30 backdrop-blur-xl border border-white/60 p-5 rounded-3xl shadow-2xl transition-transform duration-100 ease-out z-30"
-                 style="transform: translateZ({glassLiftZ}px) translateY({-scrollY * 0.1}px)">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer flex items-center justify-center text-xl shrink-0 border border-white/40">🔮</div>
-                <div class="space-y-0.5 text-left">
-                  <span class="block text-[10px] font-black uppercase tracking-widest text-slate-500 font-mono">Camera Interactivity Link</span>
-                  <p class="text-xs font-black text-black uppercase">Scroll or Drag Pointer to Modify Globe Orbit Telemetry</p>
-                </div>
-              </div>
-            </div>
-          {/if}
+          
 
         </div>
       </div>
@@ -208,28 +180,22 @@
       
       <div class="lg:col-span-7 space-y-6 text-left">
         <span class="text-xs font-black text-[#2563eb] bg-white border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">More Than Robots</span>
-        <h2 class="text-4xl font-black text-black uppercase tracking-tight">The FIRST Experience Matrix</h2>
+        <h2 class="text-4xl font-black text-black uppercase tracking-tight">The FIRST Experience</h2>
         <p class="text-slate-700 leading-relaxed font-semibold text-base">
-          FIRST Tech Challenge teams engineer, program, and operate Android-platform structural hardware deployments to compete in an alliance framework matrix. Guided by professional engineers, students map live data telemetry parameters while assembling competitive engineering profiles.
+          FIRST Tech Challenge teams engineer, program, and operate Android-platform robots to compete in an events to reach fame. Guided by professional engineers, students learn to think like scientists and engineers, while also developing self-confidence, communication skills, and leadership abilities. The program emphasizes the importance of gracious professionalism, encouraging students to compete fiercely while treating all participants with respect and kindness.
         </p>
         
         <div class="border-l-8 border-black pl-5 py-3 bg-[#facc15]/20 border-2 border-black rounded-xl box-shadow-flat text-left">
-          <p class="font-mono text-sm font-black text-black">
-            "Gracious Professionalism means competing fiercely at structural capacities while treating all human nodes with intrinsic value and mutual respect."
-          </p>
+          <p class="font-mono text-sm text-black">
+          <b>  Gracious Professionalism </b> is a core FIRST ethos that encourages high-quality work, mutual respect, and community value without being rigidly defined. In practice, it drives participants to compete intensely while ensuring everyone is treated with kindness and feels included. </p>
         </div>
       </div>
       
       <div class="lg:col-span-5 bg-black border-4 border-black p-4 rounded-2xl shadow-skeuo aspect-video flex flex-col items-center justify-center text-center relative overflow-hidden group/crt">
-        <div class="absolute inset-0 bg-crt-scanlines opacity-25 pointer-events-none z-10"></div>
-        <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none"></div>
-        <span class="text-4xl mb-2 animate-pulse z-0">🤖</span>
-        <span class="text-[10px] font-mono font-bold tracking-widest text-emerald-400 z-0 bg-emerald-950/60 border border-emerald-500/40 px-3 py-1.5 rounded-md">
-          [ DECK LOG: SEASON GAME REVEAL MEDIA HUB ]
-        </span>
-      </div>
-
-    </div>
+        
+         <img src="https://cdn.singultech.app/mainSlideshow/robotinaction_1.jpg" alt="FIRST Logo" class="w-full inline-block mr-1">
+          
+   </div>
   </section>
 
   <section class="py-16 px-6 max-w-7xl mx-auto border-t-4 border-black">

@@ -40,7 +40,7 @@
       </h1>
       
       <p class="text-slate-800 text-sm md:text-lg font-bold max-w-2xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl leading-relaxed">
-        Powered by Atlas, analyze state ranking algorithms, local match history datasets, and real-time mechanics telemetry metrics for all registered clusters within the Connecticut regional matrix.
+ Powered by Atlas, analysze all teams in CT see their match hisoty as well as info about their team.
       </p>
     </div>
   </section>
@@ -80,15 +80,6 @@
           ></iframe>
         </div>
 
-      </div>
-
-      <div class="hidden lg:block absolute top-[-30px] right-[-15px] bg-white/30 backdrop-blur-xl border border-white/70 p-5 rounded-2xl shadow-xl border-2 border-black box-shadow-flat transition-transform duration-75 pointer-events-none"
-           style="transform: translateY({-scrollY * 0.08}px) translateZ(50px)">
-        <div class="space-y-1 font-mono text-[10px] font-black text-black text-left">
-          <p class="text-[#2563eb]">📡 FRAME_PIPE: UPSTREAM</p>
-          <p>📊 MATRIX_SYNC: REALTIME</p>
-          <p class="text-emerald-600">🟢 STATUS: SECURE_LINK</p>
-        </div>
       </div>
 
     </div>

@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { fade, slide } from 'svelte/transition';
-  
+  let logo = "https://lh3.googleusercontent.com/sitesv/AA5AbUDcft2fe3r0v2rj-KjAjbrS_Cz5klXAvM62IfSlSrFezmc6BfIjx4gTVn_oZlYs3ghwErgOvzXYQebgDYF6wU8dCZMiBWyPw0Sa598HfR6VRzVtH8xTNyzAI_Enm4csGxwzws8yWdUnqQOQ-c_nbLF5v6KriQR4vSgWQZlQo9F-j1WJOQvmotaK2uk=w16383";
   // Svelte 5 State Rune for Mobile Control Deck Toggle
   let isMobileMenuOpen = $state(false);
 
@@ -25,8 +25,8 @@
   <nav class="w-full max-w-5xl pointer-events-auto bg-[#eef2f7]/90 backdrop-blur-xl border-3 border-black shadow-neumorphic-nav rounded-2xl md:rounded-full px-3 py-2.5 md:py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 relative box-shadow-flat transition-all">
     
     <div class="flex items-center justify-between w-full md:w-auto">
-      <a href="/" onclick={closeMenu} class="flex items-center justify-center w-10 h-10 bg-white border-2 border-black rounded-xl md:rounded-full shadow-skeuo hover:translate-y-[1px] active:translate-y-[2px] transition-all shrink-0">
-        <span class="text-lg">🤖</span>
+      <a href="/" onclick={closeMenu} class="flex items-center justify-center w-25 h-15 bg-white border-2 border-black rounded-xl md:rounded-full shadow-skeuo hover:translate-y-[1px] active:translate-y-[2px] transition-all shrink-0">
+        <img src={logo} alt="CT Logo" class="w-full h-[90%] object-contain invert">
       </a>
 
       <button 

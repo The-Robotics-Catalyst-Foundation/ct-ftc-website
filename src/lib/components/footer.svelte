@@ -1,16 +1,30 @@
 <script>
-  const socials = [
-    { name: 'Instagram', href: 'https://instagram.com/ct_ftc', icon: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z' },
-    { name: 'Discord', href: '#', icon: 'M20.222 0c1.406 0 2.54 1.133 2.54 2.54v16.27c0 1.407-1.134 2.54-2.54 2.54H3.778c-1.406 0-2.54-1.133-2.54-2.54V2.54C1.238 1.133 2.372 0 3.778 0h16.444zM16.92 13.916s-.44-.526-.803-.988c1.604-.452 2.215-1.46 2.215-1.46-.504.333-.984.567-1.412.72-.61.254-1.192.42-1.758.52-.375.066-.714.108-1.02.13-.67.043-1.28.016-1.833-.075-.38-.06-.757-.16-1.14-.3-.242-.086-.47-.193-.687-.31-.035-.018-.067-.035-.1-.055-.02-.01-.033-.02-.053-.03-.23-.133-.39-.24-.512-.338 0 0-.61.996 2.19 1.463-.362.46-.814 1.002-.814 1.002-3.11-.1-4.286-2.133-4.286-2.133 0-4.516 2.023-8.178 2.023-8.178 2.023-1.516 3.953-1.472 3.953-1.472l.142.164c-2.423.696-3.533 1.76-3.533 1.76s.296-.16.8-.4c1.453-.637 2.613-.807 3.1-.827.086-.01.17-.02.256-.026.545-.05 1.157-.05 1.833.02 1.04.107 2.186.413 3.393 1.053 0 0-1.066-1.013-3.353-1.68l.19-.22s1.93-.044 3.953 1.47c0 0 2.023 3.662 2.023 8.18 0 0-1.18 2.03-4.29 2.132z' },
-    { name: 'Facebook', href: '#', icon: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' }
-  ];
+const socials = [
+  { 
+    name: 'Instagram', 
+    href: 'https://www.instagram.com/ctfirsttechchallenge/', 
+    icon: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' 
+  },
+  { 
+    name: 'Discord', 
+    href: 'https://discord.com/invite/GTPU98nWY9', 
+    icon: 'M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.298 12.298 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z' 
+  },
+  { 
+    name: 'Facebook', 
+    href: 'https://www.facebook.com/profile.php?id=61553396255140', 
+    icon: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' 
+  }
+];
+   let logo = "https://lh3.googleusercontent.com/sitesv/AA5AbUDcft2fe3r0v2rj-KjAjbrS_Cz5klXAvM62IfSlSrFezmc6BfIjx4gTVn_oZlYs3ghwErgOvzXYQebgDYF6wU8dCZMiBWyPw0Sa598HfR6VRzVtH8xTNyzAI_Enm4csGxwzws8yWdUnqQOQ-c_nbLF5v6KriQR4vSgWQZlQo9F-j1WJOQvmotaK2uk=w16383";
+ 
 </script>
 
 <footer class="bg-[#eef2f7] border-t-4 border-black pt-20 pb-10 px-6 mt-20 relative overflow-hidden">
   <div class="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none"></div>
 
   <div class="max-w-7xl mx-auto relative z-10">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12 mb-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-8 gap-12 mb-16">
       
       <div class="md:col-span-4 space-y-6 text-left">
         <div class="flex items-center gap-2">
@@ -52,25 +66,14 @@
         </ul>
       </div>
 
-      <div class="md:col-span-4 bg-[#eef2f7] shadow-neumorphic-outer border-2 border-white/60 p-6 rounded-3xl text-left relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-transparent pointer-events-none"></div>
-        <h4 class="font-black text-black uppercase tracking-tight text-base mb-1">Join the Community</h4>
-        <p class="text-xs font-semibold text-slate-600 mb-5 leading-relaxed">Stay updated on continuous regional qualifier match analytics and updates.</p>
-        
-        <button class="skeuo-button w-full bg-[#2563eb] text-white border-2 border-[#1d4ed8] py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all">
-          Join System Discord
-        </button>
-      </div>
 
     </div>
 
     <div class="pt-8 border-t-2 border-dashed border-black/10 flex flex-col sm:flex-row justify-between items-center gap-4">
       <p class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest">
-        © 2026 CT FIRST Tech Challenge // Core Array Online
+        © 2026 CT FIRST Tech Challenge
       </p>
-      <a href="/contact" class="text-[10px] font-mono font-black text-[#2563eb] uppercase tracking-widest bg-white border-2 border-black px-4 py-1.5 box-shadow-mini hover:translate-y-[-1px] active:translate-y-[1px] transition-all">
-        Get Support Terminal
-      </a>
+      <p> Made by <a href="https://singul.tech" target="_blank" rel="noopener noreferrer" class="font-bold text-[#2563eb] hover:underline">Singularity Technology</a> </p>
     </div>
 
   </div>
