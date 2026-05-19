@@ -1,32 +1,20 @@
 import { pb } from '$lib/pocketbase';
-import type { PageLoad } from './$types';
 
-export interface RoboticsEvent {
-    id: string;
-    collectionId: string;
-    collectionName: string;
-    created: string;
-    updated: string;
-    name: string;
-    location: string;
-    date_time: string;
-    pics: string[];
-}
-
-export const load: PageLoad = async () => {
+/** @type {import('./$types').PageLoad} */
+export const load = async () => {
     try {
-        const records = await pb.collection('events').getFullList<RoboticsEvent>({
+        const records = await pb.collection('events').getFullList({
             sort: '-date_time',
         });
 
         return {
-            events: JSON.parse(JSON.stringify(records)) as RoboticsEvent[],
+            events: JSON.parse(JSON.stringify(records)),
             error: null
         };
     } catch (err) {
-        console.error(err);
+        console.error("Database communication matrix failure:", err);
         return {
-            events: [] as RoboticsEvent[],
+            events: [],
             error: 'Database communication matrix failure.'
         };
     }

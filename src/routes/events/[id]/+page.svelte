@@ -22,7 +22,7 @@
 
   function updateCountdown(dateISO) {
     const diff = new Date(dateISO).getTime() - Date.now();
-    if (diff <= 0) return timeStr = "Telemetry Loop Concluded";
+    if (diff <= 0) return timeStr = "Event Concluded";
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
@@ -39,7 +39,7 @@
         timer = setInterval(() => updateCountdown(event.date_time), 60000);
         setTimeout(() => isLoaded = true, 50);
       } catch (e) { 
-        console.error("System pipeline failed fetching target event stream:", e); 
+        console.error("Failed to fetch event data:", e); 
       }
     }
 
@@ -64,7 +64,7 @@
   
   <section class="relative min-h-[75vh] flex flex-col justify-center items-center overflow-hidden pt-20 pb-12 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7]">
     <div class="w-full max-w-5xl z-20 mb-auto" style="transform: translateY({parallaxHeroY}px)">
-      <nav aria-label="System Node Tree Navigation" class="inline-flex items-center gap-2.5 px-4 py-2 bg-white border-2 border-black rounded-xl box-shadow-mini">
+      <nav aria-label="Breadcrumb" class="inline-flex items-center gap-2.5 px-4 py-2 bg-white border-2 border-black rounded-xl box-shadow-mini">
         <a href="/" class="text-xs font-black uppercase tracking-wider text-slate-500 hover:text-[#2563eb] transition-colors">Home</a>
         <span class="text-[10px] font-mono text-slate-400 font-black">/</span>
         <a href="/events" class="text-xs font-black uppercase tracking-wider text-slate-500 hover:text-[#2563eb] transition-colors">Events</a>
@@ -79,7 +79,7 @@
       {#if isLoaded}
         <div in:fly={{ y: 30, duration: 600 }}>
           <span class="inline-block px-4 py-1.5 mb-6 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black box-shadow-mini transform -rotate-1">
-            {isPastEvent ? 'Historical Log Registry' : 'Active Cluster Pipeline'} // {event.id.slice(0,8)}
+            {isPastEvent ? 'Past Event' : 'Upcoming Event'}
           </span>
 
           <h1 class="text-4xl md:text-7xl font-black text-black uppercase tracking-tighter leading-[0.95] mb-8 max-w-4xl mx-auto">
@@ -91,10 +91,10 @@
           <div class="inline-flex flex-col sm:flex-row items-center gap-4 p-3 bg-white border-3 border-black rounded-2xl box-shadow-flat">
             <div class="flex items-center gap-2 px-3 py-1 bg-slate-900 text-emerald-400 font-mono text-xs font-bold rounded-lg border-2 border-black shadow-inner">
               <span class="w-2 h-2 rounded-full {isPastEvent ? 'bg-slate-400' : 'bg-emerald-400 animate-pulse'}"></span>
-              <span>{isPastEvent ? 'Archived / Concluded Match' : timeStr}</span>
+              <span>{isPastEvent ? 'Concluded' : timeStr}</span>
             </div>
             <a href="#details-section" class="skeuo-button px-6 py-2.5 bg-[#2563eb] text-white text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all whitespace-nowrap">
-              Explore Match Dataset ↓
+              View Details ↓
             </a>
           </div>
         </div>
@@ -112,15 +112,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div class="lg:col-span-7 space-y-8 text-left">
             <div class="space-y-1">
-              <span class="text-xs font-black uppercase tracking-widest text-slate-400 font-mono"></span>
               <p class="text-2xl font-black text-black uppercase tracking-tight leading-tight">
-                {isPastEvent ? 'Tournament history and telemetry indexes locked.' : 'Match deployment status structural integrity verified.'}
+                {isPastEvent ? 'This tournament has ended.' : 'Tournament schedule and information details.'}
               </p>
             </div>
 
             <div class="p-6 bg-[#eef2f7] rounded-3xl shadow-neumorphic-card-inner border border-white/50 space-y-1">
               <span class="block text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
-                ⏱️ Timestamp Data Node
+                ⏱️ Date & Time
               </span>
               <div class="text-4xl md:text-6xl font-black text-[#2563eb] tracking-tight font-mono leading-none py-1">
                 {new Date(event.date_time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
@@ -136,32 +135,39 @@
                   📍
                 </div>
                 <div>
-                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Deployment Venue Node</span>
-                  <span class="text-sm font-black text-black uppercase">{typeof event.location === 'object' ? event.location?.name || event.location?.address : event.location}</span>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Location</span>
+                  <span class="text-sm font-black text-black uppercase">{event.location}</span>
                 </div>
               </div>
               
-              <a href="https://maps.google.com/?q={encodeURIComponent(typeof event.location === 'object' ? event.location?.name || event.location?.address : event.location)}" 
+              <a href="https://www.google.com/maps/search/?api=1&query={encodeURIComponent(event.location)}" 
                  target="_blank" 
                  rel="noopener noreferrer"
                  class="sm:shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#facc15] text-black text-xs font-black uppercase tracking-wider rounded-xl border-2 border-black box-shadow-mini active:translate-y-[2px] transition-all">
-                <span>Launch Mapping ↗</span>
+                <span>Open Maps ↗</span>
               </a>
             </div>
           </div>
 
           <div class="lg:col-span-5 relative aspect-square w-full max-w-[300px] mx-auto lg:max-w-none">
              <div class="absolute -top-3 -right-3 w-16 h-16 bg-[#facc15] rounded-2xl rotate-12 border-2 border-black box-shadow-mini z-0 animate-bounce-slow"></div>
-             <div class="relative h-full w-full bg-white border-4 border-black rounded-[2rem] p-6 box-shadow-flat z-10 flex flex-col items-center justify-center text-center overflow-hidden">
+             <div class="relative h-full w-full bg-white border-4 border-black rounded-[2rem] p-2 box-shadow-flat z-10 flex flex-col items-center justify-center text-center overflow-hidden">
                <div class="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none"></div>
-               {#if event.pics}
-                  <div class="bg-[#eef2f7] p-4 rounded-xl border-2 border-black shadow-inner">
-                    <span class="block text-[9px] font-mono font-black text-[#2563eb] tracking-widest mb-1">IMAGE_PIPE_ID</span>
-                    <code class="text-xs font-mono font-black text-black uppercase break-all">{event.pics}</code>
+               {#if event.pics && event.pics.length > 0}
+                  <div class="w-full h-full rounded-[1.6rem] overflow-hidden border-2 border-black bg-slate-50 relative group">
+                    <img 
+                      src={pb.files.getURL(event, event.pics[0])} 
+                      alt="Event Cover" 
+                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="text-3xl">📸</span>
+                        <span class="text-xs font-black uppercase text-white mt-1">View Gallery ↓</span>
+                    </div>
                   </div>
                {:else}
-                  <span class="text-5xl mb-2">📦</span>
-                  <span class="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">Archive Sealed</span>
+                  <span class="text-5xl mb-2">📅</span>
+                  <span class="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">No Media Available</span>
                {/if}
              </div>
           </div>
@@ -171,68 +177,48 @@
     </div>
   </section>
 
-  {#if isPastEvent}
-    <section class="w-full border-y-4 border-black bg-white py-12 relative z-20 overflow-hidden text-left" in:fade={{ duration: 400 }}>
+  {#if event.pics && event.pics.length > 0}
+    <section id="collage-section" class="max-w-7xl mx-auto px-6 py-12 relative z-20" in:fade={{ duration: 400 }}>
       
-      <div class="max-w-5xl mx-auto px-6 mb-8 flex items-end justify-between">
+      <div class="mb-10 flex items-center justify-between border-b-4 border-black pb-4">
         <div>
-          <span class="text-xs font-black text-white bg-black px-2 py-0.5 rounded uppercase tracking-wider font-mono">Stream Loop [04]</span>
-          <h2 class="text-2xl font-black text-black uppercase tracking-tight mt-1">Telemetry Snapshot Reel</h2>
+          <span class="text-xs font-black text-white bg-black px-2 py-0.5 rounded uppercase tracking-wider font-mono">Gallery</span>
+          <h2 class="text-4xl font-black text-black uppercase tracking-tighter mt-1">Event Photos</h2>
         </div>
-        <span class="font-mono text-xs font-black text-slate-400 animate-pulse">[AUTORUN ACTIVE // HOVER TO BRAKE]</span>
+        <div class="p-3 bg-white border-2 border-black rounded-lg box-shadow-mini font-mono text-xs font-black">
+            Total Images: {event.pics.length}
+        </div>
       </div>
 
-      {#if event.images && event.images.length > 0}
-        <div class="ticker-container group w-full flex select-none overflow-hidden relative py-4 bg-[#eef2f7] border-y-2 border-black">
-          
-          <div class="ticker-track flex gap-8 px-4 shrink-0 animate-loop-scroll group-hover:animation-pause">
-            {#each event.images as img, idx}
-              <div class="w-[320px] h-[220px] bg-white border-3 border-black p-2.5 rounded-2xl box-shadow-mini transform transition-all duration-300 hover:scale-[1.03] hover:rotate-1 shrink-0">
-                <div class="w-full h-full bg-slate-200 rounded-xl overflow-hidden border-2 border-black relative">
-                  <img 
-                    src={pb.files.getUrl(event, img)} 
-                    alt="Capture logs detail" 
-                    class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                    loading="lazy"
-                  />
-                  <span class="absolute bottom-2 left-2 bg-black text-white border border-white/20 font-mono text-[9px] px-1.5 py-0.5 rounded">
-                    SYS_IMG_{idx + 1}
-                  </span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 select-none bg-white border-3 border-black p-8 rounded-3xl box-shadow-flat relative">
+         <div class="absolute inset-0 bg-grid-pattern opacity-[0.015] pointer-events-none"></div>
+         
+         {#each event.pics as img, idx}
+            <div 
+                class="bg-white border-3 border-black p-2 rounded-2xl box-shadow-mini transform transition-all duration-300 hover:scale-[1.05] hover:rotate-1 hover:box-shadow-mini-hover group"
+                style="animation-delay: {idx * 50}ms"
+            >
+              <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border-2 border-black relative">
+                <img 
+                  src={pb.files.getURL(event, img)} 
+                  alt="Event thumbnail {idx + 1}" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <span class="font-mono text-[9px] font-black text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded border border-emerald-400/30">
+                        IMAGE_{String(idx + 1).padStart(3, '0')}
+                    </span>
                 </div>
+                
+                <span class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white font-mono text-[9px] px-1.5 py-0.5 rounded">
+                  {idx + 1}
+                </span>
               </div>
-            {/each}
-          </div>
-
-          <div class="ticker-track flex gap-8 px-4 shrink-0 checked-node animate-loop-scroll group-hover:animation-pause" aria-hidden="true">
-            {#each event.images as img, idx}
-              <div class="w-[320px] h-[220px] bg-white border-3 border-black p-2.5 rounded-2xl box-shadow-mini transform transition-all duration-300 hover:scale-[1.03] hover:rotate-1 shrink-0">
-                <div class="w-full h-full bg-slate-200 rounded-xl overflow-hidden border-2 border-black relative">
-                  <img 
-                    src={pb.files.getUrl(event, img)} 
-                    alt="Capture logs detail" 
-                    class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-300"
-                    loading="lazy"
-                  />
-                  <span class="absolute bottom-2 left-2 bg-black text-white border border-white/20 font-mono text-[9px] px-1.5 py-0.5 rounded">
-                    SYS_IMG_{idx + 1}
-                  </span>
-                </div>
-              </div>
-            {/each}
-          </div>
-
-        </div>
-      {:else}
-        <div class="max-w-5xl mx-auto px-6">
-          <div class="bg-[#eef2f7] shadow-neumorphic-outer rounded-[2.5rem] p-12 text-center border-2 border-white/60">
-            <div class="w-16 h-16 bg-white border-2 border-black rounded-2xl flex items-center justify-center text-2xl mx-auto box-shadow-mini mb-4">📸</div>
-            <h4 class="font-black text-black uppercase tracking-tight text-base">Media Deck Empty</h4>
-            <p class="text-xs font-bold text-slate-500 max-w-sm mx-auto mt-1 leading-relaxed">
-              No field snapshot telemetry is currently synced to this historic entry.
-            </p>
-          </div>
-        </div>
-      {/if}
+            </div>
+          {/each}
+      </div>
     </section>
   {/if}
 
@@ -256,39 +242,16 @@
     color: #2563eb;
   }
 
-  /* --- HARDWARE ACCELERATED TICKER SCROLLER DEFINITIONS --- */
-  .animate-loop-scroll {
-    animation: ticker-translate 35s linear infinite;
+  .box-shadow-flat {
+    box-shadow: 6px 6px 0px 0px #000000;
+  }
+
+  .box-shadow-mini {
+    box-shadow: 3px 3px 0px 0px #000000;
   }
   
-  /* Reduces velocity to an observation crawl on layout hover state flags */
-  .group:hover .animate-loop-scroll {
-    animation-play-state: paused;
-  }
-
-  @keyframes ticker-translate {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-
-  /* Neomorphic Shadow Configurations */
-  .shadow-neumorphic-outer {
-    box-shadow: 
-      14px 14px 32px #bdc7d4, 
-      -14px -14px 32px #ffffff,
-      inset 1px 1px 0px rgba(255,255,255,0.9);
-  }
-
-  .shadow-neumorphic-inner {
-    box-shadow: 
-      inset 5px 5px 10px #cad4e2, 
-      inset -5px -5px 10px #ffffff;
-  }
-
-  .shadow-neumorphic-card-inner {
-    box-shadow: 
-      inset 4px 4px 8px #cad4e2, 
-      inset -4px -4px 8px #ffffff;
+  .box-shadow-mini-hover {
+    box-shadow: 6px 6px 0px 0px #000000;
   }
 
   .shadow-skeuo {
@@ -309,12 +272,23 @@
       0px 1px 2px rgba(0, 0, 0, 0.05);
   }
 
-  .box-shadow-flat {
-    box-shadow: 6px 6px 0px 0px #000000;
+  .shadow-neumorphic-outer {
+    box-shadow: 
+      14px 14px 32px #bdc7d4, 
+      -14px -14px 32px #ffffff,
+      inset 1px 1px 0px rgba(255,255,255,0.9);
   }
 
-  .box-shadow-mini {
-    box-shadow: 3px 3px 0px 0px #000000;
+  .shadow-neumorphic-inner {
+    box-shadow: 
+      inset 5px 5px 10px #cad4e2, 
+      inset -5px -5px 10px #ffffff;
+  }
+
+  .shadow-neumorphic-card-inner {
+    box-shadow: 
+      inset 4px 4px 8px #cad4e2, 
+      inset -4px -4px 8px #ffffff;
   }
 
   .animate-bounce-slow {

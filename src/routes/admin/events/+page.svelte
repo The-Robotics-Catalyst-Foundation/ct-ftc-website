@@ -1,323 +1,129 @@
-<script lang="ts">
+<script>
   import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
   import { pb } from '$lib/pocketbase';
+  import { goto } from '$app/navigation';
+  import { fade } from 'svelte/transition';
 
-  let events: any[] = [];
+  let events = $state([]);
+  let name = $state("");
+  let location = $state("");
+  let dateTime = $state("");
+  let isProcessing = $state(false);
 
-  let isWorking = false;
-  let statusBanner = '';
-  let statusIsError = false;
-
-  // form state
-  let targetRecordId = '';
-  let name = '';
-  let location = '';
-  let date_time = '';
-  let pics = '';
-
-  onMount(async () => {
-    if (!pb.authStore.isValid) {
-      await goto('/admin/login');
-      return;
-    }
-
-    await reloadSystemCollections();
+  onMount(() => {
+    if (!pb.authStore.isValid) { goto('/admin/login'); return; }
+    loadEvents();
   });
 
-  async function reloadSystemCollections() {
+  async function loadEvents() {
     try {
-      events = await pb.collection('events').getFullList({
-        sort: '-date_time'
-      });
-    } catch (err: any) {
-      logStatus(`Failed loading events: ${err.message}`, true);
+      events = await pb.collection('events').getFullList({ sort: '-date_time' });
+    } catch (e) { 
+      console.error("Failed to load events:", e); 
     }
   }
 
-  async function commitFormSubmission() {
+  async function handleAddEvent(e) {
+    e.preventDefault();
+    isProcessing = true;
     try {
-      isWorking = true;
-      statusBanner = '';
-
-      const payload = {
-        name,
-        location,
-        date_time: date_time
-          ? new Date(date_time).toISOString()
-          : null,
-        pics
+      // Location is handled cleanly here as a plain text string string
+      const data = { 
+        name, 
+        location, 
+        date_time: new Date(dateTime).toISOString(), 
+        pics: "[]" 
       };
-
-      if (targetRecordId) {
-        await pb.collection('events').update(targetRecordId, payload);
-
-        logStatus(`Updated "${name}" successfully.`, false);
-      } else {
-        await pb.collection('events').create(payload);
-
-        logStatus(`Created "${name}" successfully.`, false);
-      }
-
-      clearFormDeck();
-      await reloadSystemCollections();
-    } catch (err: any) {
-      logStatus(`Save failed: ${err.message}`, true);
-    } finally {
-      isWorking = false;
+      await pb.collection('events').create(data);
+      name = ""; location = ""; dateTime = "";
+      await loadEvents();
+    } catch (err) { 
+      alert("Error creating event: " + err.message); 
+    } finally { 
+      isProcessing = false; 
     }
   }
 
-  function editFormInject(item: any) {
-    targetRecordId = item.id;
-    name = item.name ?? '';
-    location = item.location ?? '';
-
-    date_time = item.date_time
-      ? item.date_time.slice(0, 16)
-      : '';
-
-    pics = item.pics ?? '';
-
-    logStatus('Loaded event into editor.', false);
-  }
-
-  async function purgeTargetNode(id: string, label: string) {
-    const confirmed = confirm(
-      `Delete "${label}" permanently?`
-    );
-
-    if (!confirmed) return;
-
+  async function handleDeleteEvent(id) {
+    if (!confirm("Are you sure you want to delete this event?")) return;
     try {
       await pb.collection('events').delete(id);
-
-      logStatus('Event deleted successfully.', false);
-
-      if (targetRecordId === id) {
-        clearFormDeck();
-      }
-
-      await reloadSystemCollections();
-    } catch (err: any) {
-      logStatus(`Delete failed: ${err.message}`, true);
+      await loadEvents();
+    } catch (err) { 
+      alert("Delete failed: " + err.message); 
     }
-  }
-
-  async function triggerLogoutSequence() {
-    pb.authStore.clear();
-    await goto('/admin/login');
-  }
-
-  function clearFormDeck() {
-    targetRecordId = '';
-    name = '';
-    location = '';
-    date_time = '';
-    pics = '';
-  }
-
-  function logStatus(msg: string, errorFlag = false) {
-    statusBanner = msg;
-    statusIsError = errorFlag;
   }
 </script>
 
-<svelte:head>
-  <title>Admin Dashboard</title>
-</svelte:head>
+<main class="min-h-screen text-[#1a1a1a] p-4 md:p-8 text-left w-full max-w-none">
+  
+  <div class="w-full mb-6">
+    <a href="/admin" class="text-xs font-black uppercase text-[#2563eb] hover:underline">&larr; Back to Dashboard</a>
+  </div>
 
-<main class="max-w-7xl mx-auto px-6 py-12 min-h-screen">
-  <header
-    class="mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b pb-6"
-  >
-    <div>
-      <p
-        class="text-xs uppercase tracking-[0.25em] text-blue-500 font-bold"
-      >
-        Admin Panel
-      </p>
-
-      <h1 class="text-3xl font-black mt-2">
-        Tournament Control Center
-      </h1>
-    </div>
-
-    <div class="flex gap-3">
-      <button
-        type="button"
-        onclick={clearFormDeck}
-        class="px-4 py-2 rounded-xl border text-sm font-bold hover:bg-slate-100 transition"
-      >
-        Reset
-      </button>
-
-      <button
-        type="button"
-        onclick={triggerLogoutSequence}
-        class="px-4 py-2 rounded-xl bg-rose-500 text-white text-sm font-bold hover:bg-rose-600 transition"
-      >
-        Logout
-      </button>
-    </div>
+  <header class="w-full border-b-4 border-black pb-4 mb-10">
+    <h1 class="text-4xl font-black uppercase tracking-tighter">Events</h1>
+    <p class="text-xs font-mono text-slate-500">Create, edit, and remove event listings.</p>
   </header>
 
-  {#if statusBanner}
-    <div
-      class={`mb-6 p-4 rounded-2xl border text-sm font-medium flex items-center justify-between ${
-        statusIsError
-          ? 'bg-rose-50 border-rose-200 text-rose-700'
-          : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-      }`}
-    >
-      <span>{statusBanner}</span>
-
-      <button
-        type="button"
-        onclick={() => (statusBanner = '')}
-        class="text-lg opacity-60 hover:opacity-100"
-      >
-        ×
-      </button>
-    </div>
-  {/if}
-
-  <div class="grid lg:grid-cols-12 gap-8">
-    <!-- FORM -->
-    <div class="lg:col-span-5 bg-white rounded-3xl border p-6 shadow-sm">
-      <h2 class="text-xl font-black mb-6">
-        {targetRecordId ? 'Edit Event' : 'Create Event'}
-      </h2>
-
-      <form
-        onsubmit|preventDefault={commitFormSubmission}
-        class="space-y-5"
-      >
-        <div>
-          <label class="block mb-2 text-xs font-bold uppercase">
-            Event Name
-          </label>
-
-          <input
-            bind:value={name}
-            type="text"
-            required
-            placeholder="Central CT Qualifier"
-            class="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label class="block mb-2 text-xs font-bold uppercase">
-            Location
-          </label>
-
-          <input
-            bind:value={location}
-            type="text"
-            required
-            placeholder="Town, CT"
-            class="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-blue-500"
-          />
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-bold uppercase">
-              Date & Time
-            </label>
-
-            <input
-              bind:value={date_time}
-              type="datetime-local"
-              required
-              class="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <div>
-            <label class="block mb-2 text-xs font-bold uppercase">
-              Image
-            </label>
-
-            <input
-              bind:value={pics}
-              type="text"
-              placeholder="banner.png"
-              class="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isWorking}
-          class="w-full rounded-xl bg-blue-600 text-white py-3 font-bold hover:bg-blue-700 disabled:opacity-50 transition"
-        >
-          {#if isWorking}
-            Saving...
-          {:else if targetRecordId}
-            Update Event
-          {:else}
-            Create Event
-          {/if}
-        </button>
-      </form>
-    </div>
-
-    <!-- EVENTS -->
-    <div class="lg:col-span-7">
-      <div class="rounded-3xl border bg-slate-50 p-3 min-h-[300px]">
-        {#if events.length === 0}
-          <div
-            class="flex items-center justify-center min-h-[260px] text-slate-500 text-sm"
-          >
-            No events found.
-          </div>
-        {:else}
-          <div class="space-y-3">
-            {#each events as item}
-              <div
-                class="bg-white rounded-2xl border p-4 flex flex-col sm:flex-row justify-between gap-4 shadow-sm"
-              >
-                <div>
-                  <h3 class="font-black text-lg">
-                    {item.name}
-                  </h3>
-
-                  <p class="text-sm text-slate-600 mt-1">
-                    📍 {item.location}
-                  </p>
-
-                  <p class="text-xs text-slate-400 mt-1">
-                    📅
-                    {new Date(item.date_time).toLocaleString()}
-                  </p>
-                </div>
-
-                <div class="flex gap-2">
-                  <button
-                    type="button"
-                    onclick={() => editFormInject(item)}
-                    class="px-4 py-2 rounded-xl border text-sm font-bold hover:bg-slate-100 transition"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    onclick={() =>
-                      purgeTargetNode(item.id, item.name)}
-                    class="px-4 py-2 rounded-xl bg-rose-500 text-white text-sm font-bold hover:bg-rose-600 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/if}
+  <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <form onsubmit={handleAddEvent} class="lg:col-span-5 bg-white border-3 border-black p-6 rounded-2xl box-shadow-flat space-y-4">
+      <h3 class="font-black uppercase text-sm tracking-tight border-b-2 border-black/10 pb-2">New Event</h3>
+      
+      <div class="space-y-1">
+        <label for="name" class="text-[10px] font-black uppercase text-slate-400">Event Name</label>
+        <input type="text" id="name" bind:value={name} required placeholder="Name" class="w-full bg-[#eef2f7] border-2 border-black rounded-xl px-3 py-2 text-xs font-bold shadow-inner outline-none" />
       </div>
+
+      <div class="space-y-1">
+        <label for="loc" class="text-[10px] font-black uppercase text-slate-400">Address / Location</label>
+        <input type="text" id="loc" bind:value={location} required placeholder="Address" class="w-full bg-[#eef2f7] border-2 border-black rounded-xl px-3 py-2 text-xs font-bold shadow-inner outline-none" />
+      </div>
+
+      <div class="space-y-1">
+        <label for="dt" class="text-[10px] font-black uppercase text-slate-400">Date and Time</label>
+        <input type="datetime-local" id="dt" bind:value={dateTime} required class="w-full bg-[#eef2f7] border-2 border-black rounded-xl px-3 py-2 text-xs font-bold shadow-inner outline-none" />
+      </div>
+
+      <button type="submit" disabled={isProcessing} class="w-full bg-[#2563eb] text-white font-black uppercase tracking-wider py-3 rounded-xl border-2 border-[#1d4ed8] shadow-mini-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all text-xs">
+        {isProcessing ? 'Saving...' : 'Create Event'}
+      </button>
+    </form>
+
+    <div class="lg:col-span-7 space-y-4">
+      <h3 class="font-black uppercase text-sm tracking-tight pb-1">All Events ({events.length})</h3>
+      
+      {#if events.length === 0}
+        <p class="text-xs font-bold text-slate-400 font-mono p-6 bg-white border-2 border-dashed border-slate-300 rounded-xl">No events found.</p>
+      {:else}
+        {#each events as ev (ev.id)}
+          <div out:fade={{ duration: 250 }} class="bg-white border-2 border-black p-4 rounded-xl flex items-center justify-between gap-4 box-shadow-mini">
+            <div class="truncate">
+              <span class="font-mono text-[9px] font-black uppercase px-1.5 py-0.5 bg-slate-100 rounded border border-slate-300">ID: {ev.id.slice(0,6)}</span>
+              <h4 class="font-black uppercase text-sm text-black truncate mt-1">{ev.name}</h4>
+              <p class="text-[11px] font-medium text-slate-500 truncate">{ev.location} &bull; {new Date(ev.date_time).toLocaleDateString()}</p>
+            </div>
+            
+            <div class="flex items-center gap-2 shrink-0">
+              <a href="/admin/events/{ev.id}" class="px-3 py-1.5 bg-amber-400 text-black font-black uppercase text-[10px] tracking-wider rounded border-2 border-black box-shadow-mini-flat hover:bg-amber-300 transition-colors">
+                Edit
+              </a>
+              <button onclick={() => handleDeleteEvent(ev.id)} class="px-3 py-1.5 bg-rose-600 text-white font-black uppercase text-[10px] tracking-wider rounded border-2 border-black box-shadow-mini-flat hover:bg-rose-500 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        {/each}
+      {/if}
     </div>
+
   </div>
 </main>
+
+<style>
+  .box-shadow-flat { box-shadow: 6px 6px 0px 0px #000000; }
+  .box-shadow-mini { box-shadow: 4px 4px 0px 0px #000000; }
+  .box-shadow-mini-flat { box-shadow: 2px 2px 0px 0px #000000; }
+  .shadow-mini-skeuo { box-shadow: 0px 3px 0px #1d4ed8; }
+</style>
