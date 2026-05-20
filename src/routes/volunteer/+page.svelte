@@ -33,11 +33,11 @@
     <div class="max-w-4xl mx-auto text-center space-y-6 z-10" style="transform: translateY({parallaxHeroY}px)">
       
       <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-2 box-shadow-flat transform -rotate-1">
-        ⚙️ Deployment Stream // Personnel Allocation
+        Volunteer in Ct
       </span>
 
       <h1 class="text-4xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-        Join the Crew Powering <br />
+       "How to Volunteer" <br />
         <span class="text-[#2563eb] bg-white border-4 border-black px-4 inline-block my-2 box-shadow-flat transform rotate-1">CT Robotics Competitions</span>
       </h1>
 

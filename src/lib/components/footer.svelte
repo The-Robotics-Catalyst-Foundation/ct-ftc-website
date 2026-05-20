@@ -72,7 +72,7 @@ const socials = [
       <p class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest">
         © 2026 CT FIRST Tech Challenge
       </p>
-      <p> Made by <a href="https://singul.tech" target="_blank" rel="noopener noreferrer" class="font-bold text-[#2563eb] hover:underline">Singularity Technology</a> </p>
+      <p> Made by <a href="https://singul.tech" target="_blank" rel="noopener noreferrer" class="font-bold text-[#2563eb] hover:underline">Singularity Technology #7034</a></p> <img src="https://api.singultech.app/get-image/Logo" alt="Singularity Technology Logo" class="w-20 h-20 ml-2 invert">
     </div>
 
   </div>

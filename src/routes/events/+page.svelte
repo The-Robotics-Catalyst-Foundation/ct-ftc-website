@@ -31,7 +31,7 @@
 <svelte:window bind:scrollY />
 
 <svelte:head>
-  <title>Tournament Schedule Control Deck | CT FTC</title>
+  <title>Events | CT FTC</title>
 </svelte:head>
 
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
@@ -42,15 +42,15 @@
       
       <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-1.5 box-shadow-flat transform -rotate-1">
         <span class="w-2.5 h-2.5 rounded-full bg-black {isMapLoading ? 'animate-ping' : 'animate-pulse'}"></span>
-        Active Season Schedule Logs
+        CT Tournament Schedule & Match Archives
       </span>
       
       <h1 class="text-4xl md:text-6xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-        Tournament <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-1 box-shadow-flat transform rotate-1">Schedule Deck</span>
+        Event <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-1 box-shadow-flat transform rotate-1">Details</span>
       </h1>
       
       <p class="text-slate-800 text-sm md:text-base font-bold max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl leading-relaxed">
-        Track synchronized regional tournament calendars, structured qualifiers, local arena map coordinates, and advancement pathways directly across the state sector.
+        Learn about upcoming events, including time, and location details, and explore recaps and media from past tournaments across Connecticut, including qualifiers, regionals, and the state championship.
       </p>
     </div>
   </section>

@@ -40,7 +40,7 @@
       </h1>
       
       <p class="text-slate-800 text-sm md:text-lg font-bold max-w-2xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl leading-relaxed">
- Powered by Atlas, analysze all teams in CT see their match hisoty as well as info about their team.
+ Powered by Atlas, analyze all teams in CT see their match history as well as info about their team.
       </p>
     </div>
   </section>
@@ -59,18 +59,18 @@
               <div class="w-3.5 h-3.5 rounded-full bg-[#eef2f7] shadow-inner border border-slate-300"></div>
               <div class="w-3.5 h-3.5 rounded-full bg-[#eef2f7] shadow-inner border border-slate-300"></div>
             </div>
-            <span class="text-[11px] font-mono font-black text-slate-400 uppercase tracking-widest pl-2">System Core Socket</span>
+            <span class="text-[11px] font-mono font-black text-slate-400 uppercase tracking-widest pl-2">Team List</span>
           </div>
           
           <div class="px-4 py-1.5 bg-slate-900 text-emerald-400 font-mono text-xs font-bold rounded-lg border-2 border-black shadow-inner tracking-tight flex items-center gap-2">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            atlas.robotics-catalyst.org
+           robolyst.org
           </div>
         </div>
 
         <div class="border-4 border-black rounded-2xl overflow-hidden bg-white shadow-2xl relative z-10">
           <iframe
-            src="https://atlas.robotics-catalyst.org/"
+            src="https://robolyst.org/"
             title="CT FTC Team Atlas"
             width="100%"
             height={iframeHeight}
@@ -85,12 +85,11 @@
     </div>
   </section>
 
-  <section class="max-w-7xl mx-auto px-6 py-4 relative z-20">
-    <div class="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-12 box-shadow-flat flex flex-col md:flex-row items-center justify-between gap-8 text-left group">
+  <section class="max-w-5xl mx-auto px-1 py-4 relative z-20">
+    <div class="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-12 box-shadow-flat flex flex-col md:flex-row items-center justify-between gap-2 text-left group">
       
       <div class="space-y-2">
-        <span class="text-xs font-black text-white bg-black border-2 border-black px-3 py-0.5 inline-block uppercase tracking-wider">Sync Discrepancy Registry</span>
-        <h3 class="text-2xl font-black text-black uppercase tracking-tight">Don't find your team node dataset?</h3>
+        <h3 class="text-2xl font-black text-black uppercase tracking-tight">Didn't find your team?</h3>
         <p class="text-slate-600 text-sm font-semibold max-w-xl leading-relaxed">
           Ensure your team information registration fields are completely processed on the central <span class="text-[#2563eb]">FIRST Dashboard</span> directory to allow regional cron trackers to fetch and sync metrics.
         </p>

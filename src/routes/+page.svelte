@@ -43,8 +43,8 @@
       <div class="lg:col-span-6 space-y-8 text-left" style="transform: translateY({parallaxHeroY}px)">
 
         <h1 class="text-5xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-          First Tech Challenge <br />
-          <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-2 box-shadow-flat transform rotate-1">Right Here in Connecticut</span>
+          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Tech Challenge Logo" class="w-full object-fit"> <br />
+          <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-2 box-shadow-flat transform rotate-1">Right Here in Connecticut!</span>
         </h1>
 
         <p class="text-slate-800 text-base md:text-xl font-bold leading-relaxed max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl">
@@ -68,7 +68,7 @@
           <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-4 relative overflow-hidden border border-slate-200/50">
             
             
-           <iframe src="https://atlas.robotics-catalyst.org" class="w-full h-full from-x-0 to x-10 "></iframe></div>
+           <iframe src="https://robolyst.org" class="w-full h-full from-x-0 to x-10 "></iframe></div>
 
           
 
@@ -109,7 +109,7 @@
           <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">📅</div>
           <h3 class="text-xl font-black text-black uppercase mb-3">Tournaments & Scrimmages</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
-            Track schedules, structural location coordinates, regional parameters, and qualifying structures for upcoming championship match layers.
+            See upcoming events, as well as recaps and media from past tournaments across Connecticut, including qualifiers, regionals, and the state championship.
           </p>
         </div>
         <a href="/events" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#2563eb] group-hover:underline">
@@ -120,9 +120,9 @@
       <div class="bg-white border-3 border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group">
         <div>
           <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">📊</div>
-          <h3 class="text-xl font-black text-black uppercase mb-3">CT Team Registry</h3>
+          <h3 class="text-xl font-black text-black uppercase mb-3">CT Team List</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
-            Explore live ranking matrices, historical analytics records, robot weight specifications, and performance tracking profiles.
+            Robolyst By Robotics Catalyst provides an open-source interactive directory of all CT FTC teams, showcasing their match history, awards, and key statistics to analyze performance trends across the state.
           </p>
         </div>
         <a href="/teams" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#2563eb] group-hover:underline">
@@ -133,9 +133,9 @@
       <div class="bg-white border-3 border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group sm:col-span-2 lg:col-span-1">
         <div>
           <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">🤝</div>
-          <h3 class="text-xl font-black text-black uppercase mb-3">Volunteer Network</h3>
+          <h3 class="text-xl font-black text-black uppercase mb-3">Volunteer "How to"</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
-            Access documentation guidelines to join structural arrays as an active match referee, tech notebook controller, or design award judge.
+            Learn about the various volunteer roles that support CT FTC events, from coaching teams to judging matches, and how you can contribute your time and expertise to inspire the next generation of STEM leaders.
           </p>
         </div>
         <a href="/volunteer" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#2563eb] group-hover:underline">
