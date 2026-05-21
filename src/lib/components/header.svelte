@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { fade, slide } from 'svelte/transition';
-  let logo = 'src/lib/assets/ctftc.png';
+  let logo = '/ctftc.png';
   let isMobileMenuOpen = $state(false);
 
   const navLinks = [

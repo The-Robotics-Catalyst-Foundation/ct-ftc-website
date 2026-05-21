@@ -19,7 +19,7 @@
 <svelte:window bind:scrollY />
 
 <svelte:head>
-  <title>CT Team Explorer Control Deck - CT FTC</title>
+  <title>CT Team Explorer - CT FTC</title>
 </svelte:head>
 
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
@@ -28,12 +28,6 @@
   <section class="relative pt-20 pb-12 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7]">
     <div class="max-w-7xl mx-auto text-left space-y-6 z-10" style="transform: translateY({parallaxHeaderY}px)">
       
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-1.5 box-shadow-flat transform -rotate-1">
-          <span class="w-2.5 h-2.5 rounded-full bg-black animate-pulse"></span>
-          Telemetry Pipe: Active Data Frame
-        </span>
-      </div>
       
       <h1 class="text-5xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
         CT Team <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-1 box-shadow-flat transform rotate-1">Explorer Console</span>
@@ -91,7 +85,7 @@
       <div class="space-y-2">
         <h3 class="text-2xl font-black text-black uppercase tracking-tight">Didn't find your team?</h3>
         <p class="text-slate-600 text-sm font-semibold max-w-xl leading-relaxed">
-          Ensure your team information registration fields are completely processed on the central <span class="text-[#2563eb]">FIRST Dashboard</span> directory to allow regional cron trackers to fetch and sync metrics.
+          Ensure your team information registration fields are completely processed on the central <span class="text-[#2563eb]">FIRST Dashboard</span>
         </p>
       </div>
       
