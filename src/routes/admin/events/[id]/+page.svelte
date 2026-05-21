@@ -5,7 +5,7 @@
   import { goto } from '$app/navigation';
   import { fade } from 'svelte/transition';
   
-  import fallbackLogo from '$lib/assets/ctftc.png';
+  import fallbackLogo from '/ctftc.png';
 
   const eventId = $page.params.id;
 
