@@ -32,28 +32,21 @@
 			class="z-10 mx-auto max-w-7xl space-y-6 text-left"
 			style="transform: translateY({parallaxHeaderY}px)"
 		>
-			<div class="flex items-center gap-3">
-				<span
-					class="box-shadow-flat inline-flex -rotate-1 transform items-center gap-2 border-2 border-black bg-[#facc15] px-4 py-1.5 text-xs font-black tracking-widest text-black uppercase"
-				>
-					<span class="h-2.5 w-2.5 animate-pulse rounded-full bg-black"></span>
-					Telemetry Pipe: Active Data Frame
-				</span>
-			</div>
+	
 
 			<h1
 				class="text-5xl leading-[0.95] font-black tracking-tighter text-black uppercase md:text-7xl"
 			>
 				CT Team <span
 					class="box-shadow-flat my-1 inline-block rotate-1 transform border-4 border-black bg-white px-3 text-[#2563eb]"
-					>Explorer Console</span
+					>Directory</span
 				>
 			</h1>
 
 			<p
 				class="max-w-2xl rounded-xl border-2 border-black bg-white/40 p-4 text-sm leading-relaxed font-bold text-slate-800 backdrop-blur-sm md:text-lg"
 			>
-				Powered by Atlas, analyze all teams in CT see their match history as well as info about
+				Powered by Robolyst, analyze all teams in CT see their match history as well as info about
 				their team.
 			</p>
 		</div>
@@ -90,9 +83,11 @@
 
 					<div
 						class="flex items-center gap-2 rounded-lg border-2 border-black bg-slate-900 px-4 py-1.5 font-mono text-xs font-bold tracking-tight text-emerald-400 shadow-inner"
-					>
-						<span class="h-1.5 w-1.5 animate-ping rounded-full bg-emerald-400"></span>
-						robolyst.org
+					><span class="h-1.5 w-1.5 animate-ping rounded-full bg-emerald-400"></span>
+						<a href="https://robolyst.org" target="_blank" rel="noopener noreferrer">
+							
+							robolyst.org
+						</a>
 					</div>
 				</div>
 
@@ -124,7 +119,7 @@
 				<p class="max-w-xl text-sm leading-relaxed font-semibold text-slate-600">
 					Ensure your team information registration fields are completely processed on the central <span
 						class="text-[#2563eb]">FIRST Dashboard</span
-					> directory to allow regional cron trackers to fetch and sync metrics.
+					> 
 				</p>
 			</div>
 

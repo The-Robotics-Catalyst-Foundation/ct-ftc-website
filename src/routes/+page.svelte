@@ -3,6 +3,7 @@
   import { browser } from '$app/environment';
   import { fade, fly } from 'svelte/transition';
   import Head from '$lib/components/head.svelte';
+  import Carousel from '$lib/components/carousel.svelte';
 
   // --- SVELTE 5 STATE RUNES ---
   let chartRoot = null;
@@ -96,8 +97,7 @@
       
       <div class="lg:col-span-5 bg-black border-4 border-black p-4 rounded-2xl shadow-skeuo aspect-video flex flex-col items-center justify-center text-center relative overflow-hidden group/crt">
         
-         <img src="https://cdn.singultech.app/mainSlideshow/robotinaction_1.jpg" alt="FIRST Logo" class="w-full inline-block mr-1">
-          
+        <Carousel />
    </div>
   </section>
 
@@ -113,7 +113,7 @@
           </p>
         </div>
         <a href="/events" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#2563eb] group-hover:underline">
-          Explore schedule <span class="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
+          Explore Events <span class="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
       </div>
 
@@ -122,11 +122,11 @@
           <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">📊</div>
           <h3 class="text-xl font-black text-black uppercase mb-3">CT Team List</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
-            Robolyst By Robotics Catalyst provides an open-source interactive directory of all CT FTC teams, showcasing their match history, awards, and key statistics to analyze performance trends across the state.
+            Robolyst provides an open-source interactive directory of all CT FTC teams, showcasing their match history, awards, and key statistics to analyze performance trends across the state.
           </p>
         </div>
-        <a href="/teams" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#2563eb] group-hover:underline">
-          Launch Team Explorer <span class="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
+        <a href="http://robolyst.org/stateprov/connecticut/ftc/teams" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#2563eb] group-hover:underline">
+          Launch Team Direcory <span class="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
       </div>
 

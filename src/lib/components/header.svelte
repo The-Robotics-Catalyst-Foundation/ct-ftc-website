@@ -8,7 +8,7 @@
     { name: 'Events', href: '/events' },
     { name: 'Teams', href: '/teams' },
     { name: 'Volunteer', href: '/volunteer' }, // Matched perfectly to your file route!
-    { name: 'Contact', href: '/contact' }
+   
   ];
 
   function toggleMenu() {
@@ -58,12 +58,12 @@
     </div>
 
     <a 
-      href="https://robolyst.org/" 
+      href="/contact" 
       target="_blank"
       rel="noopener noreferrer"
       class="hidden md:inline-flex items-center justify-center bg-[#facc15] text-black border-2 border-black px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest box-shadow-mini hover:translate-y-[-1px] active:translate-y-[1px] transition-all"
     >
-      Robolyst ↗
+      Contact
     </a>
 
     {#if isMobileMenuOpen}
