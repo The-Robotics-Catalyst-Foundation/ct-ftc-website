@@ -67,12 +67,7 @@
              style="transform: scale({structuralScale}) rotateY({mouseX + mapRotateY}deg) rotateX({-mouseY + mapTiltX}deg)">
           
           <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-4 relative overflow-hidden border border-slate-200/50">
-            
-            
-           <iframe src="https://robolyst.org" class="w-full h-full from-x-0 to x-10 "></iframe></div>
-
-          
-
+  
         </div>
       </div>
 
