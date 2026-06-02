@@ -53,7 +53,7 @@
 
         <div class="flex flex-wrap gap-6 pt-4">
           <a href="/events" class="skeuo-button bg-[#2563eb] text-white text-sm font-black uppercase tracking-wider px-8 py-4 rounded-2xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] transition-all">
-            View Local Events
+            View Local Events 
           </a>
           <a href="/volunteer" class="brutalist-btn bg-[#facc15] text-black text-sm font-black uppercase tracking-wider px-8 py-4 border-3 border-black box-shadow-flat transition-transform hover:-translate-y-1">
             Get Involved &rarr;
@@ -65,9 +65,9 @@
         
         <div class="relative w-full max-w-lg aspect-square bg-[#eef2f7] rounded-[3.5rem] p-4 border-2 border-white/60 shadow-neumorphic-outer group transition-all duration-300 ease-out"
              style="transform: scale({structuralScale}) rotateY({mouseX + mapRotateY}deg) rotateX({-mouseY + mapTiltX}deg)">
-          
           <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-4 relative overflow-hidden border border-slate-200/50">
-  
+   <img src="map.png" alt="CT Map" class="w-full h-full object-cover rounded-[2.5rem] shadow-neumorphic-inner border border-slate-200/50">
+         
         </div>
       </div>
 

@@ -7,15 +7,12 @@
 
   let { children } = $props(); 
 
-  // --- RUNES FOR GLOBAL REACTIVITY ---
   let currentUser = $derived(pb.authStore.model);
   let activeRoute = $derived($page.url.pathname);
 
-  // Auto-calculating profile strings directly from the reactive authStore model
   let avatarUrl = $derived(currentUser && currentUser.avatar ? pb.files.getUrl(currentUser, currentUser.avatar) : "");
-  let profileName = $derived(currentUser ? currentUser.name || "Operator" : "");
+  let profileName = $derived(currentUser ? currentUser.name || "Administrator" : "");
 
-  // Local state loop for structural micro-interactions
   let showDropdown = $state(false);
 
   onMount(() => {
@@ -30,7 +27,6 @@
     goto('/admin/login');
   }
 
-  // Close drop menus if clicked outside
   function toggleDropdown(e) {
     e.stopPropagation();
     showDropdown = !showDropdown;
@@ -48,17 +44,13 @@
       
       <div class="flex flex-col items-center justify-center relative w-full transition-all duration-[450ms] ease-in-out">
         <div class="mb-8 w-full px-4 flex items-center gap-4 text-blue-600">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
+      <img src="/logo.png">
           <span class="text-sm font-black uppercase tracking-wider text-slate-800 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">
            CT FTC
           </span>
         </div>
 
-        <article class="border border-solid border-slate-200 w-full ease-in-out duration-500 rounded-2xl inline-block shadow-sm bg-white overflow-hidden">
+        <nav class="border border-solid border-slate-200 w-full ease-in-out duration-500 rounded-2xl inline-block shadow-sm bg-white overflow-hidden">
           <a
             href="/admin"
             class="relative w-full h-16 ease-in-out duration-300 border-b border-slate-100 group flex flex-row items-center justify-start px-[18px] text-slate-500 hover:bg-slate-50 transition-colors gap-4
@@ -108,7 +100,7 @@
               Events
             </span>
           </a>
-        </article>
+        </nav>
       </div>
 
     </aside>
@@ -118,7 +110,7 @@
       <header class="w-full h-20 bg-white border-b border-slate-200 px-6 md:px-12 flex items-center justify-between shrink-0 z-20">
         
         <div class="text-left select-none">
-          <span class="text-[10px] font-mono font-bold tracking-widest uppercase text-slate-400 block mb-0.5">Amin Page</span>
+          <span class="text-[10px] font-mono font-bold tracking-widest uppercase text-slate-400 block mb-0.5">Admin Dashboard</span>
           <h1 class="text-base font-black text-slate-800 tracking-tight">
             {activeRoute === '/admin' ? 'Home' : activeRoute.startsWith('/admin/events') ? 'Events' : 'Home'}
           </h1>
@@ -143,7 +135,7 @@
             >
               <div class="shrink-0">
                 {#if avatarUrl}
-                  <img src={avatarUrl} alt="Operator Profile Avatar" class="w-15 h-15 rounded-lg object-cover border border-slate-200 shadow-sm bg-white" />
+                  <img src={avatarUrl} alt="User Profile Avatar" class="w-15 h-15 rounded-lg object-cover border border-slate-200 shadow-sm bg-white" />
                 {:else}
                   <div class="w-9 h-9 rounded-lg border border-dashed border-slate-300 flex items-center justify-center bg-slate-100 text-sm">👤</div>
                 {/if}
@@ -173,7 +165,7 @@
                     <polyline points="16 17 21 12 16 7"></polyline>
                     <line x1="21" y1="12" x2="9" y2="12"></line>
                   </svg>
-                  Disconnect Session
+                  Log Out
                 </button>
               </div>
             {/if}
@@ -191,12 +183,12 @@
 
     <div class="md:hidden fixed left-1/2 bottom-[16px] -translate-x-1/2 w-[calc(100%-32px)] max-w-[520px] z-50 flex justify-center">
       <div class="menu">
-        <a href="/" class={activeRoute === '/' ? 'active' : ''}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+        <a href="/admin" class={activeRoute === '/' ? 'active' : ''}>
+          <svg xmlns="http://www.w3.org/2000/xl" viewBox="0 0 24 24" fill="currentColor" class="size-6">
             <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
             <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
           </svg>
-          <span>Terminal</span>
+          <span>Home</span>
         </a>
         
         <a href="/admin/events" class={activeRoute.startsWith('/admin/events') ? 'active' : ''}>
@@ -206,11 +198,11 @@
           <span>Events</span>
         </a>
 
-        <button onclick={handleLogOut} class="flex flex-col items-center flex-1 min-w-0 text-white/90 justify-center py-2.5 rounded-full bg-transparent border-none outline-none active:scale-95 transition-transform">
+        <button onclick={handleLogOut} class="flex flex-col items-center flex-1 min-w-0 text-white/90 justify-center py-2.5 rounded-full border-none outline-none active:scale-95 transition-transform bg-rose-200/20 hover:bg-rose-200">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-rose-200">
             <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v9a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM6.166 5.72a.75.75 0 0 1 1.06 0l.708.707a.75.75 0 1 1-1.061 1.061l-.707-.707a.75.75 0 0 1 0-1.06Zm10.608 0a.75.75 0 0 1 0 1.06l-.707.708a.75.75 0 1 1-1.061-1.061l.707-.707a.75.75 0 0 1 1.06 0ZM3.75 12a8.25 8.25 0 1 1 16.5 0 .75.75 0 0 1-1.5 0 6.75 6.75 0 1 0-13.5 0 .75.75 0 0 1-1.5 0Z" clip-rule="evenodd" />
           </svg>
-          <span class="text-[0.75rem] font-bold mt-1 leading-none text-rose-200">Exit</span>
+          <span class="text-[0.75rem] font-bold mt-1 leading-none">Logout</span>
         </button>
       </div>
     </div>
@@ -229,7 +221,7 @@
     margin: 0;
   }
 
-  /* PHONE DOCK LAYOUT SYSTEM BLUR RULES */
+  /* Mobile bottom navigation dock styling */
   .menu {
     backdrop-filter: blur(20px) saturate(190%) contrast(120%);
     -webkit-backdrop-filter: blur(20px) saturate(190%) contrast(120%);

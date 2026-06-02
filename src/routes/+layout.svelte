@@ -4,12 +4,13 @@
   import './layout.css'; 
   import Footer from '$lib/components/footer.svelte';
   import Nav from '$lib/components/header.svelte';
-  import Head from '$lib/components/head.svelte'; // Import your new component
+  import Head from '$lib/components/head.svelte';
 
   let { children } = $props();
 
-  // 1. Get dynamic SEO data from the current page's data store
-  // 2. Set defaults if the specific page doesn't provide them
+  // Determine if the current URL belongs to the admin section
+  let isAdminRoute = $derived($page.url.pathname.startsWith('/admin'));
+
   let title = $derived($page.data.title ? `${$page.data.title} | CTFTC` : 'Connecticut FIRST Tech Challenge');
   let description = $derived($page.data.description || 'Connecticut FIRST Tech Challenge - Inspiring the Next Generation of Innovators and Engineers. Explore our events, teams, and volunteer opportunities to get involved in the excitement of robotics competitions across the state.');
 </script>
@@ -24,8 +25,12 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
-<Nav />
+{#if !isAdminRoute}
+  <Nav />
+{/if}
 
 {@render children()}
 
-<Footer/>
+{#if !isAdminRoute}
+  <Footer />
+{/if}
