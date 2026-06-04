@@ -95,7 +95,7 @@
 					class="relative z-10 overflow-hidden rounded-2xl border-4 border-black bg-white shadow-2xl"
 				>
 					<iframe
-						src="https://robolyst.org/embed/ftc/stateprov/connecticut/teams/ranked-cards"
+						src="https://robolyst.org/location/connecticut/ftc/teams	"
 						title="CT FTC Team Atlas"
 						width="100%"
 						height={iframeHeight}
