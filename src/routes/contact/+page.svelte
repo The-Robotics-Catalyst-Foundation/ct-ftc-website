@@ -1,17 +1,42 @@
-<script>
+<script lang="ts">
   import { fade, fly } from 'svelte/transition';
-  // 1. Import PocketBase
-  import {pb} from '$lib/pocketbase'
+  import { onMount } from 'svelte';
+  // Import PocketBase
+  import { pb } from '$lib/pocketbase';
 
-  // State Management
+  // Svelte 5 direct destructuring without explicit interface types
+  let { data = { upcoming: [] } } = $props();
+
+  // State Management (Svelte 5 Runes)
   let name = $state("");
   let email = $state("");
-  let category = $state("general"); // Matches lowercase default schema value
+  let category = $state("general"); 
   let message = $state("");
   let submitted = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state("");
   let scrollY = $state(0);
+
+  // Monitors the URL path anchor fragment for automatic dropdown updates
+  function evaluateUrlHash(): void {
+    if (typeof window !== 'undefined' && window.location.hash === '#volunteer') {
+      category = "volunteer";
+      
+      // Target and smoothly scroll to the form element block
+      const formBlock = document.getElementById('contact-form-block');
+      if (formBlock) {
+        formBlock.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+
+  onMount(() => {
+    evaluateUrlHash();
+    window.addEventListener('hashchange', evaluateUrlHash);
+    return () => {
+      window.removeEventListener('hashchange', evaluateUrlHash);
+    };
+  });
 
   // Social Channels Array
   const socials = [
@@ -32,33 +57,31 @@
     }
   ];
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
     isSubmitting = true;
     errorMessage = "";
 
     try {
-      // 3. Post to the 'contact' collection via PocketBase SDK
       await pb.collection('contact').create({
         name,
         email,
-        category, // Sends lowercased choice string directly
+        category,
         message
       });
 
-      // Brief layout freeze to allow plane css animation to clear off nicely
       setTimeout(() => {
         submitted = true;
         isSubmitting = false;
       }, 1200);
 
-    } catch (error) {
+    } catch (error: any) {
       errorMessage = error.message || 'Could not communicate with database.';
       isSubmitting = false;
     }
   }
 
-  function resetForm() {
+  function resetForm(): void {
     name = "";
     email = "";
     category = "general";
@@ -137,7 +160,7 @@
         </div>
       </div>
 
-      <div class="lg:col-span-7 w-full">
+      <div id="contact-form-block" class="lg:col-span-7 w-full">
         <div class="bg-[#eef2f7] shadow-neumorphic-outer rounded-[3rem] p-6 md:p-10 border-2 border-white/60 relative overflow-hidden">
           
           {#if submitted}
@@ -605,7 +628,6 @@
     }
     100% {
       opacity: 1;
-      transform: scale(1);
     }
   }
 </style>

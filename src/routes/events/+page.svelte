@@ -1,220 +1,151 @@
-<script>
-  import { onMount } from 'svelte';
-  import { pb } from '$lib/pocketbase';
-  import { slide, fly } from 'svelte/transition';
+<script lang="ts">
+    import { fade } from 'svelte/transition';
 
-  // --- SVELTE 5 STATE RUNES ---
-  let events = $state([]);
-  let isMapLoading = $state(true);
-  let scrollY = $state(0);
-  
-  const now = new Date().toISOString();
+    // Svelte 5 direct destructuring without explicit interface types
+    let { data = { upcoming: [], past: [] } } = $props();
+    
+    // Svelte 5 state management
+    let currentTab = $state('upcoming'); 
+    
+    // Highly efficient reactive derivation
+    let activeEvents = $derived(currentTab === 'upcoming' ? data.upcoming : data.past);
 
-  onMount(async () => {
-    try {
-      events = await pb.collection('events').getFullList({
-        sort: '-date_time'
-      });
-    } catch (err) {
-      console.error('Failed syncing public datastore clusters:', err);
-    } finally {
-      isMapLoading = false;
+    function formatDate(dateString: string) {
+        if (!dateString) return 'TBD';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
     }
-  });
 
-  // --- DERIVED DATA STRINGS ---
-  let futureEvents = $derived(events.filter(event => event.date_time >= now).reverse());
-  let pastEvents = $derived(events.filter(event => event.date_time < now));
-  let parallaxHeaderY = $derived(scrollY * 0.25);
+    // Modern badge styling map
+    const typeStyles: Record<string, string> = {
+        'Scrimmage': 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+        'Qualifier': 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+        'Championship': 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+    };
 </script>
 
-<svelte:window bind:scrollY />
+<div class="w-full min-h-screen bg-slate-50 text-slate-900 font-sans antialiased pb-20 selection:bg-blue-500 selection:text-white relative">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-40 pointer-events-none"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 space-y-10 relative z-10">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-5">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Tournament Schedule</h1>
+                <p class="text-sm font-medium text-slate-500 mt-1">Explore upcoming events and register to support our teams.</p>
+            </div>
 
-<svelte:head>
-  <title>Events | CT FTC</title>
-</svelte:head>
+            <div class="bg-slate-200/80 p-1 rounded-xl flex items-center border border-slate-300/30 backdrop-blur-sm">
+                <button 
+                    onclick={() => currentTab = 'upcoming'}
+                    class="px-5 py-2 text-sm font-bold rounded-lg transition-all duration-200
+                    {currentTab === 'upcoming' ? 'bg-white text-blue-600 shadow-md shadow-slate-300/50' : 'text-slate-600 hover:text-slate-900'}"
+                >
+                    Upcoming
+                </button>
+                <button 
+                    onclick={() => currentTab = 'past'}
+                    class="px-5 py-2 text-sm font-bold rounded-lg transition-all duration-200
+                    {currentTab === 'past' ? 'bg-white text-blue-600 shadow-md shadow-slate-300/50' : 'text-slate-600 hover:text-slate-900'}"
+                >
+                    Archived
+                </button>
+            </div>
+        </div>
 
-<main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
-  <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none"></div>
+        {#if activeEvents.length === 0}
+            <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto" in:fade>
+                <svg class="w-12 h-12 text-slate-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                </svg>
+                <h3 class="font-bold text-slate-800 text-lg">No sessions available</h3>
+                <p class="text-sm text-slate-500 mt-1 max-w-xs mx-auto">There are currently no {currentTab} events listed.</p>
+            </div>
+        {:else}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                {#each activeEvents as event (event.id)}
+                    {@const current = event.volunteersCurrent ?? 0}
+                    {@const required = event.volunteersNeeded ?? 0}
+                    {@const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0}
+                    {@const needsVolunteers = required > current}
 
-  <section class="relative pt-20 pb-12 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7]">
-    <div class="max-w-6xl mx-auto text-left space-y-5 z-10" style="transform: translateY({parallaxHeaderY}px)">
-      
-      <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-1.5 box-shadow-flat transform -rotate-1">
-        <span class="w-2.5 h-2.5 rounded-full bg-black {isMapLoading ? 'animate-ping' : 'animate-pulse'}"></span>
-        CT Tournament Schedule & Match Archives
-      </span>
-      
-      <h1 class="text-4xl md:text-6xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-        Event <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-1 box-shadow-flat transform rotate-1">Details</span>
-      </h1>
-      
-      <p class="text-slate-800 text-sm md:text-base font-bold max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl leading-relaxed">
-        Learn about upcoming events, including time, and location details, and explore recaps and media from past tournaments across Connecticut, including qualifiers, regionals, and the state championship.
-      </p>
+                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 group">
+                        <div>
+                            <div class="flex justify-between items-center mb-5">
+                                <span class="px-2.5 py-1 text-xs font-bold border rounded-md tracking-wide shadow-sm {typeStyles[event.type] || 'bg-slate-100 text-slate-600 border-slate-200'}">
+                                    {event.type || 'Tournament'}
+                                </span>
+                                {#if needsVolunteers && currentTab === 'upcoming'}
+                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-200/60 px-2 py-0.5 rounded-md animate-pulse">
+                                        Volunteer Needed
+                                    </span>
+                                {/if}
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors line-clamp-2">
+                                {event.name}
+                            </h3>
+                            
+                            <div class="mt-4 space-y-2.5 text-sm font-semibold text-slate-600">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                    </svg>
+                                    <span class="truncate">{event.location}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
+                                    </svg>
+                                    <span class="text-slate-500">{formatDate(event.startDate)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-5 border-t border-slate-100 space-y-2">
+                            <div class="flex justify-between items-center text-xs font-bold">
+                                <span class="text-slate-500">Volunteer Staffing</span>
+                                {#if required === 0}
+                                    <span class="text-slate-400">No slots open</span>
+                                {:else if pct >= 100}
+                                    <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Filled ✓</span>
+                                {:else}
+                                    <span class="text-slate-700">{current} / {required} full</span>
+                                {/if}
+                            </div>
+
+                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/30">
+                                <div 
+                                    class="h-full rounded-full transition-all duration-500 bg-gradient-to-r"
+                                    class:from-amber-400={pct < 50}
+                                    class:to-orange-400={pct < 50}
+                                    class:from-blue-500={pct >= 50 && pct < 100}
+                                    class:to-indigo-500={pct >= 50 && pct < 100}
+                                    class:from-emerald-500={pct >= 100}
+                                    class:to-teal-500={pct >= 100}
+                                    style="width: {required > 0 ? pct : 0}%"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <a 
+                                href="/events/{event.id}" 
+                                class="flex items-center justify-center gap-1.5 w-full bg-slate-900 hover:bg-blue-600 text-white text-center font-bold py-3 px-4 text-xs tracking-wide rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.99]"
+                            >
+                                <span>View Event Details</span>
+                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     </div>
-  </section>
-
-  <div class="max-w-6xl mx-auto px-6 py-12 relative z-20">
-    {#if isMapLoading}
-      <div class="bg-[#eef2f7] shadow-neumorphic-outer rounded-[2.5rem] p-8 border-2 border-white/60 space-y-6 animate-pulse">
-        <div class="h-6 w-48 bg-slate-400/40 rounded-full"></div>
-        <div class="h-24 w-full bg-white border-3 border-black rounded-2xl box-shadow-flat"></div>
-        <div class="h-24 w-full bg-white border-3 border-black rounded-2xl box-shadow-flat"></div>
-      </div>
-    {:else}
-      
-      <section class="mb-16">
-        <div class="mb-6 flex items-center justify-between border-b-2 border-black/10 pb-3">
-          <h2 class="text-xl font-black text-black uppercase tracking-tight flex items-center gap-2.5">
-            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse border border-black/20"></span>
-            Upcoming Tournament Pipelines
-          </h2>
-          <span class="font-mono text-xs font-black opacity-40">{futureEvents.length} Upcoming events</span>
-        </div>
-        
-        <div class="space-y-6">
-          {#each futureEvents as event}
-            <div class="bg-white border-3 border-black p-6 rounded-2xl box-shadow-flat hover:translate-y-[-3px] hover:box-shadow-flat-hover transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group">
-              
-              <div class="flex items-start gap-4 text-left">
-                <div class="w-14 h-14 rounded-2xl bg-[#eef2f7] shadow-neumorphic-inner border border-slate-300/40 flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform">
-                  📅
-                </div>
-                <div class="space-y-1">
-                  <h3 class="text-lg font-black text-black uppercase tracking-tight leading-tight group-hover:text-[#2563eb] transition-colors">
-                    {event.name}
-                  </h3>
-                  <div class="text-xs font-bold text-slate-600 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span class="flex items-center gap-1">📍 {typeof event.location === 'object' ? event.location?.name || event.location?.address : event.location}</span>
-                    <span class="text-slate-300 hidden sm:inline">|</span>
-                    <span class="font-mono font-black text-[#2563eb] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-                      {new Date(event.date_time).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="shrink-0 w-full md:w-auto">
-                <a href="/events/{event.id}" class="skeuo-button w-full md:w-auto block text-center text-xs font-black uppercase tracking-wider text-white bg-[#2563eb] border-2 border-[#1d4ed8] px-6 py-3.5 rounded-xl shadow-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all">
-                  Match Details &rarr;
-                </a>
-              </div>
-
-            </div>
-          {:else}
-            <div class="text-center p-12 bg-[#eef2f7] shadow-neumorphic-inner border border-dashed border-slate-300 rounded-2xl">
-              <span class="text-3xl block mb-2">📡</span>
-              <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">No upcoming events, check by later for updates</p>
-            </div>
-          {/each}
-        </div>
-      </section>
-
-      <section>
-        <div class="mb-6 flex items-center justify-between border-b-2 border-black/10 pb-3">
-          <h2 class="text-xl font-black text-slate-500 uppercase tracking-tight flex items-center gap-2.5">
-            <span class="w-3 h-3 rounded-full bg-slate-400 border border-black/10"></span>
-            Historical Match Registry
-          </h2>
-         </div>
-        
-        <div class="space-y-4 opacity-90">
-          {#each pastEvents as event}
-            <div class="bg-white/50 backdrop-blur-sm border-2 border-black/40 p-5 rounded-xl box-shadow-mini hover:translate-y-[-2px] hover:box-shadow-mini-hover transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left group">
-              
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-inner border border-slate-300 flex items-center justify-center text-xl shrink-0 grayscale opacity-60">
-                  📦
-                </div>
-                <div class="space-y-0.5">
-                  <h3 class="text-base font-black text-slate-700 uppercase tracking-tight line-clamp-1 group-hover:text-black transition-colors">
-                    {event.name}
-                  </h3>
-                  <p class="text-xs font-bold text-slate-500 flex flex-wrap items-center gap-x-2">
-                    <span>📍 {typeof event.location === 'object' ? event.location?.name || event.location?.address : event.location}</span>
-                    <span class="text-slate-300 font-normal">—</span>
-                    <span class="font-mono font-black">{new Date(event.date_time).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
-                  </p>
-                </div>
-              </div>
-
-              <div class="shrink-0 w-full md:w-auto">
-                <a href="/events/{event.id}" class="w-full md:w-auto block text-center text-xs font-black uppercase tracking-wider text-slate-700 bg-white border-2 border-black px-5 py-2.5 rounded-lg box-shadow-mini hover:bg-slate-50 active:translate-y-[2px] transition-all">
-                  Archived Telemetry
-                </a>
-              </div>
-
-            </div>
-          {:else}
-            <div class="text-center p-12 bg-[#eef2f7] shadow-neumorphic-inner border border-dashed border-slate-300 rounded-2xl">
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Error,  try reloading</p>
-            </div>
-          {/each}
-        </div>
-      </section>
-
-    {/if}
-  </div>
-</main>
-
-<style>
-  /* Engineering Vector Blueprint Grid Overlay Mesh */
-  .bg-grid-pattern {
-    background-size: 40px 40px;
-    background-image: 
-      linear-gradient(to right, #000000 1px, transparent 1px),
-      linear-gradient(to bottom, #000000 1px, transparent 1px);
-  }
-
-  /* Soft Outward Neomorphic Ambient Shell Shading */
-  .shadow-neumorphic-outer {
-    box-shadow: 
-      12px 12px 28px #bebebe, 
-      -12px -12px 28px #ffffff,
-      inset 1px 1px 0px rgba(255,255,255,0.9);
-  }
-
-  /* Deep Recessed Inverted Neomorphic Well Insets */
-  .shadow-neumorphic-inner {
-    box-shadow: 
-      inset 5px 5px 10px #cad4e2, 
-      inset -5px -5px 10px #ffffff;
-  }
-
-  /* Mechanical Skeuomorphic Convex Click Actions */
-  .shadow-skeuo {
-    box-shadow: 
-      0px 4px 0px #1d4ed8,
-      4px 8px 12px rgba(0, 0, 0, 0.12);
-  }
-  
-  .skeuo-button:hover {
-    box-shadow: 
-      0px 3px 0px #1d4ed8,
-      2px 5px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .skeuo-button:active {
-    box-shadow: 
-      0px 0px 0px #1d4ed8,
-      0px 1px 3px rgba(0, 0, 0, 0.05);
-  }
-
-  /* Structural Heavy Neo-Brutalist Outer Drop Shadows */
-  .box-shadow-flat {
-    box-shadow: 6px 6px 0px 0px #000000;
-  }
-  
-  .box-shadow-flat-hover {
-    box-shadow: 10px 10px 0px 0px #000000;
-  }
-
-  .box-shadow-mini {
-    box-shadow: 3px 3px 0px 0px #000000;
-  }
-
-  .box-shadow-mini-hover {
-    box-shadow: 5px 5px 0px 0px #000000;
-  }
-</style>
+</div>
