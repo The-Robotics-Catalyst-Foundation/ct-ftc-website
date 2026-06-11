@@ -21,7 +21,7 @@
 
     // 2. Global Safety Block: Is the user logged in at all?
     if (!pb.authStore.isValid || !userRole) {
-      await goto('/login');
+      await goto('admin/');
       return;
     }
 
@@ -66,7 +66,7 @@
         </nav>
       </div>
 
-      <button onclick={() => { pb.authStore.clear(); goto('/login'); }} class="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition">
+      <button onclick={() => { pb.authStore.clear(); goto('admin/'); }} class="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition">
         Sign Out
       </button>
     </aside>
