@@ -1,146 +1,166 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
 
-    // Svelte 5 direct destructuring without explicit interface types
     let { data = { upcoming: [], past: [] } } = $props();
     
-    // Svelte 5 state management
     let currentTab = $state('upcoming'); 
     
-    // Highly efficient reactive derivation
     let activeEvents = $derived(currentTab === 'upcoming' ? data.upcoming : data.past);
 
     function formatDate(dateString: string) {
         if (!dateString) return 'TBD';
         return new Date(dateString).toLocaleDateString('en-US', {
+            weekday: 'short',
             month: 'short',
             day: 'numeric',
             year: 'numeric'
         });
     }
 
-    // Modern badge styling map
+    // Neo-brutalist badge styling: Bright colors, thick borders, dark text
     const typeStyles: Record<string, string> = {
-        'Scrimmage': 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-        'Qualifier': 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-        'Championship': 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+        'Scrimmage': 'bg-[#86efac] text-slate-900 border-2 border-slate-900', // Bright Green
+        'Qualifier': 'bg-[#93c5fd] text-slate-900 border-2 border-slate-900', // Bright Blue
+        'Championship': 'bg-[#fde047] text-slate-900 border-2 border-slate-900' // Bright Yellow
     };
 </script>
 
-<div class="w-full min-h-screen bg-slate-50 text-slate-900 font-sans antialiased pb-20 selection:bg-blue-500 selection:text-white relative">
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-40 pointer-events-none"></div>
+<div class="w-full min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-32 selection:bg-slate-900 selection:text-white relative overflow-x-hidden">
     
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 space-y-10 relative z-10">
+    <!-- Brutalist Grid Background -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_2px,transparent_2px),linear-gradient(to_bottom,#cbd5e1_2px,transparent_2px)] bg-[size:40px_40px] opacity-40 pointer-events-none"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 space-y-12 relative z-10">
         
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-5">
-            <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Tournament Schedule</h1>
-                <p class="text-sm font-medium text-slate-500 mt-1">Explore upcoming events and register to support our teams.</p>
-            </div>
+        <!-- Brutalist Header & Navigation -->
+        <div class="border-b-4 border-slate-900 pb-8 bg-white/80 backdrop-blur-sm p-8 border-2 shadow-[8px_8px_0_0_rgba(15,23,42,1)] rounded-xl">
+            <h1 class="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tight">
+                Event Schedule
+            </h1>
+            <p class="mt-3 text-lg font-bold text-slate-700 max-w-2xl">
+                Find upcoming competitions, view event details, and sign up to volunteer for our teams.
+            </p>
 
-            <div class="bg-slate-200/80 p-1 rounded-xl flex items-center border border-slate-300/30 backdrop-blur-sm">
+            <!-- Brutalist Tab Switcher -->
+            <div class="mt-8 flex flex-wrap gap-4">
                 <button 
                     onclick={() => currentTab = 'upcoming'}
-                    class="px-5 py-2 text-sm font-bold rounded-lg transition-all duration-200
-                    {currentTab === 'upcoming' ? 'bg-white text-blue-600 shadow-md shadow-slate-300/50' : 'text-slate-600 hover:text-slate-900'}"
+                    class="px-8 py-3 text-sm font-black uppercase tracking-wide border-2 border-slate-900 rounded-lg transition-all duration-150 
+                    {currentTab === 'upcoming' 
+                        ? 'bg-[#fde047] translate-x-[4px] translate-y-[4px] shadow-[0px_0px_0_0_rgba(15,23,42,1)]' 
+                        : 'bg-white shadow-[4px_4px_0_0_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_rgba(15,23,42,1)]'}"
                 >
                     Upcoming
                 </button>
                 <button 
                     onclick={() => currentTab = 'past'}
-                    class="px-5 py-2 text-sm font-bold rounded-lg transition-all duration-200
-                    {currentTab === 'past' ? 'bg-white text-blue-600 shadow-md shadow-slate-300/50' : 'text-slate-600 hover:text-slate-900'}"
+                    class="px-8 py-3 text-sm font-black uppercase tracking-wide border-2 border-slate-900 rounded-lg transition-all duration-150
+                    {currentTab === 'past' 
+                        ? 'bg-[#fde047] translate-x-[4px] translate-y-[4px] shadow-[0px_0px_0_0_rgba(15,23,42,1)]' 
+                        : 'bg-white shadow-[4px_4px_0_0_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_rgba(15,23,42,1)]'}"
                 >
-                    Archived
+                    Past
                 </button>
             </div>
         </div>
 
         {#if activeEvents.length === 0}
-            <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto" in:fade>
-                <svg class="w-12 h-12 text-slate-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                </svg>
-                <h3 class="font-bold text-slate-800 text-lg">No sessions available</h3>
-                <p class="text-sm text-slate-500 mt-1 max-w-xs mx-auto">There are currently no {currentTab} events listed.</p>
+            <!-- Brutalist Empty State -->
+            <div class="bg-white border-4 border-slate-900 rounded-xl p-12 text-center shadow-[8px_8px_0_0_rgba(15,23,42,1)] max-w-xl mx-auto space-y-4" in:fade>
+                <div class="w-16 h-16 bg-[#fca5a5] border-4 border-slate-900 rounded-full flex items-center justify-center mx-auto text-slate-900 shadow-[4px_4px_0_0_rgba(15,23,42,1)]">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-black text-slate-900 text-xl uppercase">No events found</h3>
+                    <p class="text-base font-bold text-slate-600 mt-2">There are currently no events listed under the {currentTab} tab.</p>
+                </div>
             </div>
         {:else}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <!-- Event Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full pb-12">
                 {#each activeEvents as event (event.id)}
                     {@const current = event.volunteersCurrent ?? 0}
                     {@const required = event.volunteersNeeded ?? 0}
                     {@const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0}
                     {@const needsVolunteers = required > current}
 
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 group">
+                    <!-- Brutalist Scroll-Animated Card Elements -->
+                    <div class="scroll-animate-card bg-white border-4 border-slate-900 rounded-xl p-6 flex flex-col justify-between shadow-[8px_8px_0_0_rgba(15,23,42,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0_0_rgba(15,23,42,1)] transition-all duration-200 group">
+                        
                         <div>
-                            <div class="flex justify-between items-center mb-5">
-                                <span class="px-2.5 py-1 text-xs font-bold border rounded-md tracking-wide shadow-sm {typeStyles[event.type] || 'bg-slate-100 text-slate-600 border-slate-200'}">
+                            <!-- Tags Row -->
+                            <div class="flex justify-between items-start mb-5 gap-2">
+                                <span class="px-3 py-1 text-xs font-black uppercase tracking-wide {typeStyles[event.type] || 'bg-slate-200 text-slate-900 border-2 border-slate-900'}">
                                     {event.type || 'Tournament'}
                                 </span>
                                 {#if needsVolunteers && currentTab === 'upcoming'}
-                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-200/60 px-2 py-0.5 rounded-md animate-pulse">
-                                        Volunteer Needed
+                                    <span class="text-xs font-black uppercase tracking-wide text-slate-900 bg-[#fca5a5] border-2 border-slate-900 px-3 py-1">
+                                        Needs Volunteers
                                     </span>
                                 {/if}
                             </div>
 
-                            <h3 class="text-xl font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors line-clamp-2">
+                            <!-- Title -->
+                            <h3 class="text-2xl font-black text-slate-900 leading-tight border-b-2 border-transparent group-hover:border-slate-900 transition-colors inline-block mb-1">
                                 {event.name}
                             </h3>
                             
-                            <div class="mt-4 space-y-2.5 text-sm font-semibold text-slate-600">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                                    </svg>
-                                    <span class="truncate">{event.location}</span>
+                            <!-- Date & Location -->
+                            <div class="mt-4 space-y-3 text-sm font-bold text-slate-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center border-2 border-slate-900 bg-slate-100 rounded-md">
+                                        <svg class="w-4 h-4 text-slate-900 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
+                                        </svg>
+                                    </div>
+                                    <span>{formatDate(event.startDate)}</span>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
-                                    </svg>
-                                    <span class="text-slate-500">{formatDate(event.startDate)}</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center border-2 border-slate-900 bg-slate-100 rounded-md">
+                                        <svg class="w-4 h-4 text-slate-900 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                        </svg>
+                                    </div>
+                                    <span class="truncate">{event.location}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-6 pt-5 border-t border-slate-100 space-y-2">
-                            <div class="flex justify-between items-center text-xs font-bold">
-                                <span class="text-slate-500">Volunteer Staffing</span>
+                        <!-- Brutalist Volunteer Status Bar -->
+                        <div class="mt-8 pt-5 border-t-4 border-slate-900">
+                            <div class="flex justify-between items-center text-sm mb-3 font-black uppercase">
+                                <span>Volunteers</span>
                                 {#if required === 0}
-                                    <span class="text-slate-400">No slots open</span>
+                                    <span class="text-slate-500">None</span>
                                 {:else if pct >= 100}
-                                    <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Filled ✓</span>
+                                    <span class="text-slate-900 bg-[#86efac] border-2 border-slate-900 px-2 py-0.5">Filled ✓</span>
                                 {:else}
-                                    <span class="text-slate-700">{current} / {required} full</span>
+                                    <span>{current} / {required}</span>
                                 {/if}
                             </div>
 
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/30">
+                            <!-- Hard Box Progress Bar -->
+                            <div class="w-full h-4 bg-slate-100 border-2 border-slate-900 overflow-hidden relative">
                                 <div 
-                                    class="h-full rounded-full transition-all duration-500 bg-gradient-to-r"
-                                    class:from-amber-400={pct < 50}
-                                    class:to-orange-400={pct < 50}
-                                    class:from-blue-500={pct >= 50 && pct < 100}
-                                    class:to-indigo-500={pct >= 50 && pct < 100}
-                                    class:from-emerald-500={pct >= 100}
-                                    class:to-teal-500={pct >= 100}
+                                    class="h-full border-r-2 border-slate-900 transition-all duration-700 ease-out absolute left-0 top-0"
+                                    class:bg-[#fde047]={pct < 50}
+                                    class:bg-[#93c5fd]={pct >= 50 && pct < 100}
+                                    class:bg-[#86efac]={pct >= 100}
                                     style="width: {required > 0 ? pct : 0}%"
                                 ></div>
                             </div>
                         </div>
 
-                        <div class="mt-6">
+                        <!-- Brutalist Action Button -->
+                        <div class="mt-8">
                             <a 
                                 href="/events/{event.id}" 
-                                class="flex items-center justify-center gap-1.5 w-full bg-slate-900 hover:bg-blue-600 text-white text-center font-bold py-3 px-4 text-xs tracking-wide rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.99]"
+                                class="flex items-center justify-center w-full bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg hover:bg-[#fde047] hover:text-slate-900 transition-colors duration-200"
                             >
-                                <span>View Event Details</span>
-                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                </svg>
+                                View Details
                             </a>
                         </div>
                     </div>
@@ -149,3 +169,36 @@
         {/if}
     </div>
 </div>
+
+<style>
+    /* CSS Native Scroll-Driven Animations - Harder pop for brutalism */
+    @keyframes card-reveal-brutal {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .scroll-animate-card {
+        animation-name: card-reveal-brutal;
+        /* Snappier bezier curve for a "harder" mechanical feel */
+        animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        /* Triggers exactly as it enters the viewport */
+        animation-range: entry 5% entry 20%;
+    }
+
+    /* Fallback for browsers that do not support view-driven animations */
+    @supports not (animation-timeline: view()) {
+        .scroll-animate-card {
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>
