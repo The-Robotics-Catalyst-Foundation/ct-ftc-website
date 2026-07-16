@@ -2,6 +2,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
 @theme {
     /* Main Background Elements (Light Mode Base) */
     --color-bg-main: #ffffff;

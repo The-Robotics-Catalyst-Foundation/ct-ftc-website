@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import { slide } from 'svelte/transition';
-  import './layout.css'; 
+  import './layout.css';
   import Footer from '$lib/components/footer.svelte';
   import Nav from '$lib/components/header.svelte';
   import Head from '$lib/components/head.svelte';
@@ -18,10 +18,10 @@
 <svelte:head>
   <title>{title}</title>
   <meta name="description" content={description} />
-  
+
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" /> 
+  <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 

@@ -1,12 +1,58 @@
 <script>
   import { onMount } from 'svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
   import Head from '$lib/components/head.svelte';
 
   // State Management
   let isLoaded = $state(false);
   let scrollY = $state(0);
-  let activeRoleCategory = $state('tech'); 
+  /** @type {string | null} */
+  let activeRoleCategory = $state('tech');
+
+  const roleCategories = [
+    {
+      key: 'tech',
+      icon: '🛠️',
+      title: 'Technical Roles',
+      subtitle: 'Referees, FTAs, Robot Inspectors...',
+      tag: 'Field Operations',
+      description: 'Ideal for mentors, alumni, or engineers who want to manage match rule enforcement, electronics, and field setup directly.',
+      roles: ['Referee', 'Field Technical Advisor (FTA)', 'Robot Inspector']
+    },
+    {
+      key: 'judges',
+      icon: '⚖️',
+      title: 'Judges & Award Staff',
+      subtitle: 'Panel Judges, Judge Match Observers...',
+      tag: 'Evaluation Team',
+      description: 'Interview student teams, review their engineering documentation, and collaborate with other judges to determine award winners. Great for professionals of all backgrounds.',
+      roles: ['Panel Judge', 'Judge Advisor', 'Judge Match Observer']
+    },
+    {
+      key: 'logistics',
+      icon: '📋',
+      title: 'Event Logistics',
+      subtitle: 'Queuers, Scorekeepers, Emcees...',
+      tag: 'Event Flow',
+      description: 'Help keep the tournament running on schedule, coordinate team queuing movement, or energize the audience on the microphone.',
+      roles: ['Queuer', 'Scorekeeper', 'Emcee']
+    },
+    {
+      key: 'support',
+      icon: '☕',
+      title: 'Support & Setup',
+      subtitle: 'Field Reset, Team Check-in...',
+      tag: 'Event Support',
+      description: 'Perfect for parents, siblings, or newcomers looking for a straightforward way to assist during the event without requiring complex training.',
+      roles: ['Team Registration', 'Volunteer Check-in', 'Field Reset Crew']
+    }
+  ];
+
+  /** @param {string} key */
+  function toggleRoleCategory(key) {
+    activeRoleCategory = activeRoleCategory === key ? null : key;
+  }
 
   // Parallax Values
   let parallaxHeroY = $derived(scrollY * 0.3);
@@ -57,135 +103,91 @@
         <h2 class="text-3xl font-black text-black uppercase tracking-tight mt-3">How to Register as a Volunteer</h2>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-8 items-stretch mb-12">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch mb-12">
         <div class="bg-white border-3 border-black p-6 rounded-2xl box-shadow-flat flex flex-col justify-between relative">
           <div class="absolute -top-5 left-6 bg-black text-white w-10 h-10 rounded-xl flex items-center justify-center font-mono font-black text-xl border-2 border-white shadow-md">1</div>
           <div class="pt-4 space-y-2">
             <h3 class="text-lg font-black text-black uppercase">Create an Account</h3>
-            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Sign up or log into the official FIRST Inspires dashboard to set up your volunteer profile.</p>
+            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Go to firstinspires.org and create an account (for new volunteers) or login to your existing account.</p>
           </div>
         </div>
 
         <div class="bg-white border-3 border-black p-6 rounded-2xl box-shadow-flat flex flex-col justify-between relative">
           <div class="absolute -top-5 left-6 bg-black text-white w-10 h-10 rounded-xl flex items-center justify-center font-mono font-black text-xl border-2 border-white shadow-md">2</div>
           <div class="pt-4 space-y-2">
-            <h3 class="text-lg font-black text-black uppercase">Pass Screening</h3>
-            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Complete the secure FIRST Youth Protection Screening (YPP) online to ensure student safety.</p>
+            <h3 class="text-lg font-black text-black uppercase">Find Your Role</h3>
+            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Once you are on the FIRST Dashboard, click on "My Roles" and then "Event Volunteer".</p>
           </div>
         </div>
 
         <div class="bg-white border-3 border-black p-6 rounded-2xl box-shadow-flat flex flex-col justify-between relative">
           <div class="absolute -top-5 left-6 bg-black text-white w-10 h-10 rounded-xl flex items-center justify-center font-mono font-black text-xl border-2 border-white shadow-md">3</div>
           <div class="pt-4 space-y-2">
-            <h3 class="text-lg font-black text-black uppercase">Apply to a CT Event</h3>
-            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Filter the event listings in your dashboard by Connecticut, select your preferred event date, and choose your top roles.</p>
+            <h3 class="text-lg font-black text-black uppercase">Find a CT Event</h3>
+            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Click "Register to Volunteer" then search for a FIRST Tech Challenge event in Connecticut.</p>
+          </div>
+        </div>
+
+        <div class="bg-white border-3 border-black p-6 rounded-2xl box-shadow-flat flex flex-col justify-between relative">
+          <div class="absolute -top-5 left-6 bg-black text-white w-10 h-10 rounded-xl flex items-center justify-center font-mono font-black text-xl border-2 border-white shadow-md">4</div>
+          <div class="pt-4 space-y-2">
+            <h3 class="text-lg font-black text-black uppercase">Complete Registration</h3>
+            <p class="text-slate-600 text-xs font-semibold leading-relaxed">Follow the steps to complete your volunteer registration.</p>
           </div>
         </div>
       </div>
 
-      <div class="text-center pt-4">
-        <a href="https://www.firstinspires.org" target="_blank" rel="noopener noreferrer" 
+      <div class="text-center pt-4 space-y-4">
+        <a href="https://www.firstinspires.org" target="_blank" rel="noopener noreferrer"
            class="skeuo-button bg-[#2563eb] text-white text-sm font-black uppercase tracking-wider px-10 py-5 rounded-2xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] inline-flex items-center gap-3 transition-all">
           Go to FIRST Dashboard <span class="text-base">↗</span>
         </a>
+        <p class="text-xs font-semibold text-slate-500">
+          Questions? Email <a href="mailto:youssefmmacary@gmail.com" class="text-[#2563eb] font-black hover:underline">youssefmmacary@gmail.com</a>
+        </p>
       </div>
 
     </div>
   </section>
 
-  <section class="max-w-6xl mx-auto px-6 py-8 relative z-20">
-    <div class="grid lg:grid-cols-12 gap-12 items-start">
-      
-      <div class="lg:col-span-5 space-y-4">
-        <div class="text-left mb-6">
-          <span class="text-xs font-black text-white bg-black border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Volunteer Roles</span>
-          <h2 class="text-2xl font-black text-black uppercase mt-3">Find Your Perfect Role</h2>
-          <p class="text-xs font-bold text-slate-500 mt-1">Select a category below. Free online training is provided for all roles prior to the event.</p>
+  <section class="max-w-4xl mx-auto px-6 py-8 relative z-20">
+    <div class="text-left mb-6">
+      <span class="text-xs font-black text-white bg-black border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Volunteer Roles</span>
+      <h2 class="text-2xl font-black text-black uppercase mt-3">Find Your Perfect Role</h2>
+      <p class="text-xs font-bold text-slate-500 mt-1">Tap a category to see the specific roles. Free online training is provided for all roles prior to the event.</p>
+    </div>
+
+    <div class="space-y-4">
+      {#each roleCategories as role (role.key)}
+        <div class="bg-white border-3 border-black rounded-2xl box-shadow-flat overflow-hidden">
+          <button
+            onclick={() => toggleRoleCategory(role.key)}
+            aria-expanded={activeRoleCategory === role.key}
+            class="w-full text-left p-4 flex items-center gap-4 transition-colors {activeRoleCategory === role.key ? 'bg-[#eef2f7]' : 'bg-white hover:bg-slate-50'}"
+          >
+            <div class="w-10 h-10 shrink-0 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl border border-slate-200">{role.icon}</div>
+            <div class="flex-1 min-w-0">
+              <span class="block text-xs font-black uppercase tracking-wide text-black">{role.title}</span>
+              <span class="block text-[10px] font-bold text-slate-400 truncate">{role.subtitle}</span>
+            </div>
+            <span class="shrink-0 text-black text-lg font-black transition-transform duration-200 {activeRoleCategory === role.key ? 'rotate-180' : ''}">⌄</span>
+          </button>
+
+          {#if activeRoleCategory === role.key}
+            <div transition:slide={{ duration: 250 }}>
+              <div class="px-4 pb-5 pt-1 border-t-2 border-black/10 space-y-3">
+                <span class="inline-block text-[10px] font-mono font-black uppercase text-[#2563eb] tracking-widest bg-[#eef2f7] px-2.5 py-1 rounded border border-black/10">{role.tag}</span>
+                <p class="text-sm font-semibold text-slate-700 leading-relaxed">{role.description}</p>
+                <div class="flex flex-wrap gap-2 pt-1">
+                  {#each role.roles as specificRole}
+                    <span class="text-[10px] font-black uppercase tracking-wide text-black bg-[#facc15] border-2 border-black px-2.5 py-1 rounded-lg">{specificRole}</span>
+                  {/each}
+                </div>
+              </div>
+            </div>
+          {/if}
         </div>
-
-        <button onclick={() => activeRoleCategory = 'tech'} 
-                class="w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-4 {activeRoleCategory === 'tech' ? 'bg-[#eef2f7] shadow-neumorphic-inner border-slate-300' : 'bg-white border-border-subtle shadow-sm hover:border-slate-400'}">
-          <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl border border-slate-200">🛠️</div>
-          <div>
-            <span class="block text-xs font-black uppercase tracking-wide text-black">Technical Roles</span>
-            <span class="block text-[10px] font-bold text-slate-400">Referees, FTAs, Robot Inspectors...</span>
-          </div>
-        </button>
-
-        <button onclick={() => activeRoleCategory = 'judges'} 
-                class="w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-4 {activeRoleCategory === 'judges' ? 'bg-[#eef2f7] shadow-neumorphic-inner border-slate-300' : 'bg-white border-border-subtle shadow-sm hover:border-slate-400'}">
-          <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl border border-slate-200">⚖️</div>
-          <div>
-            <span class="block text-xs font-black uppercase tracking-wide text-black">Judges & Award Staff</span>
-            <span class="block text-[10px] font-bold text-slate-400">Panel Judges, Judge Match Observers...</span>
-          </div>
-        </button>
-
-        <button onclick={() => activeRoleCategory = 'logistics'} 
-                class="w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-4 {activeRoleCategory === 'logistics' ? 'bg-[#eef2f7] shadow-neumorphic-inner border-slate-300' : 'bg-white border-border-subtle shadow-sm hover:border-slate-400'}">
-          <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl border border-slate-200">📋</div>
-          <div>
-            <span class="block text-xs font-black uppercase tracking-wide text-black">Event Logistics</span>
-            <span class="block text-[10px] font-bold text-slate-400">Queuers, Scorekeepers, Emcees...</span>
-          </div>
-        </button>
-
-        <button onclick={() => activeRoleCategory = 'support'} 
-                class="w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-4 {activeRoleCategory === 'support' ? 'bg-[#eef2f7] shadow-neumorphic-inner border-slate-300' : 'bg-white border-border-subtle shadow-sm hover:border-slate-400'}">
-          <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl border border-slate-200">☕</div>
-          <div>
-            <span class="block text-xs font-black uppercase tracking-wide text-black">Support & Setup</span>
-            <span class="block text-[10px] font-bold text-slate-400">Field Reset, Team Check-in...</span>
-          </div>
-        </button>
-      </div>
-
-      <div class="lg:col-span-7 w-full h-full min-h-[300px]">
-        <div class="bg-white/40 backdrop-blur-xl border border-white/70 rounded-[2.5rem] p-8 md:p-12 shadow-2xl h-full flex flex-col justify-center text-left relative overflow-hidden box-shadow-flat border-3 border-black">
-          
-          {#if activeRoleCategory === 'tech'}
-            <div in:fly={{ x: 20, duration: 300 }} class="space-y-4">
-              <span class="text-[10px] font-mono font-black uppercase text-[#2563eb] tracking-widest bg-white px-2.5 py-1 rounded border border-black/10">Field Operations</span>
-              <h3 class="text-2xl font-black text-black uppercase">🛠️ Technical Roles</h3>
-              <p class="text-sm font-semibold text-slate-700 leading-relaxed">
-                Referees, Field Technical Advisors (FTAs), and Inspectors. Ideal for mentors, alumni, or engineers who want to manage match rule enforcement, electronics, and field setup directly.
-              </p>
-            </div>
-          {/if}
-
-          {#if activeRoleCategory === 'judges'}
-            <div in:fly={{ x: 20, duration: 300 }} class="space-y-4">
-              <span class="text-[10px] font-mono font-black uppercase text-[#2563eb] tracking-widest bg-white px-2.5 py-1 rounded border border-black/10">Evaluation Team</span>
-              <h3 class="text-2xl font-black text-black uppercase">⚖️ Judges & Award Staff</h3>
-              <p class="text-sm font-semibold text-slate-700 leading-relaxed">
-                Panel Judges and Judge Match Observers. Interview student teams, review their engineering documentation, and collaborate with other judges to determine award winners. Great for professionals of all backgrounds.
-              </p>
-            </div>
-          {/if}
-
-          {#if activeRoleCategory === 'logistics'}
-            <div in:fly={{ x: 20, duration: 300 }} class="space-y-4">
-              <span class="text-[10px] font-mono font-black uppercase text-[#2563eb] tracking-widest bg-white px-2.5 py-1 rounded border border-black/10">Event Flow</span>
-              <h3 class="text-2xl font-black text-black uppercase">📋 Event Logistics</h3>
-              <p class="text-sm font-semibold text-slate-700 leading-relaxed">
-                Queuers, Scorekeepers, and Emcees. Help keep the tournament running on schedule, coordinate team queuing movement, or energize the audience on the microphone.
-              </p>
-            </div>
-          {/if}
-
-          {#if activeRoleCategory === 'support'}
-            <div in:fly={{ x: 20, duration: 300 }} class="space-y-4">
-              <span class="text-[10px] font-mono font-black uppercase text-[#2563eb] tracking-widest bg-white px-2.5 py-1 rounded border border-black/10">Event Support</span>
-              <h3 class="text-2xl font-black text-black uppercase">☕ Support & Setup</h3>
-              <p class="text-sm font-semibold text-slate-700 leading-relaxed">
-                Team Registration, Volunteer Check-in, and Field Reset. Perfect for parents, siblings, or newcomers looking for a straightforward way to assist during the event without requiring complex training.
-              </p>
-            </div>
-          {/if}
-
-        </div>
-      </div>
-
+      {/each}
     </div>
   </section>
 </main>
