@@ -1,204 +1,223 @@
 <script lang="ts">
-    import { fade } from 'svelte/transition';
+    import { onMount } from 'svelte';
+    import { formatEventDate } from '$lib/format';
+    import { revealTiles } from '$lib/motion';
+    import GlassTile from '$lib/components/ui/GlassTile.svelte';
+    import BentoGrid from '$lib/components/ui/BentoGrid.svelte';
 
-    let { data = { upcoming: [], past: [] } } = $props();
-    
-    let currentTab = $state('upcoming'); 
-    
+    let { data } = $props();
+
+    let currentTab = $state('upcoming');
+
     let activeEvents = $derived(currentTab === 'upcoming' ? data.upcoming : data.past);
+    let featured = $derived(currentTab === 'upcoming' && activeEvents.length > 0 ? activeEvents[0] : null);
+    let rest = $derived(featured ? activeEvents.slice(1) : activeEvents);
 
-    function formatDate(dateString: string) {
-        if (!dateString) return 'TBD';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
+    const typeStyles: Record<string, string> = {
+        'Scrimmage': 'text-emerald-700',
+        'Qualifier': 'text-robotics-blue',
+        'Championship': 'text-amber-700'
+    };
+
+    function volunteerStats(event: any) {
+        const current = event.volunteersCurrent ?? 0;
+        const required = event.volunteersNeeded ?? 0;
+        const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0;
+        return { current, required, pct, needsVolunteers: required > current };
     }
 
-    // Neo-brutalist badge styling: Bright colors, thick borders, dark text
-    const typeStyles: Record<string, string> = {
-        'Scrimmage': 'bg-[#86efac] text-slate-900 border-2 border-slate-900', // Bright Green
-        'Qualifier': 'bg-[#93c5fd] text-slate-900 border-2 border-slate-900', // Bright Blue
-        'Championship': 'bg-[#fde047] text-slate-900 border-2 border-slate-900' // Bright Yellow
-    };
+    onMount(() => {
+        revealTiles('.bento-tile');
+    });
 </script>
 
-<div class="w-full min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-32 selection:bg-slate-900 selection:text-white relative overflow-x-hidden">
-    
-    <!-- Brutalist Grid Background -->
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_2px,transparent_2px),linear-gradient(to_bottom,#cbd5e1_2px,transparent_2px)] bg-[size:40px_40px] opacity-40 pointer-events-none"></div>
-    
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 space-y-12 relative z-10">
-        
-        <!-- Brutalist Header & Navigation -->
-        <div class="border-b-4 border-slate-900 pb-8 bg-white/80 backdrop-blur-sm p-8 border-2 shadow-[8px_8px_0_0_rgba(15,23,42,1)] rounded-xl">
-            <h1 class="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tight">
-                Event Schedule
+<main class="aurora-field w-full min-h-screen pb-32">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 space-y-6">
+
+        <GlassTile strong class="bento-tile" rounded="rounded-[2.5rem]" padding="p-8 md:p-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-ink-900 tracking-tight">
+                Event schedule
             </h1>
-            <p class="mt-3 text-lg font-bold text-slate-700 max-w-2xl">
+            <p class="mt-3 text-base text-ink-600 max-w-2xl">
                 Find upcoming competitions, view event details, and sign up to volunteer for our teams.
             </p>
 
-            <!-- Brutalist Tab Switcher -->
-            <div class="mt-8 flex flex-wrap gap-4">
-                <button 
+            <div class="mt-8 inline-flex items-center gap-1 p-1 rounded-full bg-white/40">
+                <button
                     onclick={() => currentTab = 'upcoming'}
-                    class="px-8 py-3 text-sm font-black uppercase tracking-wide border-2 border-slate-900 rounded-lg transition-all duration-150 
-                    {currentTab === 'upcoming' 
-                        ? 'bg-[#fde047] translate-x-[4px] translate-y-[4px] shadow-[0px_0px_0_0_rgba(15,23,42,1)]' 
-                        : 'bg-white shadow-[4px_4px_0_0_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_rgba(15,23,42,1)]'}"
+                    class="px-6 py-2 rounded-full text-sm font-semibold transition-all
+                    {currentTab === 'upcoming' ? 'bg-robotics-blue text-white shadow-ambient' : 'text-ink-600 hover:text-ink-900'}"
                 >
                     Upcoming
                 </button>
-                <button 
+                <button
                     onclick={() => currentTab = 'past'}
-                    class="px-8 py-3 text-sm font-black uppercase tracking-wide border-2 border-slate-900 rounded-lg transition-all duration-150
-                    {currentTab === 'past' 
-                        ? 'bg-[#fde047] translate-x-[4px] translate-y-[4px] shadow-[0px_0px_0_0_rgba(15,23,42,1)]' 
-                        : 'bg-white shadow-[4px_4px_0_0_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_rgba(15,23,42,1)]'}"
+                    class="px-6 py-2 rounded-full text-sm font-semibold transition-all
+                    {currentTab === 'past' ? 'bg-robotics-blue text-white shadow-ambient' : 'text-ink-600 hover:text-ink-900'}"
                 >
                     Past
                 </button>
             </div>
-        </div>
+        </GlassTile>
 
         {#if activeEvents.length === 0}
-            <!-- Brutalist Empty State -->
-            <div class="bg-white border-4 border-slate-900 rounded-xl p-12 text-center shadow-[8px_8px_0_0_rgba(15,23,42,1)] max-w-xl mx-auto space-y-4" in:fade>
-                <div class="w-16 h-16 bg-[#fca5a5] border-4 border-slate-900 rounded-full flex items-center justify-center mx-auto text-slate-900 shadow-[4px_4px_0_0_rgba(15,23,42,1)]">
-                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+            <GlassTile class="bento-tile text-center max-w-xl mx-auto space-y-4" rounded="rounded-[2.5rem]" padding="p-12">
+                <div class="w-16 h-16 glass-tile rounded-full flex items-center justify-center mx-auto text-ink-600">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                     </svg>
                 </div>
                 <div>
-                    <h3 class="font-black text-slate-900 text-xl uppercase">No events found</h3>
-                    <p class="text-base font-bold text-slate-600 mt-2">There are currently no events listed under the {currentTab} tab.</p>
+                    <h3 class="font-semibold text-ink-900 text-lg">No events found</h3>
+                    <p class="text-sm text-ink-600 mt-2">There are currently no events listed under the {currentTab} tab.</p>
                 </div>
-            </div>
+            </GlassTile>
         {:else}
-            <!-- Event Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full pb-12">
-                {#each activeEvents as event (event.id)}
-                    {@const current = event.volunteersCurrent ?? 0}
-                    {@const required = event.volunteersNeeded ?? 0}
-                    {@const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0}
-                    {@const needsVolunteers = required > current}
+            {#if featured}
+                {@const stats = volunteerStats(featured)}
+                <GlassTile strong class="bento-tile" rounded="rounded-[2.5rem]" padding="p-8 md:p-12">
+                    <div class="grid lg:grid-cols-12 gap-8 items-center">
+                        <div class="lg:col-span-8 text-left space-y-4">
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <span class="text-xs font-semibold text-robotics-blue bg-white/60 px-3 py-1 rounded-full">Next up</span>
+                                <span class="text-xs font-semibold {typeStyles[featured.type] || 'text-ink-400'}">{featured.type || 'Tournament'}</span>
+                                {#if stats.needsVolunteers}
+                                    <span class="text-xs font-semibold text-amber-700 bg-amber-100/60 px-2.5 py-1 rounded-full">Needs volunteers</span>
+                                {/if}
+                            </div>
 
-                    <!-- Brutalist Scroll-Animated Card Elements -->
-                    <div class="scroll-animate-card bg-white border-4 border-slate-900 rounded-xl p-6 flex flex-col justify-between shadow-[8px_8px_0_0_rgba(15,23,42,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0_0_rgba(15,23,42,1)] transition-all duration-200 group">
-                        
-                        <div>
-                            <!-- Tags Row -->
-                            <div class="flex justify-between items-start mb-5 gap-2">
-                                <span class="px-3 py-1 text-xs font-black uppercase tracking-wide {typeStyles[event.type] || 'bg-slate-200 text-slate-900 border-2 border-slate-900'}">
-                                    {event.type || 'Tournament'}
+                            <h2 class="text-3xl md:text-4xl font-bold text-ink-900 tracking-tight">{featured.name}</h2>
+
+                            <div class="flex flex-wrap gap-4 text-sm text-ink-600">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
+                                    </svg>
+                                    {formatEventDate(featured.startDate)}
                                 </span>
-                                {#if needsVolunteers && currentTab === 'upcoming'}
-                                    <span class="text-xs font-black uppercase tracking-wide text-slate-900 bg-[#fca5a5] border-2 border-slate-900 px-3 py-1">
-                                        Needs Volunteers
-                                    </span>
-                                {/if}
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                    </svg>
+                                    {featured.location}
+                                </span>
                             </div>
 
-                            <!-- Title -->
-                            <h3 class="text-2xl font-black text-slate-900 leading-tight border-b-2 border-transparent group-hover:border-slate-900 transition-colors inline-block mb-1">
-                                {event.name}
-                            </h3>
-                            
-                            <!-- Date & Location -->
-                            <div class="mt-4 space-y-3 text-sm font-bold text-slate-700">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 flex items-center justify-center border-2 border-slate-900 bg-slate-100 rounded-md">
-                                        <svg class="w-4 h-4 text-slate-900 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
-                                        </svg>
-                                    </div>
-                                    <span>{formatDate(event.startDate)}</span>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 flex items-center justify-center border-2 border-slate-900 bg-slate-100 rounded-md">
-                                        <svg class="w-4 h-4 text-slate-900 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                                        </svg>
-                                    </div>
-                                    <span class="truncate">{event.location}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Brutalist Volunteer Status Bar -->
-                        <div class="mt-8 pt-5 border-t-4 border-slate-900">
-                            <div class="flex justify-between items-center text-sm mb-3 font-black uppercase">
-                                <span>Volunteers</span>
-                                {#if required === 0}
-                                    <span class="text-slate-500">None</span>
-                                {:else if pct >= 100}
-                                    <span class="text-slate-900 bg-[#86efac] border-2 border-slate-900 px-2 py-0.5">Filled ✓</span>
-                                {:else}
-                                    <span>{current} / {required}</span>
-                                {/if}
-                            </div>
-
-                            <!-- Hard Box Progress Bar -->
-                            <div class="w-full h-4 bg-slate-100 border-2 border-slate-900 overflow-hidden relative">
-                                <div 
-                                    class="h-full border-r-2 border-slate-900 transition-all duration-700 ease-out absolute left-0 top-0"
-                                    class:bg-[#fde047]={pct < 50}
-                                    class:bg-[#93c5fd]={pct >= 50 && pct < 100}
-                                    class:bg-[#86efac]={pct >= 100}
-                                    style="width: {required > 0 ? pct : 0}%"
-                                ></div>
-                            </div>
-                        </div>
-
-                        <!-- Brutalist Action Button -->
-                        <div class="mt-8">
-                            <a 
-                                href="/events/{event.id}" 
-                                class="flex items-center justify-center w-full bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg hover:bg-[#fde047] hover:text-slate-900 transition-colors duration-200"
+                            <a
+                                href="/events/{featured.slug || featured.id}"
+                                class="inline-flex items-center gap-2 bg-robotics-blue text-white font-semibold text-sm py-3 px-6 rounded-full shadow-ambient shadow-ambient-hover transition-all hover:-translate-y-0.5"
                             >
-                                View Details
+                                View details &amp; volunteer
                             </a>
                         </div>
+
+                        <div class="lg:col-span-4">
+                            <div class="glass-tile !p-6 rounded-3xl text-center space-y-3">
+                                <div>
+                                    {#if stats.required === 0}
+                                        <span class="text-sm font-semibold text-ink-400">No volunteers needed</span>
+                                    {:else}
+                                        <div class="text-3xl font-bold text-robotics-blue tracking-tight">{stats.current}<span class="text-ink-400 text-lg font-semibold"> / {stats.required}</span></div>
+                                        <span class="text-xs font-semibold text-ink-400">volunteers signed up</span>
+                                    {/if}
+                                </div>
+                                {#if stats.required > 0}
+                                    <div class="w-full h-2 rounded-full bg-white/50 overflow-hidden">
+                                        <div
+                                            class="h-full rounded-full transition-all duration-700 ease-out"
+                                            class:bg-amber-400={stats.pct < 50}
+                                            class:bg-robotics-blue={stats.pct >= 50 && stats.pct < 100}
+                                            class:bg-emerald-500={stats.pct >= 100}
+                                            style="width: {stats.pct}%"
+                                        ></div>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
                     </div>
-                {/each}
-            </div>
+                </GlassTile>
+            {/if}
+
+            {#if rest.length > 0}
+                <BentoGrid minTile="280px" class="pb-12">
+                    {#each rest as event (event.id)}
+                        {@const stats = volunteerStats(event)}
+
+                        <GlassTile class="bento-tile flex flex-col justify-between text-left" rounded="rounded-[2rem]" padding="p-6">
+                            <div>
+                                <div class="flex justify-between items-start mb-5 gap-2">
+                                    <span class="text-xs font-semibold {typeStyles[event.type] || 'text-ink-400'}">
+                                        {event.type || 'Tournament'}
+                                    </span>
+                                    {#if stats.needsVolunteers && currentTab === 'upcoming'}
+                                        <span class="text-xs font-semibold text-amber-700 bg-amber-100/60 px-2.5 py-1 rounded-full">
+                                            Needs volunteers
+                                        </span>
+                                    {/if}
+                                </div>
+
+                                <h3 class="text-xl font-semibold text-ink-900 leading-tight mb-1">
+                                    {event.name}
+                                </h3>
+
+                                <div class="mt-4 space-y-3 text-sm text-ink-600">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-white/60">
+                                            <svg class="w-4 h-4 text-ink-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
+                                            </svg>
+                                        </div>
+                                        <span>{formatEventDate(event.startDate)}</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-white/60">
+                                            <svg class="w-4 h-4 text-ink-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                            </svg>
+                                        </div>
+                                        <span class="truncate">{event.location}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 pt-5 border-t border-white/60">
+                                <div class="flex justify-between items-center text-xs mb-3 font-semibold text-ink-600">
+                                    <span>Volunteers</span>
+                                    {#if stats.required === 0}
+                                        <span class="text-ink-400">None needed</span>
+                                    {:else if stats.pct >= 100}
+                                        <span class="text-emerald-700">Filled &#10003;</span>
+                                    {:else}
+                                        <span>{stats.current} / {stats.required}</span>
+                                    {/if}
+                                </div>
+
+                                <div class="w-full h-2 rounded-full bg-white/50 overflow-hidden">
+                                    <div
+                                        class="h-full rounded-full transition-all duration-700 ease-out"
+                                        class:bg-amber-400={stats.pct < 50}
+                                        class:bg-robotics-blue={stats.pct >= 50 && stats.pct < 100}
+                                        class:bg-emerald-500={stats.pct >= 100}
+                                        style="width: {stats.required > 0 ? stats.pct : 0}%"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8">
+                                <a
+                                    href="/events/{event.slug || event.id}"
+                                    class="flex items-center justify-center w-full bg-robotics-blue text-white font-semibold text-sm py-3 px-4 rounded-full shadow-ambient shadow-ambient-hover transition-all hover:-translate-y-0.5"
+                                >
+                                    View details
+                                </a>
+                            </div>
+                        </GlassTile>
+                    {/each}
+                </BentoGrid>
+            {/if}
         {/if}
     </div>
-</div>
-
-<style>
-    /* CSS Native Scroll-Driven Animations - Harder pop for brutalism */
-    @keyframes card-reveal-brutal {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .scroll-animate-card {
-        animation-name: card-reveal-brutal;
-        /* Snappier bezier curve for a "harder" mechanical feel */
-        animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        animation-fill-mode: both;
-        animation-timeline: view();
-        /* Triggers exactly as it enters the viewport */
-        animation-range: entry 5% entry 20%;
-    }
-
-    /* Fallback for browsers that do not support view-driven animations */
-    @supports not (animation-timeline: view()) {
-        .scroll-animate-card {
-            animation: none;
-            opacity: 1;
-            transform: none;
-        }
-    }
-</style>
+</main>
