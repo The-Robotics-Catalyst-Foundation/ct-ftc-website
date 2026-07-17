@@ -12,6 +12,17 @@ function isValidRole(value: FormDataEntryValue | null): value is (typeof ROLES)[
 	return typeof value === 'string' && (ROLES as readonly string[]).includes(value);
 }
 
+// Shared avatar handling for create/update: a real file replaces it, the
+// "avatarRemove" flag (set by AvatarPicker) clears it, otherwise it's left alone.
+function appendAvatar(out: FormData, form: FormData) {
+	const avatar = form.get('avatar');
+	if (avatar instanceof File && avatar.size > 0) {
+		out.append('avatar', avatar);
+	} else if (form.get('avatarRemove') === '1') {
+		out.append('avatar', '');
+	}
+}
+
 export const actions: Actions = {
 	createUser: async ({ request, locals }) => {
 		requireRole(locals.user, ['admin']);
@@ -32,6 +43,7 @@ export const actions: Actions = {
 		out.append('passwordConfirm', password);
 		out.append('authLevel', authLevel);
 		out.append('emailVisibility', 'true');
+		appendAvatar(out, form);
 
 		try {
 			await locals.pb.collection('users').create(out);
@@ -63,6 +75,8 @@ export const actions: Actions = {
 			out.append('password', password);
 			out.append('passwordConfirm', password);
 		}
+
+		appendAvatar(out, form);
 
 		try {
 			await locals.pb.collection('users').update(id, out);

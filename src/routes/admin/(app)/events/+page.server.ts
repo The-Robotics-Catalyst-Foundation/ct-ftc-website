@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { requireRole } from '$lib/server/auth';
+import { slugify } from '$lib/slug';
 import type { PageServerLoad, Actions } from './$types';
 
 const CAN_MANAGE = ['admin', 'event_manager'] as const;
@@ -12,8 +13,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 function eventFormData(form: FormData) {
 	const out = new FormData();
-	out.append('name', String(form.get('name') ?? ''));
+	const name = String(form.get('name') ?? '');
+	out.append('name', name);
 	out.append('location', String(form.get('location') ?? ''));
+
+	// Dropped silently by PocketBase until a `slug` field is added to the
+	// events collection schema - safe to send unconditionally either way.
+	const rawSlug = String(form.get('slug') ?? '').trim();
+	out.append('slug', slugify(rawSlug || name));
 
 	const dateTime = String(form.get('date_time') ?? '');
 	if (dateTime) out.append('date_time', new Date(dateTime).toISOString());

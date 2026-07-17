@@ -10,7 +10,7 @@ const OAUTH_ERRORS: Record<string, string> = {
 };
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	if (roleOf(locals.user)) throw redirect(303, '/admin/dashboard');
+	if (roleOf(locals.user)) throw redirect(303, '/admin/events');
 
 	const code = url.searchParams.get('error');
 	return { oauthError: code ? (OAUTH_ERRORS[code] ?? 'Sign-in failed. Please try again.') : null };
@@ -32,7 +32,6 @@ export const actions: Actions = {
 
 		try {
 			const { record } = await locals.pb.collection('users').authWithPassword(email, password);
-
 			if (!roleOf(record)) {
 				locals.pb.authStore.clear();
 				return fail(403, { error: 'This account does not have dashboard access.' });
@@ -41,6 +40,6 @@ export const actions: Actions = {
 			return fail(400, { error: 'Invalid email or password.' });
 		}
 
-		throw redirect(303, '/admin/dashboard');
+		throw redirect(303, '/admin/events');
 	}
 };

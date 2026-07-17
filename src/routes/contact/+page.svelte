@@ -1,28 +1,21 @@
 <script lang="ts">
-  import { fade, fly } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
-  // Import PocketBase
   import { pb } from '$lib/pocketbase';
+  import GlassTile from '$lib/components/ui/GlassTile.svelte';
+  import { revealTiles } from '$lib/motion';
 
-  // Svelte 5 direct destructuring without explicit interface types
-  let { data = { upcoming: [] } } = $props();
-
-  // State Management (Svelte 5 Runes)
   let name = $state("");
   let email = $state("");
-  let category = $state("general"); 
+  let category = $state("general");
   let message = $state("");
   let submitted = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state("");
-  let scrollY = $state(0);
 
-  // Monitors the URL path anchor fragment for automatic dropdown updates
   function evaluateUrlHash(): void {
     if (typeof window !== 'undefined' && window.location.hash === '#volunteer') {
       category = "volunteer";
-      
-      // Target and smoothly scroll to the form element block
       const formBlock = document.getElementById('contact-form-block');
       if (formBlock) {
         formBlock.scrollIntoView({ behavior: 'smooth' });
@@ -33,27 +26,27 @@
   onMount(() => {
     evaluateUrlHash();
     window.addEventListener('hashchange', evaluateUrlHash);
+    revealTiles('.bento-tile');
     return () => {
       window.removeEventListener('hashchange', evaluateUrlHash);
     };
   });
 
-  // Social Channels Array
   const socials = [
-    { 
-      name: 'Instagram', 
-      href: 'https://www.instagram.com/ctfirsttechchallenge/', 
-      icon: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' 
+    {
+      name: 'Instagram',
+      href: 'https://www.instagram.com/ctfirsttechchallenge/',
+      icon: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z'
     },
-    { 
-      name: 'Discord', 
-      href: 'https://discord.com/invite/GTPU98nWY9', 
-      icon: 'M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.298 12.298 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z' 
+    {
+      name: 'Discord',
+      href: 'https://discord.com/invite/GTPU98nWY9',
+      icon: 'M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.298 12.298 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z'
     },
-    { 
-      name: 'Facebook', 
-      href: 'https://www.facebook.com/profile.php?id=61553396255140', 
-      icon: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' 
+    {
+      name: 'Facebook',
+      href: 'https://www.facebook.com/profile.php?id=61553396255140',
+      icon: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'
     }
   ];
 
@@ -63,18 +56,12 @@
     errorMessage = "";
 
     try {
-      await pb.collection('contact').create({
-        name,
-        email,
-        category,
-        message
-      });
+      await pb.collection('contact').create({ name, email, category, message });
 
       setTimeout(() => {
         submitted = true;
         isSubmitting = false;
       }, 1200);
-
     } catch (error: any) {
       errorMessage = error.message || 'Could not communicate with database.';
       isSubmitting = false;
@@ -90,67 +77,61 @@
     errorMessage = "";
     isSubmitting = false;
   }
-
-  let parallaxHeaderY = $derived(scrollY * 0.25);
 </script>
-
-<svelte:window bind:scrollY />
 
 <svelte:head>
   <title>Contact Us | Connecticut FTC</title>
 </svelte:head>
 
-<main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
-  <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none"></div>
-
-  <section class="relative pt-20 pb-12 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7]">
-    <div class="max-w-6xl mx-auto text-left space-y-5 z-10" style="transform: translateY({parallaxHeaderY}px)">
-      <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-1.5 box-shadow-flat transform -rotate-1">
-        Get in Touch
+<main class="aurora-field min-h-screen pb-24">
+  <section class="max-w-6xl mx-auto px-6 pt-24 pb-8">
+    <GlassTile strong class="bento-tile space-y-5 text-left" rounded="rounded-[2.5rem]" padding="p-10 md:p-14">
+      <span class="inline-flex items-center gap-2 text-xs font-semibold text-robotics-blue bg-white/60 px-3 py-1.5 rounded-full">
+        Get in touch
       </span>
-      <h1 class="text-4xl md:text-6xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-        Let's Build <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-1 box-shadow-flat transform rotate-1">The Future</span>
+      <h1 class="text-4xl md:text-6xl font-bold text-ink-900 tracking-tight">
+        Let's build <span class="text-robotics-blue">the future</span>
       </h1>
-      <p class="text-slate-800 text-sm md:text-base font-bold max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl leading-relaxed">
+      <p class="text-ink-600 text-sm md:text-base max-w-xl leading-relaxed">
         Have questions about starting a local team, managing volunteer shifts, or sponsoring our tournament season?
       </p>
-    </div>
+    </GlassTile>
   </section>
 
-  <div class="max-w-6xl mx-auto px-6 py-16 relative z-20">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-      
-      <div class="lg:col-span-5 space-y-10 text-left">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <GlassTile class="bento-tile lg:col-span-5 space-y-8 text-left" rounded="rounded-[2.5rem]" padding="p-8 md:p-10">
         <div>
-          <span class="text-xs font-black text-white bg-black border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider mb-3">Contact Desk</span>
-          <h2 class="text-2xl font-black text-black uppercase tracking-tight">Direct Channels</h2>
-          <p class="text-xs font-bold text-slate-500 mt-1">Reach out directly to our specific team coordinators for faster processing.</p>
+          <span class="text-xs font-semibold text-ink-400">Contact desk</span>
+          <h2 class="text-xl font-semibold text-ink-900 tracking-tight mt-1">Direct channels</h2>
+          <p class="text-xs text-ink-400 mt-1">Reach out directly for faster processing.</p>
         </div>
 
-        <div class="space-y-6">
-          <div class="bg-white border-3 border-black p-5 rounded-2xl box-shadow-flat flex gap-4 items-start">
-            <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-inner border border-slate-300/40 flex items-center justify-center text-xl shrink-0">
-              ✉️
-            </div>
-            <div class="space-y-1">
-              <h4 class="font-black text-black uppercase text-sm tracking-tight">Email Addresses</h4>
-              <p class="text-slate-600 text-xs font-bold"> <a href="mailto:contact@connecticutftc.org" class="text-[#2563eb] hover:underline">contact@connecticutftc.org</a></p>
-            </div>
+        <div class="glass-tile !p-5 rounded-2xl flex gap-4 items-start">
+          <div class="w-12 h-12 rounded-xl bg-white/60 flex items-center justify-center text-xl shrink-0">
+            &#9993;&#65039;
+          </div>
+          <div class="space-y-1">
+            <h4 class="font-semibold text-ink-900 text-sm">Email</h4>
+            <p class="text-ink-600 text-xs">
+              <a href="mailto:contact@connecticutftc.org" class="text-robotics-blue hover:underline">contact@connecticutftc.org</a>
+            </p>
           </div>
         </div>
 
-        <div class="pt-4">
-          <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest pl-1 mb-4">Connect With Us</h4>
-          <div class="flex flex-wrap gap-4">
+        <div class="pt-2">
+          <h4 class="text-xs font-semibold text-ink-400 mb-4">Connect with us</h4>
+          <div class="flex flex-wrap gap-3">
             {#each socials as social}
-              <a 
-                href={social.href} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 title={social.name}
-                class="bg-white border-3 border-black p-3.5 rounded-xl box-shadow-flat hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center"
+                class="glass-tile !p-3.5 rounded-xl flex items-center justify-center text-ink-600 hover:text-robotics-blue transition-colors"
               >
-                <svg class="w-5 h-5 fill-black" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                   <path d={social.icon} />
                 </svg>
                 <span class="sr-only">{social.name}</span>
@@ -158,72 +139,71 @@
             {/each}
           </div>
         </div>
-      </div>
+      </GlassTile>
 
-      <div id="contact-form-block" class="lg:col-span-7 w-full">
-        <div class="bg-[#eef2f7] shadow-neumorphic-outer rounded-[3rem] p-6 md:p-10 border-2 border-white/60 relative overflow-hidden">
-          
+      <div id="contact-form-block" class="bento-tile lg:col-span-7 w-full">
+        <GlassTile rounded="rounded-[2.5rem]" padding="p-6 md:p-10">
           {#if submitted}
             <div in:fly={{ y: 20, duration: 400 }} class="h-full py-12 flex flex-col items-center justify-center text-center">
-              <div class="w-20 h-20 bg-white border-4 border-black text-emerald-500 rounded-full flex items-center justify-center mb-6 box-shadow-flat text-3xl font-bold">
-                ✓
+              <div class="w-16 h-16 glass-tile text-emerald-500 rounded-full flex items-center justify-center mb-6 text-2xl font-bold">
+                &#10003;
               </div>
-              <h3 class="text-2xl font-black text-black uppercase tracking-tight mb-2">Message Sent!</h3>
-              <p class="text-sm font-bold text-slate-600 max-w-xs mx-auto leading-relaxed">
-                Thank you for reaching out. A representative from our team will respond to your email within <span class="text-[#2563eb]">24 to 48 hours</span>.
+              <h3 class="text-2xl font-semibold text-ink-900 tracking-tight mb-2">Message sent!</h3>
+              <p class="text-sm text-ink-600 max-w-xs mx-auto leading-relaxed">
+                Thank you for reaching out. A representative will respond within <span class="text-robotics-blue font-medium">24 to 48 hours</span>.
               </p>
-              
-              <button onclick={resetForm} class="mt-8 text-xs font-black uppercase tracking-wider text-[#2563eb] hover:text-black transition-colors underline underline-offset-4">
-                &larr; Send Another Message
+
+              <button onclick={resetForm} class="mt-8 text-xs font-semibold text-robotics-blue hover:text-ink-900 transition-colors underline underline-offset-4">
+                &larr; Send another message
               </button>
             </div>
           {:else}
             <form onsubmit={handleSubmit} class="space-y-6">
-              
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="space-y-2 text-left">
-                  <label for="name" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Your Name</label>
-                  <input type="text" id="name" bind:value={name} required disabled={isSubmitting} placeholder="e.g. Jane Doe" class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50" />
+                  <label for="name" class="text-xs font-semibold text-ink-400 block pl-1">Your name</label>
+                  <input type="text" id="name" bind:value={name} required disabled={isSubmitting} placeholder="e.g. Jane Doe" class="glass-input w-full rounded-xl px-4 py-3.5 text-sm outline-none disabled:opacity-50" />
                 </div>
-                
+
                 <div class="space-y-2 text-left">
-                  <label for="email" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Email Address</label>
-                  <input type="email" id="email" bind:value={email} required disabled={isSubmitting} placeholder="name@domain.com" class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50" />
+                  <label for="email" class="text-xs font-semibold text-ink-400 block pl-1">Email address</label>
+                  <input type="email" id="email" bind:value={email} required disabled={isSubmitting} placeholder="name@domain.com" class="glass-input w-full rounded-xl px-4 py-3.5 text-sm outline-none disabled:opacity-50" />
                 </div>
               </div>
 
               <div class="space-y-2 text-left">
-                <label for="cat" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Inquiry Topic</label>
+                <label for="cat" class="text-xs font-semibold text-ink-400 block pl-1">Inquiry topic</label>
                 <div class="relative">
-                  <select id="cat" bind:value={category} disabled={isSubmitting} class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none appearance-none focus:border-[#2563eb] transition-colors cursor-pointer disabled:opacity-50">
-                    <option value="general">General Inquiry</option>
-                    <option value="team">Team Support</option>
+                  <select id="cat" bind:value={category} disabled={isSubmitting} class="glass-input w-full rounded-xl px-4 py-3.5 text-sm outline-none appearance-none cursor-pointer disabled:opacity-50">
+                    <option value="general">General inquiry</option>
+                    <option value="team">Team support</option>
                     <option value="volunteer">Volunteering</option>
                     <option value="sponsorship">Sponsorship</option>
                   </select>
-                  <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none font-black text-xs opacity-60">▼</div>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-ink-400">&#9662;</div>
                 </div>
               </div>
 
               <div class="space-y-2 text-left">
-                <label for="msg" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Message Detail</label>
-                <textarea id="msg" rows="5" bind:value={message} required disabled={isSubmitting} placeholder="Write the details of your request here..." class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors resize-none disabled:opacity-50"></textarea>
+                <label for="msg" class="text-xs font-semibold text-ink-400 block pl-1">Message detail</label>
+                <textarea id="msg" rows="5" bind:value={message} required disabled={isSubmitting} placeholder="Write the details of your request here..." class="glass-input w-full rounded-xl px-4 py-3.5 text-sm outline-none resize-none disabled:opacity-50"></textarea>
               </div>
 
               {#if errorMessage}
-                <div class="text-rose-600 text-xs font-bold text-left bg-rose-50 border-2 border-rose-600 rounded-xl p-3">
-                  ⚠️ {errorMessage}
+                <div class="text-rose-600 text-xs font-medium text-left bg-rose-50 rounded-xl p-3">
+                  &#9888;&#65039; {errorMessage}
                 </div>
               {/if}
 
-              <button 
-                type="submit" 
-                disabled={isSubmitting} 
+              <button
+                type="submit"
+                disabled={isSubmitting}
                 class="button w-full"
                 class:is-submitting={isSubmitting}
               >
                 <div class="outline"></div>
-                
+
                 <div class="state state--default" class:hidden-state={isSubmitting}>
                   <div class="icon">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="1.2em" width="1.2em">
@@ -274,8 +254,7 @@
               </button>
             </form>
           {/if}
-          
-        </div>
+        </GlassTile>
       </div>
 
     </div>
@@ -283,31 +262,21 @@
 </main>
 
 <style>
-  .bg-grid-pattern {
-    background-size: 40px 40px;
-    background-image: 
-      linear-gradient(to right, #000000 1px, transparent 1px),
-      linear-gradient(to bottom, #000000 1px, transparent 1px);
+  .glass-input {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--color-glass-border);
+    color: var(--color-ink-900);
+    font-weight: 500;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .glass-input:focus {
+    border-color: var(--color-robotics-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
   }
 
-  .shadow-neumorphic-outer {
-    box-shadow: 
-      12px 12px 28px #bebebe, 
-      -12px -12px 28px #ffffff,
-      inset 1px 1px 0px rgba(255,255,255,0.9);
-  }
-
-  .shadow-neumorphic-inner {
-    box-shadow: 
-      inset 4px 4px 10px #cad4e2, 
-      inset -4px -4px 10px #ffffff;
-  }
-
-  .box-shadow-flat {
-    box-shadow: 5px 5px 0px 0px #000000;
-  }
-
-  /* BUTTON STYLES */
+  /* Send button - kept from the prior system: a self-contained, non-brutalist
+     skeuomorphic control (soft gradient bevel, no black outline) that already
+     fits the new material language. Only the accent var below is themed. */
   .button {
     --primary: #2563eb;
     --neutral-1: #ffffff;
@@ -330,7 +299,7 @@
     min-width: 220px;
     padding: 22px;
     height: 72px;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: inherit;
     font-style: normal;
     font-size: 19px;
     font-weight: 800;
@@ -352,7 +321,7 @@
       0 0 1px 2px rgba(255, 255, 255, 0.3),
       0 10px 3px -3px rgba(0, 0, 0, 0.2);
   }
-  
+
   .button:after {
     content: "";
     position: absolute;
@@ -365,12 +334,12 @@
     z-index: 0;
     transition: all 0.4s ease;
   }
-  
+
   .button:hover::after {
     transform: scale(1.05, 1.1);
     box-shadow: inset 0 -1px 3px 0 rgba(255, 255, 255, 1);
   }
-  
+
   .button::before {
     content: "";
     inset: 7px 6px 6px 6px;
@@ -380,7 +349,7 @@
     filter: blur(0.5px);
     z-index: 2;
   }
-  
+
   .state p {
     display: flex;
     align-items: center;
@@ -388,7 +357,7 @@
     z-index: 5;
     position: relative;
   }
-  
+
   .state .icon {
     position: absolute;
     left: 0;
@@ -402,7 +371,7 @@
     justify-content: center;
     z-index: 5;
   }
-  
+
   .state .icon svg {
     overflow: visible;
   }
@@ -416,7 +385,7 @@
     transition: opacity 0.4s ease;
     inset: -2px -3.5px;
   }
-  
+
   .outline::before {
     content: "";
     position: absolute;
@@ -431,16 +400,16 @@
     animation-play-state: paused;
     opacity: 0.7;
   }
-  
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
+
   .button:hover .outline {
     opacity: 1;
   }
-  
+
   .button:hover .outline::before {
     animation-play-state: running;
   }
@@ -450,17 +419,17 @@
     opacity: 0;
     animation: slideDown 0.8s ease forwards calc(var(--i) * 0.03s);
   }
-  
+
   .button:hover p span {
     opacity: 1;
     animation: wave 0.5s ease forwards calc(var(--i) * 0.02s);
   }
-  
+
   .button.is-submitting p span {
     opacity: 1;
     animation: disappear 0.6s ease forwards calc(var(--i) * 0.03s);
   }
-  
+
   @keyframes wave {
     30% {
       opacity: 1;
@@ -476,7 +445,7 @@
       transform: translateY(0) translateX(0) rotate(0);
     }
   }
-  
+
   @keyframes slideDown {
     0% {
       opacity: 0;
@@ -498,7 +467,7 @@
       transform: translateY(0) translateX(0) rotate(0);
     }
   }
-  
+
   @keyframes disappear {
     from { opacity: 1; }
     to {
@@ -512,19 +481,19 @@
   .state--default .icon svg {
     animation: land 0.6s ease forwards;
   }
-  
+
   .button:hover .state--default .icon {
     transform: rotate(45deg) scale(1.25);
   }
-  
+
   .button.is-submitting .state--default svg {
     animation: takeOff 0.8s linear forwards;
   }
-  
+
   .button.is-submitting .state--default .icon {
     transform: rotate(0) scale(1.25);
   }
-  
+
   @keyframes takeOff {
     0% { opacity: 1; }
     60% {
@@ -536,7 +505,7 @@
       transform: translateX(180px) rotate(45deg) scale(0);
     }
   }
-  
+
   @keyframes land {
     0% {
       transform: translateX(-60px) translateY(30px) rotate(-50deg) scale(2);
@@ -559,11 +528,11 @@
     left: -5px;
     background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.5));
   }
-  
+
   .button.is-submitting .state--default .icon:before {
     animation: contrail 0.8s linear forwards;
   }
-  
+
   @keyframes contrail {
     0% { width: 0; opacity: 1; }
     8% { width: 15px; }
@@ -577,38 +546,38 @@
     display: flex;
     position: relative;
   }
-  
+
   .state--default span:nth-child(4) {
     margin-right: 5px;
   }
-  
+
   .state--sent {
     display: none;
   }
-  
+
   .state--sent svg {
     transform: scale(1.25);
     margin-right: 8px;
   }
-  
+
   .hidden-state {
     position: absolute;
   }
-  
+
   .button.is-submitting .visible-sent {
     display: flex;
   }
-  
+
   .button.is-submitting .state--sent span {
     opacity: 0;
     animation: slideDown 0.8s ease forwards calc(var(--i) * 0.2s);
   }
-  
+
   .button.is-submitting .state--sent .icon svg {
     opacity: 0;
     animation: appear 1.2s ease forwards 0.8s;
   }
-  
+
   @keyframes appear {
     0% {
       opacity: 0;
