@@ -15,7 +15,6 @@
     currentIndex = (currentIndex + 1) % images.length;
   }
 
-  /** @param {number} index */
   function goToSlide(index) {
     currentIndex = index;
   }
@@ -62,3 +61,9 @@
   </div>
 
 </div>
+
+<style>
+  .box-shadow-flat {
+    box-shadow: 6px 6px 0px 0px #000000;
+  }
+</style>

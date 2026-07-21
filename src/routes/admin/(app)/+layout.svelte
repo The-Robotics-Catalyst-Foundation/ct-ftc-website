@@ -19,6 +19,7 @@
 
 	const navItems = $derived(
 		[
+			{ href: '/admin/dashboard', label: 'Dashboard', roles: ['admin', 'event_manager', 'photographer'] },
 			{ href: '/admin/events', label: 'Events', roles: ['admin', 'event_manager', 'photographer'] },
 			{ href: '/admin/messages', label: 'Messages', roles: ['admin', 'event_manager'] },
 			{ href: '/admin/users', label: 'Users', roles: ['admin'] }
@@ -38,6 +39,7 @@
 	const initial = $derived((data.name?.trim()?.[0] ?? data.email?.[0] ?? '?').toUpperCase());
 </script>
 
+<<<<<<< HEAD
 {#snippet sidebarContent(onNavigate?: (e: MouseEvent) => void)}
 	<div class="space-y-6">
 		<div class="flex items-center gap-3 px-1">
@@ -48,6 +50,25 @@
 					<span
 						class="flex h-full w-full items-center justify-center text-sm font-semibold text-robotics-blue"
 						style="background: rgba(29, 78, 216, 0.1);"
+=======
+<div class="admin-shell flex font-sans">
+	<aside class="glass-panel m-4 flex w-64 shrink-0 flex-col justify-between rounded-3xl p-5">
+		<div class="space-y-6">
+			<div class="px-1">
+				<p class="truncate text-sm font-semibold text-text-main">{data.email}</p>
+				<span class="role-badge {data.role} mt-2">{roleLabel[data.role]}</span>
+			</div>
+
+			<nav class="space-y-1">
+				{#each navItems as item (item.href)}
+					<a
+						href={item.href}
+						class="block rounded-xl px-3 py-2.5 text-sm font-medium transition-colors {$page.url.pathname.startsWith(
+							item.href
+						)
+							? 'bg-ftc-blue/10 font-semibold text-ftc-blue'
+							: 'text-text-muted hover:bg-white/60 hover:text-text-main'}"
+>>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 					>
 						{initial}
 					</span>

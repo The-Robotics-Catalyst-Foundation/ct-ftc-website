@@ -4,6 +4,7 @@
 
 
 @theme {
+<<<<<<< HEAD
     /* Base field the aurora + glass tiles sit on */
     --color-base-mist: #eef2f8;
 
@@ -33,12 +34,34 @@
        glass/aurora material system as the public site now (admin.css just maps
        its class names onto the tokens above) - these are convenience aliases
        for admin's still-existing utility-class usage, not a separate palette. */
+=======
+    /* Main Background Elements (Light Mode Base) */
+    --color-bg-main: #ffffff;
+>>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
     --color-bg-surface: #f8fafc;
-    --color-ftc-blue: #1d4ed8;
-    --color-ftc-blue-dark: #1e40af;
-    --color-text-main: #0f172a;
-    --color-text-muted: #475569;
-    --color-border-subtle: #e2e8f0;
+    --color-bg-surface-hover: #f1f5f9;
+
+    /* Brand Accents (Deep Royals & Electric Blues) */
+    --color-ftc-blue: #1d4ed8;       /* Primary Action/Headers */
+    --color-ftc-blue-dark: #1e40af;  /* Hover states / Deep Text */
+    --color-ftc-sky: #38bdf8;        /* Subtle boarders/indicators */
+
+    /* Contrast Highlights (FIRST Gold/Orange alternative) */
+    --color-ftc-gold: #d97706;       /* Warm Amber for high contrast */
+
+    /* Typography Scales */
+    --color-text-main: #0f172a;      /* Slate 900 for absolute contrast */
+    --color-text-muted: #475569;     /* Slate 600 for descriptions */
+    --color-border-subtle: #e2e8f0;  /* Slate 200 for clean layouts */
+
+    /* Typography Fonts */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+    /* Custom Animation Keyframes (Updated for Light Background) */
+    --animate-spin-slow: globe-spin 40s linear infinite;
+    --animate-globe-zoom: globe-zoom 5s cubic-bezier(0.85, 0, 0.15, 1) forwards;
+    --animate-fade-in: fade-in 0.5s ease-out forwards;
 }
 
 html {
@@ -47,19 +70,21 @@ html {
 }
 
 body {
+<<<<<<< HEAD
     @apply font-sans bg-base-mist text-ink-900 min-h-screen antialiased overflow-x-hidden;
     overscroll-behavior-y: contain;
+=======
+    /* Applies your new clean white background system globally */
+    @apply font-sans bg-bg-main text-text-main min-h-screen antialiased;
+>>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 }
 
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
+/* Updated map layout background gradient for the landing page hero grid */
+.bg-robotics-gradient {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
+<<<<<<< HEAD
 /* The aurora field: soft blue/gold blooms behind every glass section. */
 .aurora-field {
     position: relative;
@@ -83,14 +108,28 @@ body {
         linear-gradient(to right, rgb(15 23 42 / 5%) 1px, transparent 1px),
         linear-gradient(to bottom, rgb(15 23 42 / 5%) 1px, transparent 1px);
     background-size: 44px 44px;
+=======
+/* 1. Gentle spinning animation for the global map view */
+@keyframes globe-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+>>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 }
 
-/* Shared glass material - blur/saturate is the point, not a border-radius trick. */
-.glass-material {
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
+/* 2. Camera tracking zoom modified to focus on light assets */
+@keyframes globe-zoom {
+  0% {
+    transform: scale(1) translate(0, 0) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.8) translate(-10%, -8%) rotate(-5deg);
+  }
+  100% {
+    transform: scale(7.5) translate(-36.5%, -23.5%) rotate(0deg);
+  }
 }
 
+<<<<<<< HEAD
 .glass-tile {
     background: var(--color-glass-white);
     border: 1px solid var(--color-glass-border);
@@ -141,6 +180,9 @@ body {
 }
 
 /* Smooth appearance for HUD-style overlays */
+=======
+/* 3. Smooth appearance for the HUD text overlay */
+>>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
