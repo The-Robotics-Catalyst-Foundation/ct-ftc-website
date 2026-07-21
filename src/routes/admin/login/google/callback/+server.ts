@@ -47,5 +47,5 @@ export const GET: RequestHandler = async ({ locals, url, cookies }) => {
 		throw redirect(303, '/admin?error=no_account');
 	}
 
-	throw redirect(303, '/admin/events');
+	throw redirect(303, '/admin/dashboard');
 };
