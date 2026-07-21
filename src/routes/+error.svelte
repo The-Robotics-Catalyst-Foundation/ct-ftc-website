@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
+  import { House, Wrench, Mail } from '@lucide/svelte';
 
   let scrollY = $state(0);
   let isLoaded = $state(false);
@@ -42,17 +43,17 @@
         
         <div class="grid grid-cols-1 gap-3">
           <a href="/" class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-black hover:bg-slate-50 transition-all font-bold text-sm">
-            <span>🏠 Home</span>
+            <span class="flex items-center gap-2"><House class="w-4 h-4" strokeWidth={2.5} /> Home</span>
             <span class="text-xs opacity-60">→</span>
           </a>
-          
+
           <a href="/volunteer" class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-black hover:bg-slate-50 transition-all font-bold text-sm">
-            <span>🛠️ Volunteer Registration</span>
+            <span class="flex items-center gap-2"><Wrench class="w-4 h-4" strokeWidth={2.5} /> Volunteer Registration</span>
             <span class="text-xs opacity-60">→</span>
           </a>
 
           <a href="/contact" class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-black hover:bg-slate-50 transition-all font-bold text-sm">
-            <span>✉️ Contact Us</span>
+            <span class="flex items-center gap-2"><Mail class="w-4 h-4" strokeWidth={2.5} /> Contact Us</span>
             <span class="text-xs opacity-60">→</span>
           </a>
         </div>

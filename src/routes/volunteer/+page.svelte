@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { slide } from 'svelte/transition';
   import Head from '$lib/components/head.svelte';
+  import { Wrench, Scale, ClipboardList, Coffee } from '@lucide/svelte';
 
   // State Management
   let isLoaded = $state(false);
@@ -13,7 +14,7 @@
   const roleCategories = [
     {
       key: 'tech',
-      icon: '🛠️',
+      icon: Wrench,
       title: 'Technical Roles',
       subtitle: 'Referees, FTAs, Robot Inspectors...',
       tag: 'Field Operations',
@@ -22,7 +23,7 @@
     },
     {
       key: 'judges',
-      icon: '⚖️',
+      icon: Scale,
       title: 'Judges & Award Staff',
       subtitle: 'Panel Judges, Judge Match Observers...',
       tag: 'Evaluation Team',
@@ -31,7 +32,7 @@
     },
     {
       key: 'logistics',
-      icon: '📋',
+      icon: ClipboardList,
       title: 'Event Logistics',
       subtitle: 'Queuers, Scorekeepers, Emcees...',
       tag: 'Event Flow',
@@ -40,7 +41,7 @@
     },
     {
       key: 'support',
-      icon: '☕',
+      icon: Coffee,
       title: 'Support & Setup',
       subtitle: 'Field Reset, Team Check-in...',
       tag: 'Event Support',
@@ -165,7 +166,9 @@
             aria-expanded={activeRoleCategory === role.key}
             class="w-full text-left p-4 flex items-center gap-4 transition-colors {activeRoleCategory === role.key ? 'bg-[#eef2f7]' : 'bg-white hover:bg-slate-50'}"
           >
-            <div class="w-10 h-10 shrink-0 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl border border-slate-200">{role.icon}</div>
+            <div class="w-10 h-10 shrink-0 rounded-xl bg-white shadow-sm flex items-center justify-center border border-slate-200">
+              <role.icon class="w-5 h-5 text-black" strokeWidth={2.5} />
+            </div>
             <div class="flex-1 min-w-0">
               <span class="block text-xs font-black uppercase tracking-wide text-black">{role.title}</span>
               <span class="block text-[10px] font-bold text-slate-400 truncate">{role.subtitle}</span>

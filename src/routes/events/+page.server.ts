@@ -19,6 +19,7 @@ export const load: PageServerLoad = async () => {
         return {
             upcoming: upcomingRecords.map(record => ({
                 id: record.id,
+                slug: record.slug || '',
                 name: record.name || 'Untitled Event',
                 type: record.type || 'Tournament', // If 'type' doesn't exist yet, it safely fallbacks
                 location: record.location || 'Location Pending',
@@ -30,6 +31,7 @@ export const load: PageServerLoad = async () => {
             })),
             past: pastRecords.map(record => ({
                 id: record.id,
+                slug: record.slug || '',
                 name: record.name || 'Untitled Event',
                 type: record.type || 'Tournament',
                 location: record.location || 'Location Pending',

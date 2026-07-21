@@ -1,58 +1,40 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   import { page } from '$app/stores';
->>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
   import { enhance } from '$app/forms';
   import { pb } from '$lib/pocketbase';
   import { fade, fly } from 'svelte/transition';
-  import { revealTiles } from '$lib/motion';
-  import GlassTile from '$lib/components/ui/GlassTile.svelte';
+  import { CircleCheck, TriangleAlert } from '@lucide/svelte';
 
   let { data } = $props();
 
-  const volunteerSteps = [
-    'Review the roles needed for this event and pick what fits you.',
-    'Register your role through the official FIRST Dashboard.',
-    "Come back here and confirm you've registered so organizers know to expect you."
-  ];
-
+  // --- SVELTE 5 STATE RUNES ---
   let event: any = $state(null);
   let isLoaded = $state(false);
+  let scrollY = $state(0);
+  let mousePos = $state({ x: 0, y: 0 });
   let timeStr = $state('');
-  let hasVolunteered = $state(data.alreadyVolunteered);
-  let isSubmittingRsvp = $state(false);
-  let rsvpError = $state('');
-  let showVolunteerModal = $state(false);
-  let confirmedRegistration = $state(false);
-  let rsvpEmail = $state('');
-
-  function openVolunteerModal() {
-    showVolunteerModal = true;
-  }
-
-  function closeVolunteerModal() {
-    showVolunteerModal = false;
-    confirmedRegistration = false;
-    rsvpEmail = '';
-    rsvpError = '';
-  }
-
-  function handleModalKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') closeVolunteerModal();
-  }
+  let hasVolunteered = $state(data?.alreadyVolunteered ?? false);
+  let volunteerSubmitting = $state(false);
+  let volunteerError = $state('');
 
   const now = new Date().toISOString();
 
+  // Optimized Mouse Move Parallax
+  function handleMouseMove(e: MouseEvent) {
+    mousePos = {
+      x: (e.clientX / window.innerWidth - 0.5) * 10,
+      y: (e.clientY / window.innerHeight - 0.5) * 10
+    };
+  }
+
   function updateCountdown(dateISO: string) {
     const diff = new Date(dateISO).getTime() - Date.now();
-    if (diff <= 0) return (timeStr = 'Event concluded');
+    if (diff <= 0) return (timeStr = 'Event Concluded');
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
-    timeStr = `${d}d ${h}h ${m}m remaining`;
+    timeStr = `${d}d ${h}h ${m}m Remaining`;
   }
 
   onMount(() => {
@@ -69,91 +51,9 @@
         }
         updateCountdown(event.date_time);
         timer = setInterval(() => updateCountdown(event.date_time), 60000);
-        setTimeout(() => {
-          isLoaded = true;
-          revealTiles('.bento-tile');
-        }, 50);
+        setTimeout(() => (isLoaded = true), 50);
       } catch (e) {
         console.error('Failed to fetch event data:', e);
-      }
-    }
-
-    fetchEventNode();
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  });
-
-  let isPastEvent = $derived(event ? event.date_time < now : false);
-  let pdfUrl = $derived(event && event.event_pdf ? pb.files.getURL(event, event.event_pdf) : null);
-</script>
-
-<svelte:window onkeydown={showVolunteerModal ? handleModalKeydown : undefined} />
-
-{#if event}
-<main class="aurora-field min-h-screen pb-24">
-
-  <section class="max-w-5xl mx-auto px-6 pt-24 pb-6">
-    <nav aria-label="Breadcrumb" class="inline-flex items-center gap-2.5 px-4 py-2 glass-tile rounded-full text-xs font-semibold">
-      <a href="/" class="text-ink-400 hover:text-robotics-blue transition-colors">Home</a>
-      <span class="text-ink-400">/</span>
-      <a href="/events" class="text-ink-400 hover:text-robotics-blue transition-colors">Events</a>
-      <span class="text-ink-400">/</span>
-      <span class="text-robotics-blue max-w-[150px] sm:max-w-xs truncate" aria-current="page">{event.name}</span>
-    </nav>
-  </section>
-
-  <section class="max-w-5xl mx-auto px-6 pb-6 text-center">
-    {#if isLoaded}
-      <div in:fly={{ y: 20, duration: 500 }}>
-        <span class="inline-block px-4 py-1.5 mb-6 text-xs font-semibold text-ink-900 bg-white/60 rounded-full">
-          {isPastEvent ? 'Past event' : 'Upcoming event'}
-        </span>
-
-        <h1 class="text-4xl md:text-6xl font-bold text-ink-900 tracking-tight leading-[1.05] mb-8 max-w-4xl mx-auto">
-=======
-  import { page } from '$app/stores';
-  import { pb } from '$lib/pocketbase';
-  import { fade, fly } from 'svelte/transition';
-
-  // --- SVELTE 5 STATE RUNES ---
-  let event = $state(null);
-  let isLoaded = $state(false);
-  let scrollY = $state(0);
-  let mousePos = $state({ x: 0, y: 0 });
-  let timeStr = $state(''); 
-
-  const now = new Date().toISOString();
-
-  // Optimized Mouse Move Parallax 
-  function handleMouseMove(e) {
-    mousePos = {
-      x: (e.clientX / window.innerWidth - 0.5) * 10,
-      y: (e.clientY / window.innerHeight - 0.5) * 10
-    };
-  }
-
-  function updateCountdown(dateISO) {
-    const diff = new Date(dateISO).getTime() - Date.now();
-    if (diff <= 0) return timeStr = "Event Concluded";
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    timeStr = `${d}d ${h}h ${m}m Remaining`;
-  }
-
-  onMount(() => {
-    let timer;
-    
-    async function fetchEventNode() {
-      try {
-        event = await pb.collection('events').getOne($page.params.id);
-        updateCountdown(event.date_time);
-        timer = setInterval(() => updateCountdown(event.date_time), 60000);
-        setTimeout(() => isLoaded = true, 50);
-      } catch (e) { 
-        console.error("Failed to fetch event data:", e); 
       }
     }
 
@@ -168,7 +68,7 @@
   let isPastEvent = $derived(event ? event.date_time < now : false);
   let parallaxHeroY = $derived(scrollY * 0.20);
   let parallaxHeadlineY = $derived(scrollY * 0.35);
-  
+
   // Safe extraction of PocketBase PDF URL
   let pdfUrl = $derived(event && event.event_pdf ? pb.files.getURL(event, event.event_pdf) : null);
 </script>
@@ -178,7 +78,7 @@
 {#if event}
 <main class="min-h-screen bg-[#eef2f7] text-[#1a1a1a] pb-24 overflow-x-hidden relative perspective-1000">
   <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none z-0"></div>
-  
+
   <section class="relative min-h-[70vh] flex flex-col justify-center items-center overflow-hidden pt-20 pb-12 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7]">
     <div class="w-full max-w-5xl z-20 mb-auto" style="transform: translateY({parallaxHeroY}px)">
       <nav aria-label="Breadcrumb" class="inline-flex items-center gap-2.5 px-4 py-2 bg-white border-2 border-black rounded-xl box-shadow-mini">
@@ -187,26 +87,22 @@
         <a href="/events" class="text-xs font-black uppercase tracking-wider text-slate-500 hover:text-[#2563eb] transition-colors">Events</a>
         <span class="text-[10px] font-mono text-slate-400 font-black">/</span>
         <span class="text-xs font-black uppercase tracking-wider text-[#2563eb] max-w-[150px] sm:max-w-xs truncate" aria-current="page">
->>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
           {event.name}
         </span>
       </nav>
     </div>
 
-<<<<<<< HEAD
-        <div class="inline-flex flex-col sm:flex-row items-center gap-3 p-2 glass-tile rounded-full">
-          <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 text-xs font-semibold text-ink-600">
-            <span class="w-1.5 h-1.5 rounded-full {isPastEvent ? 'bg-ink-400' : 'bg-emerald-500 animate-pulse'}"></span>
-            <span>{isPastEvent ? 'Concluded' : timeStr}</span>
-          </div>
-=======
     <div class="w-full max-w-5xl z-10 text-center my-auto pt-8" style="transform: translateY({parallaxHeadlineY}px)">
       {#if isLoaded}
         <div in:fly={{ y: 30, duration: 600 }}>
           <span class="inline-block px-4 py-1.5 mb-6 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black box-shadow-mini transform -rotate-1">
             {isPastEvent ? 'Past Event' : 'Upcoming Event'}
           </span>
->>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
+          {#if event.type}
+            <span class="inline-block px-4 py-1.5 mb-6 ml-2 text-xs font-black uppercase tracking-widest text-slate-900 bg-white border-2 border-black box-shadow-mini transform rotate-1">
+              {event.type}
+            </span>
+          {/if}
 
           <h1 class="text-4xl md:text-7xl font-black text-black uppercase tracking-tighter leading-[0.95] mb-8 max-w-4xl mx-auto">
             {#each event.name.split(' ') as word}
@@ -219,7 +115,7 @@
               <span class="w-2 h-2 rounded-full {isPastEvent ? 'bg-slate-400' : 'bg-emerald-400 animate-pulse'}"></span>
               <span>{isPastEvent ? 'Concluded' : timeStr}</span>
             </div>
-            
+
             <div class="flex gap-2">
               <a href="#details-section" class="skeuo-button px-5 py-2.5 bg-[#2563eb] text-white text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all whitespace-nowrap">
                 Details
@@ -242,46 +138,16 @@
   <section id="details-section" class="max-w-5xl mx-auto px-6 py-16 relative z-20">
     <div class="relative w-full bg-[#eef2f7] rounded-[3.5rem] p-5 border-2 border-white/60 shadow-neumorphic-outer transition-transform duration-300 ease-out"
          style="transform: rotateY({mousePos.x}deg) rotateX({-mousePos.y}deg)">
-      
+
       <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-6 md:p-12 relative overflow-hidden border border-slate-200/60">
         <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-600/5 to-transparent rounded-full -mr-32 -mt-32 pointer-events-none"></div>
 
-<<<<<<< HEAD
-          <div class="glass-tile !p-6 rounded-3xl space-y-1">
-            <span class="flex items-center gap-1.5 text-xs font-semibold text-ink-400">
-              <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-              Date &amp; time
-            </span>
-            <div class="text-4xl md:text-5xl font-bold text-robotics-blue tracking-tight leading-none py-1">
-              {new Date(event.date_time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-            </div>
-            <span class="block text-xs font-semibold text-ink-600">
-              {new Date(event.date_time).toLocaleDateString(undefined, { dateStyle: 'full' })}
-            </span>
-          </div>
-
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-tile !p-5 rounded-2xl">
-            <div class="flex items-start gap-3">
-              <div class="w-11 h-11 rounded-xl bg-white/60 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-ink-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                </svg>
-              </div>
-              <div>
-                <span class="block text-xs font-semibold text-ink-400">Location</span>
-                <span class="text-sm font-semibold text-ink-900">{event.location}</span>
-              </div>
-=======
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div class="lg:col-span-7 space-y-8 text-left">
             <div class="space-y-1">
               <p class="text-2xl font-black text-black uppercase tracking-tight leading-tight">
                 {isPastEvent ? 'This tournament has ended.' : 'Tournament schedule and information details.'}
               </p>
->>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
             </div>
 
             <div class="p-6 bg-[#eef2f7] rounded-3xl shadow-neumorphic-card-inner border border-white/50 space-y-1">
@@ -312,82 +178,104 @@
                   <span class="text-sm font-black text-black uppercase">{event.location}</span>
                 </div>
               </div>
-              
-              <a href="https://www.google.com/maps/search/?api=1&query={encodeURIComponent(event.location)}" 
-                 target="_blank" 
+
+              <a href="https://maps.google.com/?q={encodeURIComponent(event.location)}"
+                 target="_blank"
                  rel="noopener noreferrer"
                  class="sm:shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#facc15] text-black text-xs font-black uppercase tracking-wider rounded-xl border-2 border-black box-shadow-mini active:translate-y-[2px] transition-all">
                 <span>Open Maps ↗</span>
               </a>
             </div>
 
-<<<<<<< HEAD
-            <p class="text-xs text-ink-400">
-              {event.volunteersAttending ?? 0}{#if event.volunteersNeeded} / {event.volunteersNeeded}{/if} volunteers signed up so far{#if hasVolunteered} &middot; <span class="text-emerald-700 font-semibold">you're on the list</span>{/if}
-            </p>
-          {/if}
-        </div>
-
-        <div class="lg:col-span-5 relative aspect-square w-full max-w-[300px] mx-auto lg:max-w-none">
-          <div class="relative h-full w-full glass-tile rounded-[2rem] p-2 flex flex-col items-center justify-center text-center overflow-hidden">
-            {#if event.pics && event.pics.length > 0}
-              <div class="w-full h-full rounded-[1.6rem] overflow-hidden bg-white/40 relative group">
-                <img
-                  src={pb.files.getURL(event, event.pics[0])}
-                  alt="Event cover"
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <a href="#collage-section" class="absolute inset-0 bg-ink-900/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
-=======
             {#if !isPastEvent}
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <a href="/volunteer" class="flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 text-white text-sm font-black uppercase tracking-wider rounded-2xl border-2 border-black box-shadow-flat hover:bg-blue-600 active:translate-y-[2px] transition-all">
-                  <span>Sign Up to Volunteer</span>
-                  <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                  </svg>
-                </a>
+              <div class="p-5 bg-white border-2 border-black rounded-2xl box-shadow-mini space-y-4">
+                <div>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Volunteer for this event</span>
+                  <p class="text-xs font-bold text-slate-500 mt-0.5">No experience required — just show up ready to help.</p>
+                </div>
 
-                <a href="/contact/#volunteer" class="flex items-center justify-center gap-2 px-6 py-4 bg-white text-black text-sm font-black uppercase tracking-wider rounded-2xl border-2 border-black box-shadow-mini hover:bg-slate-50 active:translate-y-[2px] transition-all">
-                  <span>Contact Coordinator</span>
-                  <svg class="w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
->>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
-                  </svg>
+                {#if hasVolunteered}
+                  <div class="flex items-center gap-2 px-4 py-3 bg-emerald-50 border-2 border-emerald-600 rounded-xl text-emerald-700 text-xs font-black uppercase tracking-wide">
+                    <CircleCheck class="w-5 h-5 shrink-0" strokeWidth={2.5} />
+                    You're signed up to volunteer
+                  </div>
+                {:else}
+                  <form
+                    method="POST"
+                    action="?/volunteer"
+                    class="flex flex-col sm:flex-row gap-3"
+                    use:enhance={() => {
+                      volunteerSubmitting = true;
+                      volunteerError = '';
+                      return async ({ result, update }) => {
+                        volunteerSubmitting = false;
+                        if (result.type === 'success') {
+                          hasVolunteered = true;
+                        } else if (result.type === 'failure') {
+                          volunteerError = (result.data?.error as string) ?? 'Something went wrong.';
+                        }
+                        await update({ reset: result.type === 'success' });
+                      };
+                    }}
+                  >
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="you@email.com"
+                      disabled={volunteerSubmitting}
+                      class="flex-1 bg-[#eef2f7] border-2 border-black rounded-xl px-4 py-3 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50"
+                    />
+                    <button
+                      type="submit"
+                      disabled={volunteerSubmitting}
+                      class="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-black uppercase tracking-wider rounded-xl border-2 border-black box-shadow-mini hover:bg-blue-600 active:translate-y-[2px] transition-all disabled:opacity-60 whitespace-nowrap"
+                    >
+                      {volunteerSubmitting ? 'Signing Up…' : 'Sign Up to Volunteer'}
+                    </button>
+                  </form>
+
+                  {#if volunteerError}
+                    <div class="flex items-center gap-2 text-rose-600 text-xs font-bold bg-rose-50 border-2 border-rose-600 rounded-xl p-3">
+                      <TriangleAlert class="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                      {volunteerError}
+                    </div>
+                  {/if}
+                {/if}
+
+                <a href="/contact/#volunteer" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 hover:text-black transition-colors">
+                  Have questions? Contact the coordinator <span>&rarr;</span>
                 </a>
               </div>
             {/if}
           </div>
 
           <div class="lg:col-span-5 relative aspect-square w-full max-w-[300px] mx-auto lg:max-w-none">
-             <div class="absolute -top-3 -right-3 w-16 h-16 bg-[#facc15] rounded-2xl rotate-12 border-2 border-black box-shadow-mini z-0 animate-bounce-slow"></div>
-             <div class="relative h-full w-full bg-white border-4 border-black rounded-[2rem] p-2 box-shadow-flat z-10 flex flex-col items-center justify-center text-center overflow-hidden">
-               <div class="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none"></div>
-               {#if event.pics && event.pics.length > 0}
-                  <div class="w-full h-full rounded-[1.6rem] overflow-hidden border-2 border-black bg-slate-50 relative group">
-                    <img 
-                      src={pb.files.getURL(event, event.pics[0])} 
-                      alt="Event Cover" 
-                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <a href="#collage-section" class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
-                        </svg>
-                        <span class="text-xs font-black uppercase text-white mt-1">View Gallery</span>
-                    </a>
-                  </div>
-               {:else}
-                  <svg class="w-12 h-12 text-slate-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3A1.5 1.5 0 001.5 6v12.75a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 3.75 0 11-.75 0 .375 3.75 0 01.75 0z" />
-                  </svg>
-                  <span class="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">No Media Available</span>
-               {/if}
-             </div>
+            <div class="absolute -top-3 -right-3 w-16 h-16 bg-[#facc15] rounded-2xl rotate-12 border-2 border-black box-shadow-mini z-0 animate-bounce-slow"></div>
+            <div class="relative h-full w-full bg-white border-4 border-black rounded-[2rem] p-2 box-shadow-flat z-10 flex flex-col items-center justify-center text-center overflow-hidden">
+              <div class="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none"></div>
+              {#if event.pics && event.pics.length > 0}
+                <div class="w-full h-full rounded-[1.6rem] overflow-hidden border-2 border-black bg-slate-50 relative group">
+                  <img
+                    src={pb.files.getURL(event, event.pics[0])}
+                    alt="Event Cover"
+                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <a href="#collage-section" class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+                    </svg>
+                    <span class="text-xs font-black uppercase text-white mt-1">View Gallery</span>
+                  </a>
+                </div>
+              {:else}
+                <svg class="w-12 h-12 text-slate-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3A1.5 1.5 0 001.5 6v12.75a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 3.75 0 11-.75 0 .375 3.75 0 01.75 0z" />
+                </svg>
+                <span class="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">No Media Available</span>
+              {/if}
+            </div>
           </div>
         </div>
 
@@ -402,11 +290,11 @@
           <span class="text-xs font-black text-white bg-[#2563eb] px-2 py-0.5 rounded uppercase tracking-wider font-mono">Documentation</span>
           <h2 class="text-4xl font-black text-black uppercase tracking-tighter mt-1">Event Guide & Rules</h2>
         </div>
-        <a 
-          href={pdfUrl} 
-          download 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={pdfUrl}
+          download
+          target="_blank"
+          rel="noopener noreferrer"
           class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-black text-[#facc15] text-xs font-black uppercase tracking-wider rounded-xl border-2 border-black box-shadow-mini-yellow hover:bg-slate-900 active:translate-y-[2px] transition-all"
         >
           <span>Download PDF</span>
@@ -422,11 +310,11 @@
           <div class="w-3 h-3 rounded-full bg-[#facc15] border border-black"></div>
           <div class="w-3 h-3 rounded-full bg-[#22c55e] border border-black"></div>
         </div>
-        
+
         <div class="w-full h-[500px] md:h-[750px] rounded-2xl overflow-hidden border-2 border-black bg-slate-100 mt-0 md:mt-4 relative">
-          <object 
-            data={`${pdfUrl}#toolbar=1&navpanes=0`} 
-            type="application/pdf" 
+          <object
+            data={`${pdfUrl}#toolbar=1&navpanes=0`}
+            type="application/pdf"
             class="w-full h-full"
           >
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-slate-50">
@@ -455,38 +343,38 @@
           <h2 class="text-4xl font-black text-black uppercase tracking-tighter mt-1">Event Photos</h2>
         </div>
         <div class="p-3 bg-white border-2 border-black rounded-lg box-shadow-mini font-mono text-xs font-black">
-            Total Images: {event.pics.length}
+          Total Images: {event.pics.length}
         </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 select-none bg-white border-3 border-black p-8 rounded-3xl box-shadow-flat relative">
-         <div class="absolute inset-0 bg-grid-pattern opacity-[0.015] pointer-events-none"></div>
-         
-         {#each event.pics as img, idx}
-            <div 
-                class="bg-white border-3 border-black p-2 rounded-2xl box-shadow-mini transform transition-all duration-300 hover:scale-[1.03] hover:rotate-1 hover:box-shadow-mini-hover group"
-                style="animation-delay: {idx * 50}ms"
-            >
-              <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border-2 border-black relative">
-                <img 
-                  src={pb.files.getURL(event, img)} 
-                  alt="Event thumbnail {idx + 1}" 
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                    <span class="font-mono text-[9px] font-black text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded border border-emerald-400/30">
-                        IMAGE_{String(idx + 1).padStart(3, '0')}
-                    </span>
-                </div>
-                
-                <span class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white font-mono text-[9px] px-1.5 py-0.5 rounded">
-                  {idx + 1}
+        <div class="absolute inset-0 bg-grid-pattern opacity-[0.015] pointer-events-none"></div>
+
+        {#each event.pics as img, idx}
+          <div
+            class="bg-white border-3 border-black p-2 rounded-2xl box-shadow-mini transform transition-all duration-300 hover:scale-[1.03] hover:rotate-1 hover:box-shadow-mini-hover group"
+            style="animation-delay: {idx * 50}ms"
+          >
+            <div class="aspect-[4/3] w-full bg-slate-200 rounded-xl overflow-hidden border-2 border-black relative">
+              <img
+                src={pb.files.getURL(event, img)}
+                alt="Event thumbnail {idx + 1}"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                <span class="font-mono text-[9px] font-black text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded border border-emerald-400/30">
+                  IMAGE_{String(idx + 1).padStart(3, '0')}
                 </span>
               </div>
+
+              <span class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white font-mono text-[9px] px-1.5 py-0.5 rounded">
+                {idx + 1}
+              </span>
             </div>
-          {/each}
+          </div>
+        {/each}
       </div>
     </section>
   {/if}
@@ -499,7 +387,7 @@
 
   .bg-grid-pattern {
     background-size: 40px 40px;
-    background-image: 
+    background-image:
       linear-gradient(to right, #000000 1px, transparent 1px),
       linear-gradient(to bottom, #000000 1px, transparent 1px);
   }
@@ -519,7 +407,7 @@
 
   .shadow-skeuo { box-shadow: 0px 4px 0px #1d4ed8, 4px 8px 12px rgba(0, 0, 0, 0.1); }
   .shadow-skeuo-black { box-shadow: 0px 4px 0px #000000, 4px 8px 12px rgba(0, 0, 0, 0.1); }
-  
+
   .skeuo-button:hover { box-shadow: 0px 3px 0px #1d4ed8, 2px 5px 8px rgba(0, 0, 0, 0.08); }
   .skeuo-button:active { box-shadow: 0px 0px 0px #1d4ed8, 0px 1px 2px rgba(0, 0, 0, 0.05); }
 
@@ -528,8 +416,8 @@
 
   /* Neumorphism Classes */
   .shadow-neumorphic-outer {
-    box-shadow: 
-      14px 14px 32px #bdc7d4, 
+    box-shadow:
+      14px 14px 32px #bdc7d4,
       -14px -14px 32px #ffffff,
       inset 1px 1px 0px rgba(255,255,255,0.9);
   }
