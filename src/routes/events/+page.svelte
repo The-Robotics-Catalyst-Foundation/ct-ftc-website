@@ -19,6 +19,12 @@
         'Championship': 'text-amber-700'
     };
 
+    const typeBadgeStyles: Record<string, string> = {
+        'Scrimmage': 'bg-emerald-100/60 text-emerald-700',
+        'Qualifier': 'bg-blue-100/60 text-robotics-blue',
+        'Championship': 'bg-amber-100/60 text-amber-700'
+    };
+
     function volunteerStats(event: any) {
         const current = event.volunteersCurrent ?? 0;
         const required = event.volunteersNeeded ?? 0;
@@ -145,7 +151,7 @@
                     {#each rest as event (event.id)}
                         {@const stats = volunteerStats(event)}
 
-                        <GlassTile class="bento-tile flex flex-col justify-between text-left" rounded="rounded-[2rem]" padding="p-6">
+                        <GlassTile class="bento-tile min-h-[420px] flex flex-col justify-between text-left" rounded="rounded-[2rem]" padding="p-6">
                             <div>
                                 <div class="flex justify-between items-start mb-5 gap-2">
                                     <span class="text-xs font-semibold {typeStyles[event.type] || 'text-ink-400'}">
@@ -158,7 +164,7 @@
                                     {/if}
                                 </div>
 
-                                <h3 class="text-xl font-semibold text-ink-900 leading-tight mb-1">
+                                <h3 class="text-xl font-semibold text-ink-900 leading-tight mb-1 line-clamp-2">
                                     {event.name}
                                 </h3>
 
@@ -206,7 +212,13 @@
                                 </div>
                             </div>
 
-                            <div class="mt-8">
+                            <div class="mt-4 flex justify-center">
+                                <span class="text-xs font-semibold px-3 py-1 rounded-full {typeBadgeStyles[event.type] || 'bg-white/60 text-ink-600'}">
+                                    {event.type || 'Tournament'}
+                                </span>
+                            </div>
+
+                            <div class="mt-4">
                                 <a
                                     href="/events/{event.slug || event.id}"
                                     class="flex items-center justify-center w-full bg-robotics-blue text-white font-semibold text-sm py-3 px-4 rounded-full shadow-ambient shadow-ambient-hover transition-all hover:-translate-y-0.5"

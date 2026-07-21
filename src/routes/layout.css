@@ -26,7 +26,6 @@
     --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'Geist Variable', system-ui, sans-serif;
     --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'SF Pro Display', 'Geist Variable', sans-serif;
 
-    --animate-aurora-drift: aurora-drift 22s ease-in-out infinite alternate;
     --animate-fade-in: fade-in 0.5s ease-out forwards;
 
     /* Legacy aliases still referenced directly as Tailwind utilities (text-text-main,
@@ -49,6 +48,7 @@ html {
 
 body {
     @apply font-sans bg-base-mist text-ink-900 min-h-screen antialiased overflow-x-hidden;
+    overscroll-behavior-y: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -75,8 +75,14 @@ body {
         radial-gradient(30% 28% at 85% 20%, rgb(245 177 0 / 28%), transparent 70%),
         radial-gradient(45% 40% at 60% 85%, rgb(37 99 235 / 22%), transparent 70%);
     filter: blur(60px) saturate(140%);
-    animation: var(--animate-aurora-drift);
-    will-change: transform;
+}
+
+/* Faint hairline grid, sits behind the aurora blooms for pages that want a more structured/technical backdrop. */
+.grid-field {
+    background-image:
+        linear-gradient(to right, rgb(15 23 42 / 5%) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(15 23 42 / 5%) 1px, transparent 1px);
+    background-size: 44px 44px;
 }
 
 /* Shared glass material - blur/saturate is the point, not a border-radius trick. */
@@ -132,11 +138,6 @@ body {
     box-shadow:
         0 28px 70px -12px rgb(15 23 42 / 30%),
         0 4px 12px rgb(15 23 42 / 8%);
-}
-
-@keyframes aurora-drift {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(3%, -4%) scale(1.08); }
 }
 
 /* Smooth appearance for HUD-style overlays */
