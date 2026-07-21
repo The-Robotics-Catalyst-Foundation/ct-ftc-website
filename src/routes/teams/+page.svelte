@@ -4,7 +4,6 @@
 	import GlassTile from '$lib/components/ui/GlassTile.svelte';
 	import { revealTiles } from '$lib/motion';
 
-	let iframeHeight = $state('850px');
 	let showHelp = $state(false);
 
 	onMount(() => {
@@ -89,11 +88,10 @@
 				<iframe
 					src="https://robolyst.org/location/connecticut/ftc/teams"
 					title="CT FTC Team Atlas"
-					width="100%"
-					height={iframeHeight}
+					loading="lazy"
 					frameborder="0"
 					allowfullscreen
-					class="block w-full bg-white"
+					class="block w-full h-[70vh] min-h-[420px] sm:h-[650px] md:h-[850px] bg-white"
 				></iframe>
 			</div>
 		</GlassTile>
