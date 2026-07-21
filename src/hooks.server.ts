@@ -1,4 +1,4 @@
-import PocketBase from 'pocketbase';
+import PocketBase, { ClientResponseError } from 'pocketbase';
 import { dev } from '$app/environment';
 import { PB_URL } from '$lib/pocketbase';
 import type { Handle } from '@sveltejs/kit';
@@ -14,8 +14,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (pb.authStore.isValid) {
 		try {
 			await pb.collection('users').authRefresh();
-		} catch {
-			pb.authStore.clear();
+		} catch (err) {
+			// Only drop the session when PocketBase actually rejected the token
+			// (expired/revoked). A network blip, timeout, or cold-start 5xx from
+			// the PB host shouldn't sign the user out - just keep the existing
+			// (still valid, unrefreshed) token and try again next request.
+			const status = err instanceof ClientResponseError ? err.status : 0;
+			if (status === 401 || status === 403) {
+				pb.authStore.clear();
+			}
 		}
 	}
 
