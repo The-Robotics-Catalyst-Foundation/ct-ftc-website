@@ -3,6 +3,10 @@
 	import { fade, fly } from 'svelte/transition';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+	let iframeHeight = $state('850px');
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 	let showHelp = $state(false);
 =======
 	// --- SVELTE 5 STATE RUNES ---
@@ -132,10 +136,11 @@
 				<iframe
 					src="https://robolyst.org/location/connecticut/ftc/teams"
 					title="CT FTC Team Atlas"
-					loading="lazy"
+					width="100%"
+					height={iframeHeight}
 					frameborder="0"
 					allowfullscreen
-					class="block w-full h-[70vh] min-h-[420px] sm:h-[650px] md:h-[850px] bg-white"
+					class="block w-full bg-white"
 				></iframe>
 			</div>
 		</GlassTile>

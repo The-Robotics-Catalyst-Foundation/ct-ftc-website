@@ -26,8 +26,9 @@
         <div class="md:col-span-4 space-y-6 text-left">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-full glass-tile flex items-center justify-center">
-              <img src={logo} alt="CT Logo" loading="lazy" class="w-[70%] h-[70%] object-contain invert" />
+              <img src={logo} alt="CT Logo" class="w-[70%] h-[70%] object-contain invert" />
             </div>
+<<<<<<< HEAD
             <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FTC Logo" loading="lazy" class="h-10 object-contain">
 =======
   <div class="max-w-7xl mx-auto relative z-10">
@@ -38,6 +39,9 @@
           <div class="w-10 h-10 bg-white border-2 border-black rounded-xl flex items-center justify-center font-mono font-black text-black shadow-skeuo-mini">
             <img src={logo} alt="CT Logo" class="w-full h-[90%] object-contain invert">
 >>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
+=======
+            <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FTC Logo" class="h-10 object-contain">
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
           </div>
           <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FTC Logo" class="h-12 object-contain">
         </div>
@@ -72,14 +76,14 @@
             <p class="text-sm text-ink-600">
               Made by <a href="https://singul.tech" target="_blank" rel="noopener noreferrer" class="text-robotics-blue hover:underline font-semibold">Singularity Technology #7034</a>
             </p>
-            <img src="https://api.singultech.app/get-image/Logo" alt="Singularity Technology Logo" loading="lazy" class="w-8 h-8 object-contain invert">
+            <img src="https://api.singultech.app/get-image/Logo" alt="Singularity Technology Logo" class="w-8 h-8 object-contain invert">
           </div>
 
           <div class="flex items-center gap-3">
             <p class="text-sm text-ink-600">
               Hosted by <a href="https://robotics-catalyst.org" target="_blank" rel="noopener noreferrer" class="text-robotics-blue hover:underline font-semibold">Robotics Catalyst Fdn.</a>
             </p>
-            <img src="/robolyst-small.png" alt="Robotics-Catalyst Logo" loading="lazy" class="w-8 h-8 object-contain">
+            <img src="/robolyst-small.png" alt="Robotics-Catalyst Logo" class="w-8 h-8 object-contain">
           </div>
         </div>
 =======

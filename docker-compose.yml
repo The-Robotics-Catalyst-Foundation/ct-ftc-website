@@ -3,11 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      # adapter-node defaults this to 512K, which rejects any multi-photo
-      # event upload well before it reaches PocketBase. Raised so a
-      # photographer can batch-upload a full gallery in one request.
-      BODY_SIZE_LIMIT: '500M'
   pocketbase:
     build:
       context: .

@@ -1,38 +1,28 @@
-import { error, fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { pb } from '$lib/pocketbase';
 import { checkRateLimit } from '$lib/server/rate-limit';
 import type { PageServerLoad, Actions } from './$types';
 
 // The route param may be a real PocketBase record id or a human slug -
-// resolve to the actual record either way so cookie keys, updates, and the
-// initial server-rendered page all stay consistent regardless of which one
-// is in the URL.
-async function resolveEvent(param: string) {
-	try {
-		return await pb.collection('events').getOne(param);
-	} catch {
-		return await pb.collection('events').getFirstListItem(pb.filter('slug = {:slug}', { slug: param }));
-	}
-}
-
+// resolve to the actual id either way so cookie keys and updates stay
+// consistent regardless of which one is in the URL.
 async function resolveEventId(param: string): Promise<string> {
-	return (await resolveEvent(param)).id;
+	try {
+		const record = await pb.collection('events').getOne(param);
+		return record.id;
+	} catch {
+		const record = await pb.collection('events').getFirstListItem(pb.filter('slug = {:slug}', { slug: param }));
+		return record.id;
+	}
 }
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
-	let event;
 	try {
-		event = await resolveEvent(params.id);
+		const id = await resolveEventId(params.id);
+		return { alreadyVolunteered: !!cookies.get(`volunteered_${id}`) };
 	} catch {
-		error(404, 'Event not found');
+		return { alreadyVolunteered: false };
 	}
-
-	return {
-		event,
-		alreadyVolunteered: !!cookies.get(`volunteered_${event.id}`),
-		title: event.name,
-		description: `${event.name}${event.location ? ` at ${event.location}` : ''} - a Connecticut FIRST Tech Challenge event.`
-	};
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

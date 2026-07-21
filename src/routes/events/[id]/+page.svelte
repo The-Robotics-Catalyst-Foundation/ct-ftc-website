@@ -1,12 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  import { page } from '$app/stores';
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
   import { enhance } from '$app/forms';
   import { pb } from '$lib/pocketbase';
   import { fade, fly } from 'svelte/transition';
   import { revealTiles } from '$lib/motion';
-  import { formatCountdown } from '$lib/format';
-  import { jsonLdScript } from '$lib/seo.js';
   import GlassTile from '$lib/components/ui/GlassTile.svelte';
 
   let { data } = $props();
@@ -17,10 +19,9 @@
     "Come back here and confirm you've registered so organizers know to expect you."
   ];
 
-  // Rendered server-side already (see +page.server.ts), so crawlers and
-  // no-JS clients get the real event content on first paint.
-  let event: any = $derived(data.event);
+  let event: any = $state(null);
   let isLoaded = $state(false);
+  let timeStr = $state('');
   let hasVolunteered = $state(data.alreadyVolunteered);
   let isSubmittingRsvp = $state(false);
   let rsvpError = $state('');
@@ -45,42 +46,52 @@
 
   const now = new Date().toISOString();
 
+  function updateCountdown(dateISO: string) {
+    const diff = new Date(dateISO).getTime() - Date.now();
+    if (diff <= 0) return (timeStr = 'Event concluded');
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    timeStr = `${d}d ${h}h ${m}m remaining`;
+  }
+
   onMount(() => {
-    setTimeout(() => {
-      isLoaded = true;
-      revealTiles('.bento-tile');
-    }, 50);
-  });
+    let timer: ReturnType<typeof setInterval> | undefined;
 
-  let isPastEvent = $derived(event.date_time < now);
-  let countdown = $derived(formatCountdown(event.date_time));
-  let pdfUrl = $derived(event.event_pdf ? pb.files.getURL(event, event.event_pdf) : null);
-
-  const eventSchema = $derived({
-    '@context': 'https://schema.org',
-    '@type': 'SportsEvent',
-    name: event.name,
-    startDate: new Date(event.date_time).toISOString(),
-    eventStatus: isPastEvent ? 'https://schema.org/EventCompleted' : 'https://schema.org/EventScheduled',
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    location: {
-      '@type': 'Place',
-      name: event.location || 'Location TBD'
-    },
-    organizer: {
-      '@type': 'Organization',
-      name: 'Connecticut FIRST Tech Challenge',
-      url: 'https://ctftc.org'
+    async function fetchEventNode() {
+      const id = $page.params.id;
+      if (!id) return;
+      try {
+        try {
+          event = await pb.collection('events').getOne(id);
+        } catch {
+          event = await pb.collection('events').getFirstListItem(pb.filter('slug = {:slug}', { slug: id }));
+        }
+        updateCountdown(event.date_time);
+        timer = setInterval(() => updateCountdown(event.date_time), 60000);
+        setTimeout(() => {
+          isLoaded = true;
+          revealTiles('.bento-tile');
+        }, 50);
+      } catch (e) {
+        console.error('Failed to fetch event data:', e);
+      }
     }
-  });
-</script>
 
-<svelte:head>
-  {@html jsonLdScript(eventSchema)}
-</svelte:head>
+    fetchEventNode();
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  });
+
+  let isPastEvent = $derived(event ? event.date_time < now : false);
+  let pdfUrl = $derived(event && event.event_pdf ? pb.files.getURL(event, event.event_pdf) : null);
+</script>
 
 <svelte:window onkeydown={showVolunteerModal ? handleModalKeydown : undefined} />
 
+{#if event}
 <main class="aurora-field min-h-screen pb-24">
 
   <section class="max-w-5xl mx-auto px-6 pt-24 pb-6">
@@ -186,7 +197,7 @@
         <div class="inline-flex flex-col sm:flex-row items-center gap-3 p-2 glass-tile rounded-full">
           <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 text-xs font-semibold text-ink-600">
             <span class="w-1.5 h-1.5 rounded-full {isPastEvent ? 'bg-ink-400' : 'bg-emerald-500 animate-pulse'}"></span>
-            <span>{isPastEvent ? 'Concluded' : (countdown ?? 'Upcoming')}</span>
+            <span>{isPastEvent ? 'Concluded' : timeStr}</span>
           </div>
 =======
     <div class="w-full max-w-5xl z-10 text-center my-auto pt-8" style="transform: translateY({parallaxHeadlineY}px)">
@@ -239,15 +250,15 @@
           <div class="glass-tile !p-6 rounded-3xl space-y-1">
             <span class="flex items-center gap-1.5 text-xs font-semibold text-ink-400">
               <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9 3.75h.008v.008H12v-.008Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              Date
+              Date &amp; time
             </span>
-            <div class="text-3xl md:text-4xl font-bold text-robotics-blue tracking-tight leading-tight py-1">
-              {new Date(event.date_time).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+            <div class="text-4xl md:text-5xl font-bold text-robotics-blue tracking-tight leading-none py-1">
+              {new Date(event.date_time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
             </div>
             <span class="block text-xs font-semibold text-ink-600">
-              {new Date(event.date_time).getFullYear()}
+              {new Date(event.date_time).toLocaleDateString(undefined, { dateStyle: 'full' })}
             </span>
           </div>
 
@@ -324,7 +335,6 @@
                 <img
                   src={pb.files.getURL(event, event.pics[0])}
                   alt="Event cover"
-                  loading="lazy"
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <a href="#collage-section" class="absolute inset-0 bg-ink-900/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -482,6 +492,7 @@
   {/if}
 
 </main>
+{/if}
 
 <style>
   :global(html) { scroll-behavior: smooth; }

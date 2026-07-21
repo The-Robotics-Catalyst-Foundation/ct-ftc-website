@@ -66,10 +66,10 @@
 
 html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
 }
 
 body {
+<<<<<<< HEAD
 <<<<<<< HEAD
     @apply font-sans bg-base-mist text-ink-900 min-h-screen antialiased overflow-x-hidden;
     overscroll-behavior-y: contain;
@@ -77,6 +77,9 @@ body {
     /* Applies your new clean white background system globally */
     @apply font-sans bg-bg-main text-text-main min-h-screen antialiased;
 >>>>>>> parent of b02fc9f (Merge pull request #4 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
+=======
+    @apply font-sans bg-base-mist text-ink-900 min-h-screen antialiased;
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 }
 
 /* Updated map layout background gradient for the landing page hero grid */
@@ -100,6 +103,10 @@ body {
         radial-gradient(30% 28% at 85% 20%, rgb(245 177 0 / 28%), transparent 70%),
         radial-gradient(45% 40% at 60% 85%, rgb(37 99 235 / 22%), transparent 70%);
     filter: blur(60px) saturate(140%);
+<<<<<<< HEAD
+=======
+    animation: var(--animate-aurora-drift);
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 }
 
 /* Faint hairline grid, sits behind the aurora blooms for pages that want a more structured/technical backdrop. */
@@ -140,22 +147,6 @@ body {
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* backdrop-filter blur cost scales with radius, and every fixed/glass element
-   recomputes it on every scroll frame - on phones, this pile of large blur
-   radii (28px per tile, 60px for the aurora glow, often several stacked at
-   once) is what actually reads as scroll jank. Trimming the radius on small
-   screens keeps the look while cutting the per-frame compositing cost. */
-@media (max-width: 767px) {
-    .glass-material,
-    .glass-tile {
-        backdrop-filter: blur(14px) saturate(160%);
-        -webkit-backdrop-filter: blur(14px) saturate(160%);
-    }
-    .aurora-field::before {
-        filter: blur(32px) saturate(130%);
-    }
 }
 .glass-tile.glass-tile-strong {
     background: var(--color-glass-white-strong);

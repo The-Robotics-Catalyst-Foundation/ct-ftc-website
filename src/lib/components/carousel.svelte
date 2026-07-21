@@ -26,16 +26,15 @@
   });
 </script>
 
-<div class="relative rounded-xl">
-
+<div class="rounded-xl">
+  
   <div class="relative aspect-[16/9] w-full bg-black/5">
     {#each images as img, i}
       {#if currentIndex === i}
         <div class=" w-full h-full" transition:fade={{ duration: 300 }}>
-          <img
-            src={typeof img === 'string' ? img : img.src}
-            alt={img.alt || `Slide ${i + 1}`}
-            loading="lazy"
+          <img 
+            src={typeof img === 'string' ? img : img.src} 
+            alt={img.alt || `Slide ${i + 1}`} 
             class="w-full h-full object-cover rounded-xl"
           />
           

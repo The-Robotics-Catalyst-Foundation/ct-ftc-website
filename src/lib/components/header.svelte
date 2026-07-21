@@ -1,7 +1,11 @@
 <script>
   import { page } from '$app/stores';
 <<<<<<< HEAD
+<<<<<<< HEAD
   import { fade, fly } from 'svelte/transition';
+=======
+  import { slide } from 'svelte/transition';
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
   import { onMount } from 'svelte';
   import { formatCountdown } from '$lib/format';
   import { revealOnce } from '$lib/motion';
@@ -33,17 +37,14 @@
   onMount(() => {
     revealOnce('#site-nav', { distance: -14 });
   });
-
-  $effect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
-  });
 </script>
 
 <div class="fixed top-4 left-0 right-0 z-[200] px-4 md:px-6 flex justify-center pointer-events-none">
   <nav
     id="site-nav"
-    class="glass-tile glass-tile-strong w-full max-w-5xl pointer-events-auto rounded-3xl md:rounded-full p-2.5 flex items-center gap-3 relative"
+    class="glass-tile glass-tile-strong w-full max-w-5xl pointer-events-auto rounded-3xl md:rounded-full p-2.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-3 relative"
   >
+<<<<<<< HEAD
     <a
       href="/"
       onclick={closeMenu}
@@ -56,6 +57,35 @@
     </a>
 =======
 </script>
+=======
+    <div class="flex items-center justify-between w-full md:w-auto">
+      <a
+        href="/"
+        onclick={closeMenu}
+        class="flex items-center gap-3 shrink-0 transition-transforfm hover:-translate-y-0.5"
+      >
+        <span class="flex items-center justify-center w-20 h-20 rounded-full glass-tile shrink-0">
+          <img src={logo} alt="CT FIRST Tech Challenge logo" class="w-[70%] h-[70%] object-contain invert" />
+        </span>
+        <img src={ftcLogo} alt="FIRST Tech Challenge logo" class="hidden sm:block h-10 md:h-12 object-contain" />
+      </a>
+
+      <button
+        onclick={toggleMenu}
+        aria-label="Toggle navigation menu"
+        aria-expanded={isMobileMenuOpen}
+        class="md:hidden w-11 h-11 rounded-full glass-tile flex flex-col items-center justify-center gap-1 transition-transform active:scale-95"
+      >
+        {#if isMobileMenuOpen}
+          <span class="text-base font-semibold text-ink-900">&times;</span>
+        {:else}
+          <div class="w-4 h-0.5 rounded-full bg-ink-900"></div>
+          <div class="w-4 h-0.5 rounded-full bg-ink-900"></div>
+          <div class="w-4 h-0.5 rounded-full bg-ink-900"></div>
+        {/if}
+      </button>
+    </div>
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
 
 <div class="fixed top-4 left-0 right-0 z-[200] px-4 md:px-6 flex justify-center pointer-events-none">
   <nav class="w-full max-w-5xl pointer-events-auto bg-[#eef2f7]/90 backdrop-blur-xl border-3 border-black shadow-neumorphic-nav rounded-2xl md:rounded-full px-3 py-2.5 md:py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 relative box-shadow-flat transition-all">
@@ -103,6 +133,7 @@
     </a>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     <button
       onclick={toggleMenu}
       aria-label="Toggle navigation menu"
@@ -113,78 +144,59 @@
       <div class="w-4 h-0.5 rounded-full bg-ink-900"></div>
       <div class="w-4 h-0.5 rounded-full bg-ink-900"></div>
     </button>
+=======
+    {#if isMobileMenuOpen}
+      <div
+        transition:slide={{ duration: 250 }}
+        class="w-full md:hidden flex flex-col gap-2 pt-1"
+      >
+        {#if nextEvent && countdown}
+          <a
+            href="/events"
+            onclick={closeMenu}
+            class="w-full p-3 rounded-2xl glass-tile flex items-center gap-2 text-xs font-semibold text-ink-600"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-aurora-gold shrink-0"></span>
+            <span class="text-ink-900">{nextEvent.name}</span>
+            <span class="text-ink-400">&middot; {countdown}</span>
+          </a>
+        {/if}
+
+        {#each navLinks as link}
+          <a
+            href={link.href}
+            onclick={closeMenu}
+            class="w-full p-3 rounded-2xl font-semibold text-sm transition-all flex items-center justify-between
+            {$page.url.pathname.startsWith(link.href)
+              ? 'bg-robotics-blue text-white shadow-ambient'
+              : 'glass-tile text-ink-900'}"
+          >
+            <span>{link.name}</span>
+          </a>
+        {/each}
+
+        <a
+          href="/contact"
+          onclick={closeMenu}
+          class="w-full p-3 rounded-2xl glass-tile font-semibold text-sm text-center text-ink-900"
+        >
+          Contact
+        </a>
+
+        <a
+          href="https://atlas.robotics-catalyst.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick={closeMenu}
+          class="w-full p-3 bg-robotics-blue text-white font-semibold text-sm text-center rounded-2xl shadow-ambient block"
+        >
+          Launch Atlas Deck &nearr;
+        </a>
+      </div>
+    {/if}
+>>>>>>> parent of 14b64b2 (Merge pull request #5 from The-Robotics-Catalyst-Foundation/liquid-glass-bento)
   </nav>
 </div>
-
-{#if isMobileMenuOpen}
-  <div class="fixed inset-0 z-[250] md:hidden">
-    <button
-      aria-label="Close navigation menu"
-      onclick={closeMenu}
-      transition:fade={{ duration: 200 }}
-      class="absolute inset-0 w-full bg-ink-900/40 backdrop-blur-sm cursor-default"
-    ></button>
-
-    <div
-      transition:fly={{ x: 320, duration: 300, opacity: 1 }}
-      class="glass-tile glass-tile-strong absolute top-0 right-0 h-full w-[82%] max-w-xs rounded-l-[2rem] p-5 pt-6 flex flex-col gap-2 overflow-y-auto"
-    >
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold tracking-wide text-ink-400">Menu</span>
-        <button
-          onclick={closeMenu}
-          aria-label="Close navigation menu"
-          class="w-9 h-9 rounded-full glass-tile flex items-center justify-center text-ink-900"
-        >
-          <span class="text-base font-semibold">&times;</span>
-        </button>
-      </div>
-
-      {#if nextEvent && countdown}
-        <a
-          href="/events"
-          onclick={closeMenu}
-          class="w-full p-3 rounded-2xl glass-tile flex items-center gap-2 text-xs font-semibold text-ink-600"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-aurora-gold shrink-0"></span>
-          <span class="text-ink-900">{nextEvent.name}</span>
-          <span class="text-ink-400">&middot; {countdown}</span>
-        </a>
-      {/if}
-
-      {#each navLinks as link}
-        <a
-          href={link.href}
-          onclick={closeMenu}
-          class="w-full p-3 rounded-2xl font-semibold text-sm transition-all flex items-center justify-between
-          {$page.url.pathname.startsWith(link.href)
-            ? 'bg-robotics-blue text-white shadow-ambient'
-            : 'glass-tile text-ink-900'}"
-        >
-          <span>{link.name}</span>
-        </a>
-      {/each}
-
-      <a
-        href="/contact"
-        onclick={closeMenu}
-        class="w-full p-3 rounded-2xl glass-tile font-semibold text-sm text-center text-ink-900"
-      >
-        Contact
-      </a>
-
-      <a
-        href="https://atlas.robotics-catalyst.org/"
-        target="_blank"
-        rel="noopener noreferrer"
-        onclick={closeMenu}
-        class="w-full p-3 mt-auto bg-robotics-blue text-white font-semibold text-sm text-center rounded-2xl shadow-ambient block"
-      >
-        Launch Atlas Deck &nearr;
-      </a>
-    </div>
-  </div>
-{/if}
 
 <div class="h-32 md:h-28"></div>
 =======
