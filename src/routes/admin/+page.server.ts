@@ -3,17 +3,8 @@ import { roleOf } from '$lib/server/auth';
 import { checkRateLimit } from '$lib/server/rate-limit';
 import type { PageServerLoad, Actions } from './$types';
 
-const OAUTH_ERRORS: Record<string, string> = {
-	no_account: 'No dashboard account is associated with that Google account. Contact an administrator.',
-	state_mismatch: 'Your sign-in session expired. Please try again.',
-	oauth_failed: 'Google sign-in failed. Please try again.'
-};
-
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	if (roleOf(locals.user)) throw redirect(303, '/admin/dashboard');
-
-	const code = url.searchParams.get('error');
-	return { oauthError: code ? (OAUTH_ERRORS[code] ?? 'Sign-in failed. Please try again.') : null };
 };
 
 export const actions: Actions = {

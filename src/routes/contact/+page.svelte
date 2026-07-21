@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import { Mail, Check, TriangleAlert } from '@lucide/svelte';
   // Import PocketBase
   import { pb } from '$lib/pocketbase';
 
@@ -129,8 +130,8 @@
 
         <div class="space-y-6">
           <div class="bg-white border-3 border-black p-5 rounded-2xl box-shadow-flat flex gap-4 items-start">
-            <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-inner border border-slate-300/40 flex items-center justify-center text-xl shrink-0">
-              ✉️
+            <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-inner border border-slate-300/40 flex items-center justify-center shrink-0">
+              <Mail class="w-5 h-5 text-black" strokeWidth={2.5} />
             </div>
             <div class="space-y-1">
               <h4 class="font-black text-black uppercase text-sm tracking-tight">Email Addresses</h4>
@@ -165,8 +166,8 @@
           
           {#if submitted}
             <div in:fly={{ y: 20, duration: 400 }} class="h-full py-12 flex flex-col items-center justify-center text-center">
-              <div class="w-20 h-20 bg-white border-4 border-black text-emerald-500 rounded-full flex items-center justify-center mb-6 box-shadow-flat text-3xl font-bold">
-                ✓
+              <div class="w-20 h-20 bg-white border-4 border-black text-emerald-500 rounded-full flex items-center justify-center mb-6 box-shadow-flat">
+                <Check class="w-10 h-10" strokeWidth={3} />
               </div>
               <h3 class="text-2xl font-black text-black uppercase tracking-tight mb-2">Message Sent!</h3>
               <p class="text-sm font-bold text-slate-600 max-w-xs mx-auto leading-relaxed">
@@ -211,8 +212,9 @@
               </div>
 
               {#if errorMessage}
-                <div class="text-rose-600 text-xs font-bold text-left bg-rose-50 border-2 border-rose-600 rounded-xl p-3">
-                  ⚠️ {errorMessage}
+                <div class="text-rose-600 text-xs font-bold text-left bg-rose-50 border-2 border-rose-600 rounded-xl p-3 flex items-center gap-2">
+                  <TriangleAlert class="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  {errorMessage}
                 </div>
               {/if}
 

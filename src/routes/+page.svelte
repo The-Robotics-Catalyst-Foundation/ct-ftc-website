@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import Head from '$lib/components/head.svelte';
   import Carousel from '$lib/components/carousel.svelte';
+  import { Calendar, ChartColumn, Handshake, Wrench, Megaphone, Users } from '@lucide/svelte';
 
   // --- SVELTE 5 STATE RUNES ---
   let scrollY = $state(0);
@@ -45,7 +46,7 @@
         </h1>
 
         <p class="text-slate-800 text-base md:text-xl font-bold leading-relaxed max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl">
-          FIRST Tech Challenge is a robotics competition for students in grades 7–12 to compete head to head, by designing, building, and programming a robot to compete in an alliance format against other teams.
+          FIRST Tech Challenge is a robotics competition for students in grades 7–12 to compete head to x, by designing, building, and programming a robot to compete in an alliance format against other teams.
         </p>
 
         <div class="flex flex-wrap gap-6 pt-4">
@@ -79,14 +80,29 @@
         <span class="text-xs font-black text-[#2563eb] bg-white border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">More Than Robots</span>
         <h2 class="text-4xl font-black text-black uppercase tracking-tight">The FIRST Experience</h2>
         <p class="text-slate-700 leading-relaxed font-semibold text-base">
-          FIRST Tech Challenge teams engineer, program, and operate Android-platform robots to compete in events to reach fame. Guided by professional engineers, students learn to think like scientists and engineers, while also developing self-confidence, communication skills, and leadership abilities. The program emphasizes the importance of gracious professionalism, encouraging students to compete fiercely while treating all participants with respect and kindness.
+          FIRST Tech Challenge is more than a robot on a field. Guided by professional engineers, students build real engineering skills alongside the confidence and leadership that come with them.
         </p>
 
-        <div class="border-l-8 border-black pl-5 py-3 bg-[#facc15]/20 border-2 border-black rounded-xl box-shadow-flat text-left">
-          <p class="font-mono text-sm text-black">
-            <b>Gracious Professionalism</b> is a core FIRST ethos that encourages high-quality work, mutual respect, and community value without being rigidly defined. In practice, it drives participants to compete intensely while ensuring everyone is treated with kindness and feels included.
-          </p>
-        </div>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <span class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white border-2 border-black">
+              <Wrench class="w-3.5 h-3.5 text-black" strokeWidth={2.5} />
+            </span>
+            <p class="text-slate-700 font-semibold text-sm leading-relaxed"><b class="text-black font-black">Build the robot.</b> Teams design, build, and program an Android-platform competition robot from scratch each season, then drive it head-to-head in alliance matches.</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white border-2 border-black">
+              <Megaphone class="w-3.5 h-3.5 text-black" strokeWidth={2.5} />
+            </span>
+            <p class="text-slate-700 font-semibold text-sm leading-relaxed"><b class="text-black font-black">Give back through outreach.</b> Every team runs STEM outreach in its own community, spreading robotics and engineering to younger students.</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white border-2 border-black">
+              <Users class="w-3.5 h-3.5 text-black" strokeWidth={2.5} />
+            </span>
+            <p class="text-slate-700 font-semibold text-sm leading-relaxed"><b class="text-black font-black">Connect with the community.</b> Compete alongside mentors, volunteers, and fellow CT teams under <span class="text-[#2563eb]">gracious professionalism</span> &mdash; competing fiercely while treating every participant with respect.</p>
+          </li>
+        </ul>
       </div>
 
       <div class="lg:col-span-5 bg-black border-4 border-black p-4 rounded-2xl shadow-skeuo aspect-video flex flex-col items-center justify-center text-center relative overflow-hidden group/crt">
@@ -101,7 +117,9 @@
 
       <div class="bg-white border-[3px] border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group">
         <div>
-          <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">📅</div>
+          <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center mb-6">
+            <Calendar class="w-6 h-6 text-black" strokeWidth={2.5} />
+          </div>
           <h3 class="text-xl font-black text-black uppercase mb-3">Tournaments & Scrimmages</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
             See upcoming events, as well as recaps and media from past tournaments across Connecticut, including qualifiers, regionals, and the state championship.
@@ -114,7 +132,9 @@
 
       <div class="bg-white border-[3px] border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group">
         <div>
-          <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">📊</div>
+          <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center mb-6">
+            <ChartColumn class="w-6 h-6 text-black" strokeWidth={2.5} />
+          </div>
           <h3 class="text-xl font-black text-black uppercase mb-3">CT Team List</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
             Robolyst provides an open-source interactive directory of all CT FTC teams, showcasing their match history, awards, and key statistics to analyze performance trends across the state.
@@ -127,7 +147,9 @@
 
       <div class="bg-white border-[3px] border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group sm:col-span-2 lg:col-span-1">
         <div>
-          <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-2xl mb-6">🤝</div>
+          <div class="w-12 h-12 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center mb-6">
+            <Handshake class="w-6 h-6 text-black" strokeWidth={2.5} />
+          </div>
           <h3 class="text-xl font-black text-black uppercase mb-3">Volunteer "How to"</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed mb-6">
             Learn about the various volunteer roles that support CT FTC events, from coaching teams to judging matches, and how you can contribute your time and expertise to inspire the next generation of STEM leaders.
