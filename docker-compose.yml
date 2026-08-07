@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - BODY_SIZE_LIMIT=50M
   pocketbase:
     build:
       context: .

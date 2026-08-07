@@ -1,21 +1,17 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import { enhance } from '$app/forms';
   import { Mail, Check, TriangleAlert } from '@lucide/svelte';
-  // Import PocketBase
-  import { pb } from '$lib/pocketbase';
 
   // Svelte 5 direct destructuring without explicit interface types
-  let { data = { upcoming: [] } } = $props();
+  let { form } = $props();
 
   // State Management (Svelte 5 Runes)
-  let name = $state("");
-  let email = $state("");
-  let category = $state("general"); 
-  let message = $state("");
+  let category = $state("general");
   let submitted = $state(false);
   let isSubmitting = $state(false);
-  let errorMessage = $state("");
+  let errorMessage = $derived(form?.error ?? "");
   let scrollY = $state(0);
 
   // Monitors the URL path anchor fragment for automatic dropdown updates
@@ -58,38 +54,9 @@
     }
   ];
 
-  async function handleSubmit(e: SubmitEvent): Promise<void> {
-    e.preventDefault();
-    isSubmitting = true;
-    errorMessage = "";
-
-    try {
-      await pb.collection('contact').create({
-        name,
-        email,
-        category,
-        message
-      });
-
-      setTimeout(() => {
-        submitted = true;
-        isSubmitting = false;
-      }, 1200);
-
-    } catch (error: any) {
-      errorMessage = error.message || 'Could not communicate with database.';
-      isSubmitting = false;
-    }
-  }
-
   function resetForm(): void {
-    name = "";
-    email = "";
-    category = "general";
-    message = "";
     submitted = false;
-    errorMessage = "";
-    isSubmitting = false;
+    category = "general";
   }
 
   let parallaxHeaderY = $derived(scrollY * 0.25);
@@ -178,24 +145,37 @@
               </button>
             </div>
           {:else}
-            <form onsubmit={handleSubmit} class="space-y-6">
-              
+            <form
+              method="POST"
+              use:enhance={() => {
+                isSubmitting = true;
+                return async ({ result, update }) => {
+                  isSubmitting = false;
+                  if (result.type === 'success') {
+                    submitted = true;
+                  }
+                  await update({ reset: result.type === 'success' });
+                };
+              }}
+              class="space-y-6"
+            >
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="space-y-2 text-left">
                   <label for="name" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Your Name</label>
-                  <input type="text" id="name" bind:value={name} required disabled={isSubmitting} placeholder="e.g. Jane Doe" class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50" />
+                  <input type="text" id="name" name="name" autocomplete="name" required disabled={isSubmitting} placeholder="e.g. Jane Doe" class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50" />
                 </div>
-                
+
                 <div class="space-y-2 text-left">
                   <label for="email" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Email Address</label>
-                  <input type="email" id="email" bind:value={email} required disabled={isSubmitting} placeholder="name@domain.com" class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50" />
+                  <input type="email" id="email" name="email" autocomplete="email" required disabled={isSubmitting} placeholder="name@domain.com" class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50" />
                 </div>
               </div>
 
               <div class="space-y-2 text-left">
                 <label for="cat" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Inquiry Topic</label>
                 <div class="relative">
-                  <select id="cat" bind:value={category} disabled={isSubmitting} class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none appearance-none focus:border-[#2563eb] transition-colors cursor-pointer disabled:opacity-50">
+                  <select id="cat" name="category" bind:value={category} disabled={isSubmitting} class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none appearance-none focus:border-[#2563eb] transition-colors cursor-pointer disabled:opacity-50">
                     <option value="general">General Inquiry</option>
                     <option value="team">Team Support</option>
                     <option value="volunteer">Volunteering</option>
@@ -207,7 +187,7 @@
 
               <div class="space-y-2 text-left">
                 <label for="msg" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Message Detail</label>
-                <textarea id="msg" rows="5" bind:value={message} required disabled={isSubmitting} placeholder="Write the details of your request here..." class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors resize-none disabled:opacity-50"></textarea>
+                <textarea id="msg" name="message" rows="5" required disabled={isSubmitting} placeholder="Write the details of your request here..." class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors resize-none disabled:opacity-50"></textarea>
               </div>
 
               {#if errorMessage}

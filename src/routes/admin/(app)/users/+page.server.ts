@@ -18,25 +18,28 @@ export const actions: Actions = {
 		const form = await request.formData();
 
 		const email = String(form.get('email') ?? '').trim();
-		const name = String(form.get('name') ?? '').trim();
-		const password = String(form.get('password') ?? '');
 		const authLevel = form.get('authLevel');
 
-		if (!email || !password) return fail(400, { error: 'Email and password are required.' });
+		if (!email) return fail(400, { error: 'Email is required.' });
 		if (!isValidRole(authLevel)) return fail(400, { error: 'Invalid role.' });
+
+		// PocketBase requires a password to create the account, but the
+		// invitee never sees it - they set their own via the emailed
+		// password-reset link (see /admin/set-password).
+		const tempPassword = crypto.randomUUID() + crypto.randomUUID();
 
 		const out = new FormData();
 		out.append('email', email);
-		out.append('name', name);
-		out.append('password', password);
-		out.append('passwordConfirm', password);
+		out.append('password', tempPassword);
+		out.append('passwordConfirm', tempPassword);
 		out.append('authLevel', authLevel);
 		out.append('emailVisibility', 'true');
 
 		try {
 			await locals.pb.collection('users').create(out);
+			await locals.pb.collection('users').requestPasswordReset(email);
 		} catch (err: any) {
-			return fail(400, { error: err?.message ?? 'Failed to create account.' });
+			return fail(400, { error: err?.message ?? 'Failed to invite account.' });
 		}
 	},
 

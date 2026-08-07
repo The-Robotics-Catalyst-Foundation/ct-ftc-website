@@ -1,26 +1,35 @@
-import type { PageServerLoad } from './$types';
+import { fail } from '@sveltejs/kit';
+import type { Actions } from './$types';
 import { pb } from '$lib/pocketbase';
+import { checkRateLimit } from '$lib/server/rate-limit';
 
-export const load: PageServerLoad = async () => {
-	try {
-		const records = await pb.collection('events').getList(1, 3, {
-			filter: 'date_time >= @now',
-			sort: 'date_time'
-		});
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-		return {
-			upcomingEvents: records.items.map((record) => ({
-				id: record.id,
-				slug: record.slug || '',
-				name: record.name || 'Untitled Event',
-				location: record.location || 'Location Pending',
-				dateTime: record.date_time || '',
-				volunteersCurrent: record.volunteersAttending ?? 0,
-				volunteersNeeded: record.volunteersNeeded ?? 0
-			}))
-		};
-	} catch (err) {
-		console.error('Failed to load upcoming events for the volunteer page:', err);
-		return { upcomingEvents: [] };
+export const actions: Actions = {
+	subscribe: async ({ request, getClientAddress }) => {
+		const form = await request.formData();
+		const email = String(form.get('email') ?? '').trim();
+
+		if (!EMAIL_PATTERN.test(email)) {
+			return fail(400, { error: 'Enter a valid email address.' });
+		}
+
+		if (!checkRateLimit(`newsletter:${getClientAddress()}`)) {
+			return fail(429, { error: 'Too many attempts. Please wait a few minutes and try again.' });
+		}
+
+		try {
+			await pb.collection('volunteer_newsletter').create({ email });
+		} catch (err: any) {
+			// Someone subscribing twice with the same address hits PocketBase's
+			// unique-field validation - treat that as a success too, since the
+			// visitor's intent (being on the list) is already satisfied.
+			if (err?.response?.data?.email?.code === 'validation_not_unique') {
+				return { success: true };
+			}
+			return fail(400, { error: err?.message ?? 'Could not subscribe right now.' });
+		}
+
+		return { success: true };
 	}
 };

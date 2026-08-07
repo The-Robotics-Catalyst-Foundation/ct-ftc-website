@@ -1,3 +1,6 @@
-# allow crawling everything by default
+# allow crawling everything except the admin panel
 User-agent: *
-Disallow:
+Disallow: /admin
+
+# Add your production domain here once confirmed, e.g.:
+# Sitemap: https://your-real-domain.example/sitemap.xml

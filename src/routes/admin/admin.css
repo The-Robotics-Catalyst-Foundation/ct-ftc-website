@@ -175,3 +175,111 @@
 	background: #facc15;
 	color: #1a1a1a;
 }
+
+/* --- Phone-view primitives: FAB + bottom sheet. Self-contained media
+   queries (not Tailwind's `md:` utilities) so they don't fight admin.css's
+   own `display` rules on the same elements regardless of stylesheet order. */
+
+.fab-button {
+	display: none;
+}
+
+.sheet-backdrop,
+.sheet-panel {
+	display: none;
+}
+
+@media (max-width: 767px) {
+	.fab-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: fixed;
+		bottom: 1.5rem;
+		right: 1.5rem;
+		z-index: 60;
+		width: 3.5rem;
+		height: 3.5rem;
+		background: var(--color-ftc-blue);
+		color: #fff;
+		font-size: 1.75rem;
+		font-weight: 800;
+		line-height: 1;
+		border: 3px solid #000;
+		border-radius: 999px;
+		box-shadow: 4px 4px 0px 0px #000;
+		transition: box-shadow 0.15s ease, transform 0.1s ease;
+	}
+	.fab-button:active {
+		transform: translate(3px, 3px);
+		box-shadow: 1px 1px 0px 0px #000;
+	}
+
+	.sheet-backdrop {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 70;
+		background: rgba(15, 23, 42, 0.5);
+	}
+
+	.sheet-panel {
+		display: block;
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 71;
+		max-height: 88vh;
+		overflow-y: auto;
+		background: #fff;
+		border: 3px solid #000;
+		border-bottom: none;
+		border-radius: 1.5rem 1.5rem 0 0;
+		box-shadow: 0px -6px 0px 0px #000;
+		padding: 0.75rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
+	}
+}
+
+.sheet-handle {
+	width: 3rem;
+	height: 0.3rem;
+	background: var(--color-border-subtle);
+	border-radius: 999px;
+	margin: 0 auto 0.75rem;
+}
+
+.sheet-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+}
+
+.sheet-title {
+	font-size: 1rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	color: var(--color-text-main);
+}
+
+.sheet-close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 2px solid #000;
+	border-radius: 0.5rem;
+	background: #fff;
+	font-size: 1.1rem;
+	font-weight: 800;
+	line-height: 1;
+	box-shadow: 2px 2px 0px 0px #000;
+	transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+.sheet-close:active {
+	transform: translate(1px, 1px);
+	box-shadow: 1px 1px 0px 0px #000;
+}

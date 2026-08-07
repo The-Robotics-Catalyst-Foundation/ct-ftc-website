@@ -33,10 +33,10 @@
         onclick={closeMenu}
         class="flex items-center gap-3 shrink-0 transition-transform hover:-translate-y-0.5"
       >
-        <span class="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-white border-2 border-black shadow-skeuo shrink-0">
+        <span class="flex items-center justify-center w-18 h-12 md:w-14 md:h-14 rounded-full bg-white border-2 border-black shadow-skeuo shrink-0">
           <img src={logo} alt="CT FIRST Tech Challenge logo" class="w-[70%] h-[70%] object-contain invert" />
         </span>
-        <img src={ftcLogo} alt="FIRST Tech Challenge logo" class="hidden sm:block h-10 md:h-12 object-contain" />
+        <img src={ftcLogo} alt="FIRST Tech Challenge logo" class="hidden sm:block h-10 md:h-8 object-contain" />
       </a>
 
       <button
