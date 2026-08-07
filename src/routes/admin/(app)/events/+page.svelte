@@ -78,6 +78,14 @@
 					<label for="event_pdf" class="admin-label">Sponsorship / info PDF</label>
 					<input id="event_pdf" name="event_pdf" type="file" accept="application/pdf" class="glass-input" />
 				</div>
+				<div class="sm:col-span-2">
+					<label for="imgLink" class="admin-label">Photo album link</label>
+					<input id="imgLink" name="imgLink" type="url" placeholder="https://..." class="glass-input" />
+				</div>
+				<div class="sm:col-span-2">
+					<label for="code" class="admin-label">Event code (used as URL slug)</label>
+					<input id="code" name="code" placeholder="Leave blank to auto-generate" class="glass-input" />
+				</div>
 				<div class="flex gap-2 sm:col-span-2">
 					<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Saving…' : 'Create event'}</button>
 					<button type="button" class="btn-secondary" onclick={() => (showCreate = false)}>Cancel</button>
@@ -113,6 +121,8 @@
 							<input name="volunteersAttending" type="number" min="0" class="glass-input" value={event.volunteersAttending} placeholder="Attending" />
 						</div>
 						<input name="event_pdf" type="file" accept="application/pdf" class="glass-input" />
+						<input name="imgLink" type="url" class="glass-input" value={event.imgLink} placeholder="Photo album link" />
+						<input name="code" class="glass-input" value={event.slug} placeholder="Event code (used as URL slug)" />
 						<div class="flex gap-2">
 							<button type="submit" disabled={busy} class="btn-primary">Save</button>
 							<button type="button" class="btn-secondary" onclick={() => (editingId = null)}>Cancel</button>
@@ -127,16 +137,23 @@
 								{event.date_time ? new Date(event.date_time).toLocaleString() : 'No date set'}
 							</p>
 						</div>
-						{#if event.event_pdf}
-							<a
-								href={pb.files.getUrl(event, event.event_pdf)}
-								target="_blank"
-								rel="noreferrer"
-								class="btn-secondary shrink-0 px-3 py-1.5 text-xs"
-							>
-								PDF
-							</a>
-						{/if}
+						<div class="flex shrink-0 gap-2">
+							{#if event.event_pdf}
+								<a
+									href={pb.files.getUrl(event, event.event_pdf)}
+									target="_blank"
+									rel="noreferrer"
+									class="btn-secondary px-3 py-1.5 text-xs"
+								>
+									PDF
+								</a>
+							{/if}
+							{#if event.imgLink}
+								<a href={event.imgLink} target="_blank" rel="noreferrer" class="btn-secondary px-3 py-1.5 text-xs">
+									Photos
+								</a>
+							{/if}
+						</div>
 					</div>
 
 					<div class="mt-3 flex items-center gap-2 text-xs text-text-muted">

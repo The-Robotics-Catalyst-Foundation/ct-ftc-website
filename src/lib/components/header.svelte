@@ -1,7 +1,6 @@
 <script>
   import { page } from '$app/stores';
   import { slide } from 'svelte/transition';
-  import { onMount } from 'svelte';
 
   let logo = '/ctftc.png';
   let ftcLogo = 'https://wpafbstem.com/FTC/img/FTC_logo.png';
@@ -21,9 +20,6 @@
     isMobileMenuOpen = false;
   }
 
-  onMount(() => {
-    revealOnce('#site-nav', { distance: -14 });
-  });
 </script>
 
 <div class="fixed top-4 left-0 right-0 z-[200] px-4 md:px-6 flex justify-center pointer-events-none">
@@ -142,5 +138,27 @@
 
   .box-shadow-mini {
     box-shadow: 3px 3px 0px 0px #000000;
+  }
+
+  /* One-time reveal on load: fade + slide down from -14px */
+  #site-nav {
+    animation: nav-reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes nav-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #site-nav {
+      animation: none;
+    }
   }
 </style>

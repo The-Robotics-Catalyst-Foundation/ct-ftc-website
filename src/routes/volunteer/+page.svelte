@@ -3,13 +3,36 @@
   import { fade } from 'svelte/transition';
   import { slide } from 'svelte/transition';
   import Head from '$lib/components/head.svelte';
-  import { Wrench, Scale, ClipboardList, Coffee } from '@lucide/svelte';
+  import { Wrench, Scale, ClipboardList, Coffee, ChevronLeft, ChevronRight } from '@lucide/svelte';
+
+  let { data } = $props();
 
   // State Management
   let isLoaded = $state(false);
   let scrollY = $state(0);
   /** @type {string | null} */
   let activeRoleCategory = $state('tech');
+  let activeEventIndex = $state(0);
+
+  const upcomingEvents = data?.upcomingEvents ?? [];
+
+  function nextEvent() {
+    activeEventIndex = (activeEventIndex + 1) % upcomingEvents.length;
+  }
+
+  function prevEvent() {
+    activeEventIndex = (activeEventIndex - 1 + upcomingEvents.length) % upcomingEvents.length;
+  }
+
+  /** @param {string} dateString */
+  function formatEventDate(dateString) {
+    if (!dateString) return 'Date TBD';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
 
   const roleCategories = [
     {
@@ -61,6 +84,11 @@
 
   onMount(() => {
     setTimeout(() => isLoaded = true, 100);
+
+    if (upcomingEvents.length > 1) {
+      const interval = setInterval(nextEvent, 5000);
+      return () => clearInterval(interval);
+    }
   });
 </script>
 
@@ -150,6 +178,99 @@
 
     </div>
   </section>
+
+  <section class="max-w-6xl mx-auto px-6 pb-4 relative z-20">
+    <div class="bg-white border-3 border-black rounded-[2.5rem] p-8 md:p-12 box-shadow-flat flex flex-col md:flex-row items-center gap-8">
+      <div class="flex-1 text-center md:text-left space-y-3">
+        <span class="text-xs font-black text-black bg-[#facc15] border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Just want to help at one event?</span>
+        <h2 class="text-2xl font-black text-black uppercase tracking-tight">Skip the Full Registration</h2>
+        <p class="text-slate-600 text-sm font-semibold leading-relaxed max-w-xl">
+          The steps above register you as an official FIRST volunteer &mdash; the right path for a specific role like referee, judge, or FTA, or if you plan on volunteering all season. If you'd rather just raise your hand for a single Connecticut event, open that event's page and use the quick sign-up form there instead.
+        </p>
+      </div>
+      <a href="/events" class="shrink-0 skeuo-button bg-black text-white text-sm font-black uppercase tracking-wider px-8 py-4 rounded-2xl border-2 border-black box-shadow-flat hover:translate-y-[1px] active:translate-y-[4px] transition-all whitespace-nowrap">
+        Browse CT Events &rarr;
+      </a>
+    </div>
+  </section>
+
+  {#if upcomingEvents.length}
+    <section class="max-w-4xl mx-auto px-6 pb-16 relative z-20">
+      <div class="mb-6 text-center md:text-left">
+        <span class="text-xs font-black text-white bg-black border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Right Now</span>
+        <h2 class="text-2xl font-black text-black uppercase tracking-tight mt-3">Upcoming Events Looking for Help</h2>
+      </div>
+
+      <div class="relative bg-white border-3 border-black rounded-[2.5rem] p-6 md:p-10 box-shadow-flat overflow-hidden">
+        {#each upcomingEvents as event, i}
+          {#if i === activeEventIndex}
+            {@const current = event.volunteersCurrent}
+            {@const required = event.volunteersNeeded}
+            {@const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0}
+            <div in:fade={{ duration: 250 }} class="flex flex-col md:flex-row md:items-center gap-6 md:px-8">
+              <div class="flex-1 space-y-3 text-center md:text-left">
+                <span class="inline-block text-xs font-black uppercase tracking-wide text-black bg-[#eef2f7] border-2 border-black px-3 py-1">
+                  {formatEventDate(event.dateTime)}
+                </span>
+                <h3 class="text-2xl font-black text-black uppercase tracking-tight">{event.name}</h3>
+                <p class="text-sm font-bold text-slate-600">{event.location}</p>
+
+                <div class="pt-2 max-w-xs mx-auto md:mx-0">
+                  <div class="flex justify-between items-center text-[10px] font-black uppercase text-slate-500 mb-1.5">
+                    <span>Volunteers</span>
+                    <span>{current} / {required || '—'}</span>
+                  </div>
+                  <div class="w-full h-3 bg-[#eef2f7] border-2 border-black overflow-hidden">
+                    <div class="h-full bg-[#facc15] border-r-2 border-black" style="width: {required > 0 ? pct : 0}%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href="/events/{event.slug || event.id}#details-section"
+                class="shrink-0 skeuo-button bg-[#2563eb] text-white text-sm font-black uppercase tracking-wider px-6 py-4 rounded-2xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] transition-all whitespace-nowrap"
+              >
+                Sign Up to Volunteer
+              </a>
+            </div>
+          {/if}
+        {/each}
+
+        {#if upcomingEvents.length > 1}
+          <button
+            type="button"
+            onclick={prevEvent}
+            aria-label="Previous event"
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white border-2 border-black flex items-center justify-center box-shadow-flat hover:-translate-x-0.5 transition-transform"
+          >
+            <ChevronLeft class="w-4 h-4" strokeWidth={2.5} />
+          </button>
+          <button
+            type="button"
+            onclick={nextEvent}
+            aria-label="Next event"
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white border-2 border-black flex items-center justify-center box-shadow-flat hover:translate-x-0.5 transition-transform"
+          >
+            <ChevronRight class="w-4 h-4" strokeWidth={2.5} />
+          </button>
+        {/if}
+      </div>
+
+      {#if upcomingEvents.length > 1}
+        <div class="flex items-center justify-center gap-2 mt-5">
+          {#each upcomingEvents as _, i}
+            <button
+              type="button"
+              onclick={() => (activeEventIndex = i)}
+              aria-label={`Go to event ${i + 1}`}
+              aria-current={activeEventIndex === i ? 'true' : undefined}
+              class="w-2.5 h-2.5 rounded-full border-2 border-black transition-all {activeEventIndex === i ? 'bg-black scale-110' : 'bg-white'}"
+            ></button>
+          {/each}
+        </div>
+      {/if}
+    </section>
+  {/if}
 
   <section class="max-w-4xl mx-auto px-6 py-8 relative z-20">
     <div class="text-left mb-6">

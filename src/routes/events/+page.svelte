@@ -97,7 +97,10 @@
                     {@const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0}
                     {@const needsVolunteers = required > current}
 
-                    <div class="scroll-animate-card bg-white border-4 border-slate-900 rounded-xl p-6 flex flex-col justify-between shadow-[8px_8px_0_0_rgba(15,23,42,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0_0_rgba(15,23,42,1)] transition-all duration-200 group">
+                    <a
+                        href="/events/{event.slug || event.id}"
+                        class="scroll-animate-card bg-white border-4 border-slate-900 rounded-xl p-6 flex flex-col justify-between shadow-[8px_8px_0_0_rgba(15,23,42,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0_0_rgba(15,23,42,1)] transition-all duration-200 group"
+                    >
 
                         <div>
                             <div class="flex justify-between items-start mb-5 gap-2">
@@ -160,14 +163,13 @@
                         </div>
 
                         <div class="mt-8">
-                            <a
-                                href="/events/{event.slug || event.id}"
-                                class="flex items-center justify-center w-full bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg hover:bg-[#fde047] hover:text-slate-900 transition-colors duration-200"
+                            <span
+                                class="flex items-center justify-center w-full bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg group-hover:bg-[#fde047] group-hover:text-slate-900 transition-colors duration-200"
                             >
                                 View Details
-                            </a>
+                            </span>
                         </div>
-                    </div>
+                    </a>
                 {/each}
             </div>
         {/if}

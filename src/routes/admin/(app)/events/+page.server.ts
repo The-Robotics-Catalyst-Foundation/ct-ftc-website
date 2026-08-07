@@ -10,6 +10,18 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return { events };
 };
 
+function slugify(input: string): string {
+	return input
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
+function randomSlug(): string {
+	return crypto.randomUUID().slice(0, 8);
+}
+
 function eventFormData(form: FormData) {
 	const out = new FormData();
 	out.append('name', String(form.get('name') ?? ''));
@@ -23,6 +35,11 @@ function eventFormData(form: FormData) {
 
 	const pdf = form.get('event_pdf');
 	if (pdf instanceof File && pdf.size > 0) out.append('event_pdf', pdf);
+
+	out.append('imgLink', String(form.get('imgLink') ?? ''));
+
+	const code = String(form.get('code') ?? '').trim();
+	out.append('slug', code ? slugify(code) : randomSlug());
 
 	return out;
 }

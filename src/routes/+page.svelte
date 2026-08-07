@@ -2,17 +2,33 @@
   import { browser } from '$app/environment';
   import Head from '$lib/components/head.svelte';
   import Carousel from '$lib/components/carousel.svelte';
+  import TeamMap from '$lib/components/team-map.svelte';
   import { Calendar, ChartColumn, Handshake, Wrench, Megaphone, Users } from '@lucide/svelte';
+
+  let { data } = $props();
 
   // --- SVELTE 5 STATE RUNES ---
   let scrollY = $state(0);
   let mouseX = $state(0);
   let mouseY = $state(0);
+  let townInput = $state('');
+
+  /** @param {SubmitEvent} e */
+  function searchTown(e) {
+    e.preventDefault();
+    const slug = townInput
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    if (!slug) return;
+    window.open(`https://robolyst.org/location/${slug}-ct/ftc`, '_blank', 'noopener,noreferrer');
+  }
 
   // --- DERIVED RUNES (2030 SCROLL ANIMATIONS MATRIX) ---
   // Calculates real-time 3D rotation, depth offsets, and scale matrices based on page scroll depth
   let parallaxHeroY = $derived(scrollY * 0.35);
-  let mapRotateY = $derived((scrollY * 0.1) % 360);
+  let mapRotateY = $derived(Math.min(scrollY * 0.02, 8));
   let mapTiltX = $derived(Math.min(scrollY * 0.08, 15));
   let structuralScale = $derived(Math.max(1 - scrollY * 0.0005, 0.9));
 
@@ -65,8 +81,29 @@
           style="transform: scale({structuralScale}) rotateY({mouseX + mapRotateY}deg) rotateX({-mouseY + mapTiltX}deg)"
         >
           <div class="w-full h-full rounded-[2.8rem] bg-[#eef2f7] shadow-neumorphic-inner p-4 relative overflow-hidden border border-slate-200/50">
-            <img src="map.png" alt="CT Map" class="w-full h-full object-cover rounded-[2.5rem] shadow-neumorphic-inner border border-slate-200/50">
+            <TeamMap teamGroups={data.teamGroups} />
           </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <form onsubmit={searchTown} class="flex items-center gap-0 rounded-xl border-[3px] border-black box-shadow-flat overflow-hidden">
+            <input
+              type="text"
+              bind:value={townInput}
+              placeholder="Your CT town..."
+              aria-label="Your CT town name"
+              class="bg-white text-black text-xs font-black uppercase tracking-wider placeholder:text-slate-400 placeholder:normal-case placeholder:tracking-normal px-4 py-3 outline-none w-40"
+            />
+            <button
+              type="submit"
+              class="brutalist-btn bg-white text-black text-xs font-black uppercase tracking-wider px-4 py-3 border-l-[3px] border-black transition-colors hover:bg-[#eef2f7] whitespace-nowrap"
+            >
+              Search Town &rarr;
+            </button>
+          </form>
+          <a href="/contact" class="brutalist-btn bg-[#facc15] text-black text-xs font-black uppercase tracking-wider px-6 py-3 rounded-xl border-[3px] border-black box-shadow-flat transition-transform hover:-translate-y-1">
+            Create a Team
+          </a>
         </div>
       </div>
 
