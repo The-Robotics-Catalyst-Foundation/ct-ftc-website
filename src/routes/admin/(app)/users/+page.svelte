@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Sheet from '$lib/components/sheet.svelte';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -15,13 +16,51 @@
 	};
 </script>
 
+{#snippet createUserForm()}
+	<form
+		method="POST"
+		action="?/createUser"
+		use:enhance={() => {
+			busy = true;
+			return async ({ update }) => {
+				await update();
+				busy = false;
+				showCreate = false;
+			};
+		}}
+		class="grid grid-cols-1 gap-4 sm:grid-cols-2"
+	>
+		<div class="sm:col-span-2">
+			<label for="email" class="admin-label">Email</label>
+			<input id="email" name="email" type="email" required class="glass-input" />
+		</div>
+		<div class="sm:col-span-2">
+			<label for="authLevel" class="admin-label">Role</label>
+			<select id="authLevel" name="authLevel" required class="glass-input">
+				<option value="photographer">Photographer</option>
+				<option value="event_manager">Event Manager</option>
+				<option value="admin">Admin</option>
+			</select>
+		</div>
+		<p class="text-xs text-text-muted sm:col-span-2">
+			They'll get an email with a link to set their own password and activate the account.
+		</p>
+		<div class="flex gap-2 sm:col-span-2">
+			<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Sending invite…' : 'Send invite'}</button>
+			<button type="button" class="btn-secondary" onclick={() => (showCreate = false)}>Cancel</button>
+		</div>
+	</form>
+{/snippet}
+
 <div class="mx-auto max-w-4xl">
 	<div class="mb-6 flex items-center justify-between">
 		<div>
 			<h1 class="text-2xl font-bold tracking-tight text-text-main">Users</h1>
 			<p class="mt-1 text-sm text-text-muted">Provision staff accounts. There is no public sign-up.</p>
 		</div>
-		<button type="button" class="btn-primary" onclick={() => (showCreate = true)}>New account</button>
+		<div class="hidden md:block">
+			<button type="button" class="btn-primary" onclick={() => (showCreate = true)}>New account</button>
+		</div>
 	</div>
 
 	{#if form?.error}
@@ -29,46 +68,9 @@
 	{/if}
 
 	{#if showCreate}
-		<div class="glass-panel mb-6 p-6">
+		<div class="glass-panel mb-6 hidden p-6 md:block">
 			<h2 class="mb-4 text-sm font-semibold text-text-main">New account</h2>
-			<form
-				method="POST"
-				action="?/createUser"
-				use:enhance={() => {
-					busy = true;
-					return async ({ update }) => {
-						await update();
-						busy = false;
-						showCreate = false;
-					};
-				}}
-				class="grid grid-cols-1 gap-4 sm:grid-cols-2"
-			>
-				<div>
-					<label for="name" class="admin-label">Name</label>
-					<input id="name" name="name" class="glass-input" />
-				</div>
-				<div>
-					<label for="email" class="admin-label">Email</label>
-					<input id="email" name="email" type="email" required class="glass-input" />
-				</div>
-				<div>
-					<label for="password" class="admin-label">Password</label>
-					<input id="password" name="password" type="password" required minlength="8" class="glass-input" />
-				</div>
-				<div>
-					<label for="authLevel" class="admin-label">Role</label>
-					<select id="authLevel" name="authLevel" required class="glass-input">
-						<option value="photographer">Photographer</option>
-						<option value="event_manager">Event Manager</option>
-						<option value="admin">Admin</option>
-					</select>
-				</div>
-				<div class="flex gap-2 sm:col-span-2">
-					<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Creating…' : 'Create account'}</button>
-					<button type="button" class="btn-secondary" onclick={() => (showCreate = false)}>Cancel</button>
-				</div>
-			</form>
+			{@render createUserForm()}
 		</div>
 	{/if}
 
@@ -140,3 +142,9 @@
 		{/each}
 	</div>
 </div>
+
+<button type="button" class="fab-button" onclick={() => (showCreate = true)} aria-label="New account">+</button>
+
+<Sheet open={showCreate} onClose={() => (showCreate = false)} title="New account">
+	{@render createUserForm()}
+</Sheet>

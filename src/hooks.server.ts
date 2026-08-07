@@ -24,6 +24,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const response = await resolve(event);
 
+	// Admin panel is never meant to be indexed - belt-and-suspenders with the
+	// <meta name="robots"> tag and robots.txt Disallow, since crawlers that
+	// ignore one of the three often still respect this response header.
+	if (event.url.pathname.startsWith('/admin')) {
+		response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+	}
+
 	// Re-issue the cookie so a refreshed token (or a cleared/invalid one) is
 	// persisted. Scoped to /admin so the session token is never sent on
 	// public-site requests. httpOnly + secure + sameSite=strict are the

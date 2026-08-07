@@ -123,7 +123,9 @@
                 width="100%"
                 height={iframeHeight}
                 frameborder="0"
+                scrolling="no"
                 allowfullscreen
+                style="overflow: hidden;"
                 class="block w-full rounded-2xl border-0"
             ></iframe>
         </div>

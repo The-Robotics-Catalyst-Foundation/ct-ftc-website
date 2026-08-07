@@ -77,7 +77,7 @@
           <p class="text-sm md:text-base font-bold text-slate-700">
             Made by <a href="https://singul.tech" target="_blank" rel="noopener noreferrer" class="text-[#2563eb] hover:underline font-black">Singularity Technology #7034</a>
           </p>
-          <img src="https://api.singultech.app/get-image/Logo" alt="Singularity Technology Logo" class="w-10 h-10 object-contain invert">
+          <img src="https://singul.tech/logo.png" alt="Singularity Technology Logo" class="w-10 h-10 object-contain invert">
         </div>
 
         <div class="flex items-center gap-3">

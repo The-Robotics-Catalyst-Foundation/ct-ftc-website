@@ -14,9 +14,12 @@
   let container: HTMLDivElement = $state()!;
   let map: import('maplibre-gl').Map | null = null;
   let ready = $state(false);
+  let flyTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const CT_CENTER: [number, number] = [-72.7107, 41.6032];
   const CT_ZOOM = 7.4;
+  const USA_CENTER: [number, number] = [-98.5795, 39.8283];
+  const USA_ZOOM = 3.3;
 
   let totalTeams = $derived(teamGroups.reduce((sum, g) => sum + g.teams.length, 0));
 
@@ -86,8 +89,8 @@
           }
         ]
       },
-      center: CT_CENTER,
-      zoom: CT_ZOOM,
+      center: USA_CENTER,
+      zoom: USA_ZOOM,
       attributionControl: false,
       cooperativeGestures: true
     });
@@ -95,6 +98,19 @@
     map.on('load', () => {
       ready = true;
       addPins(maplibregl);
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        map!.jumpTo({ center: CT_CENTER, zoom: CT_ZOOM });
+        return;
+      }
+
+      // Hold on the USA view for a beat before flying in - without this pause,
+      // the fly-in kicks off in the same tick the loading overlay disappears,
+      // so on a fast load the "zoom out to USA" moment is never actually seen.
+      flyTimeout = setTimeout(() => {
+        map?.flyTo({ center: CT_CENTER, zoom: CT_ZOOM, duration: 2600, essential: true });
+      }, 900);
     });
   });
 
@@ -157,6 +173,7 @@
   }
 
   onDestroy(() => {
+    if (flyTimeout) clearTimeout(flyTimeout);
     map?.remove();
     map = null;
   });
@@ -170,7 +187,7 @@
   <div class="relative h-full w-full overflow-hidden rounded-[2.5rem]" bind:this={container}>
     {#if !ready}
       <div class="absolute inset-0 flex items-center justify-center bg-[#eef2f7] text-xs font-black uppercase tracking-widest text-slate-400">
-        Loading CT team map…
+        Loading team map…
       </div>
     {/if}
 

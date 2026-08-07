@@ -33,12 +33,28 @@
         });
     }
 
-    // Neo-brutalist badge styling: Bright colors, thick borders, dark text
+    // Exact brand mapping per event type. Keyed lowercase since PocketBase
+    // data casing isn't guaranteed to match ("scrimmage" vs "Scrimmage") -
+    // matching case-sensitively silently fell through to the grey default.
     const typeStyles: Record<string, string> = {
-        'Scrimmage': 'bg-[#86efac] text-slate-900 border-2 border-slate-900',
-        'Qualifier': 'bg-[#93c5fd] text-slate-900 border-2 border-slate-900',
-        'Championship': 'bg-[#fde047] text-slate-900 border-2 border-slate-900'
+        scrimmage: 'bg-[#FF8C00] text-slate-900 border-2 border-slate-900',
+        qualifier: 'bg-[#0066FF] text-white border-2 border-slate-900',
+        championship: 'bg-[#FFD700] text-slate-900 border-2 border-slate-900',
+        tournament: 'bg-[#c4b5fd] text-slate-900 border-2 border-slate-900'
     };
+
+    // Top accent bar color per event type - same mapping as the badge, just
+    // the raw hex since it's used as a plain background color, not a class.
+    const typeAccent: Record<string, string> = {
+        scrimmage: '#FF8C00',
+        qualifier: '#0066FF',
+        championship: '#FFD700',
+        tournament: '#c4b5fd'
+    };
+
+    function typeKey(type?: string): string {
+        return (type || 'tournament').trim().toLowerCase();
+    }
 </script>
 
 <div class="w-full min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-32 selection:bg-slate-900 selection:text-white relative overflow-x-hidden">
@@ -99,21 +115,24 @@
 
                     <a
                         href="/events/{event.slug || event.id}"
-                        class="scroll-animate-card bg-white border-4 border-slate-900 rounded-xl p-6 flex flex-col justify-between shadow-[8px_8px_0_0_rgba(15,23,42,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0_0_rgba(15,23,42,1)] transition-all duration-200 group"
+                        class="scroll-animate-card bg-white border-4 border-slate-900 rounded-xl overflow-hidden shadow-[8px_8px_0_0_rgba(15,23,42,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0_0_rgba(15,23,42,1)] transition-all duration-200 group flex flex-col"
                     >
-
-                        <div>
-                            <div class="flex justify-between items-start mb-5 gap-2">
-                                <span class="px-3 py-1 text-xs font-black uppercase tracking-wide {typeStyles[event.type || ''] || 'bg-slate-200 text-slate-900 border-2 border-slate-900'}">
-                                    {event.type || 'Tournament'}
+                        <div
+                            class="flex items-start justify-between gap-2 px-6 py-4 border-b-4 border-slate-900"
+                            style="background-color: {typeAccent[typeKey(event.type)] ?? '#cbd5e1'}"
+                        >
+                            <span class="px-3 py-1 text-xs font-black uppercase tracking-wide {typeStyles[typeKey(event.type)] || 'bg-slate-200 text-slate-900 border-2 border-slate-900'}">
+                                {event.type || 'Tournament'}
+                            </span>
+                            {#if needsVolunteers && currentTab === 'upcoming'}
+                                <span class="text-xs font-black uppercase tracking-wide text-slate-900 bg-[#fca5a5] border-2 border-slate-900 px-3 py-1">
+                                    Needs Volunteers
                                 </span>
-                                {#if needsVolunteers && currentTab === 'upcoming'}
-                                    <span class="text-xs font-black uppercase tracking-wide text-slate-900 bg-[#fca5a5] border-2 border-slate-900 px-3 py-1">
-                                        Needs Volunteers
-                                    </span>
-                                {/if}
-                            </div>
+                            {/if}
+                        </div>
 
+                        <div class="p-6 flex flex-col justify-between flex-1">
+                        <div>
                             <h3 class="text-2xl font-black text-slate-900 leading-tight border-b-2 border-transparent group-hover:border-slate-900 transition-colors inline-block mb-1">
                                 {event.name}
                             </h3>
@@ -168,6 +187,7 @@
                             >
                                 View Details
                             </span>
+                        </div>
                         </div>
                     </a>
                 {/each}
