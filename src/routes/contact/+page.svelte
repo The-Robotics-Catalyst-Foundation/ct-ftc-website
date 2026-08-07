@@ -144,17 +144,16 @@
           <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest pl-1 mb-4">Connect With Us</h4>
           <div class="flex flex-wrap gap-4">
             {#each socials as social}
-              <a 
-                href={social.href} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                title={social.name}
-                class="bg-white border-3 border-black p-3.5 rounded-xl box-shadow-flat hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center"
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="bg-white border-3 border-black pl-3.5 pr-4 py-2.5 rounded-xl box-shadow-flat hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center gap-2.5"
               >
-                <svg class="w-5 h-5 fill-black" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="w-5 h-5 fill-black shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                   <path d={social.icon} />
                 </svg>
-                <span class="sr-only">{social.name}</span>
+                <span class="text-xs font-black uppercase tracking-wide text-black">{social.name}</span>
               </a>
             {/each}
           </div>

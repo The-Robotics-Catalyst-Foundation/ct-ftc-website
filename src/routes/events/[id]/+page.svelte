@@ -128,6 +128,15 @@
                   </svg>
                 </a>
               {/if}
+              {#if event.imgLink}
+                <a href={event.imgLink} target="_blank" rel="noopener noreferrer" class="skeuo-button-yellow flex items-center gap-1.5 px-5 py-2.5 bg-emerald-400 text-black text-xs font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-skeuo-black hover:translate-y-[1px] active:translate-y-[3px] transition-all whitespace-nowrap">
+                  <span>View Photos Here</span>
+                  <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 6v12.75a1.5 1.5 0 0 0 1.5 1.5Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 8.25a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                  </svg>
+                </a>
+              {/if}
             </div>
           </div>
         </div>
@@ -219,6 +228,14 @@
                     }}
                   >
                     <input
+                      type="text"
+                      name="name"
+                      required
+                      placeholder="Your name"
+                      disabled={volunteerSubmitting}
+                      class="flex-1 bg-[#eef2f7] border-2 border-black rounded-xl px-4 py-3 text-sm font-bold shadow-inner outline-none focus:border-[#2563eb] transition-colors disabled:opacity-50"
+                    />
+                    <input
                       type="email"
                       name="email"
                       required
@@ -242,6 +259,10 @@
                     </div>
                   {/if}
                 {/if}
+
+                <p class="text-xs font-bold text-slate-500">
+                  Want a credentialed role like referee, judge, or FTA instead? <a href="/volunteer" class="text-[#2563eb] font-black hover:underline">Register through FIRST</a>.
+                </p>
 
                 <a href="/contact/#volunteer" class="inline-flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 hover:text-black transition-colors">
                   Have questions? Contact the coordinator <span>&rarr;</span>

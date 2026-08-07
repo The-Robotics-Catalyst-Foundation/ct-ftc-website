@@ -1,21 +1,39 @@
 <script>
     import { onMount } from 'svelte';
+    import { CircleHelp, X } from '@lucide/svelte';
 
     // --- SVELTE 5 STATE RUNES ---
     let isLoaded = $state(false);
     let scrollY = $state(0);
     let iframeHeight = $state('850px');
+    let helpOpen = $state(false);
+    let helpWrapper = $state();
 
     // --- DERIVED PARALLAX RUNES ---
     let parallaxHeaderY = $derived(scrollY * 0.25);
-    let consoleTilt = $derived(Math.min(scrollY * 0.05, 12));
 
     onMount(() => {
         setTimeout(() => (isLoaded = true), 50);
     });
+
+    function toggleHelp() {
+        helpOpen = !helpOpen;
+    }
+
+    /** @param {MouseEvent} e */
+    function handleWindowClick(e) {
+        if (helpOpen && helpWrapper && !helpWrapper.contains(e.target)) {
+            helpOpen = false;
+        }
+    }
+
+    /** @param {KeyboardEvent} e */
+    function handleWindowKeydown(e) {
+        if (e.key === 'Escape') helpOpen = false;
+    }
 </script>
 
-<svelte:window bind:scrollY />
+<svelte:window bind:scrollY onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
 <svelte:head>
     <title>CT Team Explorer Control Deck - CT FTC</title>
@@ -27,109 +45,90 @@
     <section
         class="relative border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e6eef7] px-6 pt-20 pb-12"
     >
-        <div
-            class="z-10 mx-auto max-w-7xl space-y-6 text-left"
-            style="transform: translateY({parallaxHeaderY}px)"
-        >
-            <h1
-                class="text-5xl leading-[0.95] font-black tracking-tighter text-black uppercase md:text-7xl"
+        <div class="relative mx-auto max-w-7xl" bind:this={helpWrapper}>
+            <button
+                type="button"
+                onclick={toggleHelp}
+                aria-expanded={helpOpen}
+                aria-controls="team-directory-help"
+                aria-label="Didn't find your team? Get help"
+                class="box-shadow-flat absolute top-0 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full border-2 border-black bg-white text-black transition-transform hover:-translate-y-0.5"
             >
-                CT Team <span
-                    class="box-shadow-flat my-1 inline-block rotate-1 transform border-4 border-black bg-white px-3 text-[#2563eb]"
-                    >Directory</span
-                >
-            </h1>
+                <CircleHelp class="h-5 w-5" strokeWidth={2.5} />
+            </button>
 
-            <p
-                class="max-w-2xl rounded-xl border-2 border-black bg-white/40 p-4 text-sm leading-relaxed font-bold text-slate-800 backdrop-blur-sm md:text-lg"
+            {#if helpOpen}
+                <div
+                    id="team-directory-help"
+                    role="dialog"
+                    aria-label="Didn't find your team?"
+                    class="box-shadow-flat absolute top-14 right-6 z-30 w-[min(20rem,calc(100vw-3rem))] rounded-[1.75rem] border-4 border-black bg-white p-6 text-left"
+                >
+                    <button
+                        type="button"
+                        onclick={toggleHelp}
+                        aria-label="Close"
+                        class="absolute top-4 right-4 text-slate-400 transition-colors hover:text-black"
+                    >
+                        <X class="h-4 w-4" strokeWidth={2.5} />
+                    </button>
+
+                    <h3 class="pr-6 text-lg font-black tracking-tight text-black uppercase">
+                        Didn't find your team?
+                    </h3>
+                    <p class="mt-2 text-sm leading-relaxed font-semibold text-slate-600">
+                        Ensure your team information registration fields are completely processed on the
+                        central <span class="text-[#2563eb]">FIRST Dashboard</span>
+                    </p>
+
+                    <a
+                        href="https://firstinspires.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="skeuo-button shadow-skeuo mt-4 block rounded-2xl border-2 border-black bg-[#facc15] px-6 py-3 text-center text-xs font-black tracking-wider text-black uppercase transition-all hover:translate-y-[1px] active:translate-y-[4px]"
+                    >
+                        Official Dashboard &rarr;
+                    </a>
+                </div>
+            {/if}
+
+            <div
+                class="z-10 space-y-6 pr-16 text-left"
+                style="transform: translateY({parallaxHeaderY}px)"
             >
-                Powered by Robolyst, analyze all teams in CT see their match history as well as info about
-                their team.
-            </p>
+                <h1
+                    class="text-5xl leading-[0.95] font-black tracking-tighter text-black uppercase md:text-7xl"
+                >
+                    CT Team <span
+                        class="box-shadow-flat my-1 inline-block rotate-1 transform border-4 border-black bg-white px-3 text-[#2563eb]"
+                        >Directory</span
+                    >
+                </h1>
+
+                <p
+                    class="max-w-2xl rounded-xl border-2 border-black bg-white/40 p-4 text-sm leading-relaxed font-bold text-slate-800 backdrop-blur-sm md:text-lg"
+                >
+                    Powered by Robolyst, analyze all teams in CT see their match history as well as info
+                    about their team.
+                </p>
+            </div>
         </div>
     </section>
 
     <section class="relative z-20 mx-auto max-w-7xl px-6 py-16">
-        <div
-            class="shadow-neumorphic-outer relative w-full rounded-[3.5rem] border-2 border-white/60 bg-[#eef2f7] p-5 transition-transform duration-300 ease-out"
-            style="transform: rotateX({consoleTilt}deg)"
-        >
-            <div
-                class="shadow-neumorphic-inner relative flex h-full w-full flex-col overflow-hidden rounded-[2.8rem] border border-slate-200/60 bg-[#eef2f7] p-4"
-            >
-                <div
-                    class="box-shadow-flat mb-4 flex flex-col items-center justify-between gap-4 rounded-2xl border-2 border-black bg-white bg-gradient-to-r from-white to-slate-50 px-6 py-4 sm:flex-row"
-                >
-                    <div class="flex items-center gap-3">
-                        <div class="flex gap-1.5">
-                            <div
-                                class="h-3.5 w-3.5 rounded-full border border-slate-300 bg-[#eef2f7] shadow-inner"
-                            ></div>
-                            <div
-                                class="h-3.5 w-3.5 rounded-full border border-slate-300 bg-[#eef2f7] shadow-inner"
-                            ></div>
-                            <div
-                                class="h-3.5 w-3.5 rounded-full border border-slate-300 bg-[#eef2f7] shadow-inner"
-                            ></div>
-                        </div>
-                        <span
-                            class="pl-2 font-mono text-[11px] font-black tracking-widest text-slate-400 uppercase"
-                            >Team List</span
-                        >
-                    </div>
-
-                    <div
-                        class="flex items-center gap-2 rounded-lg border-2 border-black bg-slate-900 px-4 py-1.5 font-mono text-xs font-bold tracking-tight text-emerald-400 shadow-inner"
-                    >
-                        <span class="h-1.5 w-1.5 animate-ping rounded-full bg-emerald-400"></span>
-                        <a href="https://robolyst.org" target="_blank" rel="noopener noreferrer">
-                            robolyst.org
-                        </a>
-                    </div>
-                </div>
-
-                <div
-                    class="relative z-10 overflow-hidden rounded-2xl border-4 border-black bg-white shadow-2xl"
-                >
-                    <iframe
-                        src="https://robolyst.org/location/connecticut/ftc/teams"
-                        title="CT FTC Team Atlas"
-                        width="100%"
-                        height={iframeHeight}
-                        frameborder="0"
-                        allowfullscreen
-                        class="block w-full bg-white"
-                    ></iframe>
-                </div>
-            </div>
+        <div class="overflow-hidden rounded-[2.5rem] bg-black p-6">
+            <iframe
+                src="https://robolyst.org/embed/ftc/location/Connecticut/teams/raw-list"
+                title="CT FTC Team Atlas"
+                width="100%"
+                height={iframeHeight}
+                frameborder="0"
+                allowfullscreen
+                class="block w-full rounded-2xl border-0"
+            ></iframe>
         </div>
     </section>
 
-    <section class="relative z-20 mx-auto max-w-5xl px-1 py-4">
-        <div
-            class="box-shadow-flat group flex flex-col items-center justify-between gap-2 rounded-[2.5rem] border-4 border-black bg-white p-8 text-left md:flex-row md:p-12"
-        >
-            <div class="space-y-2">
-                <h3 class="text-2xl font-black tracking-tight text-black uppercase">
-                    Didn't find your team?
-                </h3>
-                <p class="max-w-xl text-sm leading-relaxed font-semibold text-slate-600">
-                    Ensure your team information registration fields are completely processed on the central <span
-                        class="text-[#2563eb]">FIRST Dashboard</span
-                    >
-                </p>
-            </div>
-
-            <a
-                href="https://firstinspires.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="skeuo-button shadow-skeuo min-w-[200px] shrink-0 rounded-2xl border-2 border-black bg-[#facc15] px-8 py-4.5 text-center text-sm font-black tracking-wider text-black uppercase transition-all hover:translate-y-[1px] active:translate-y-[4px]"
-            >
-                Official Dashboard &rarr;
-            </a>
-        </div>
-    </section>
 </main>
 
 <style>
@@ -139,21 +138,6 @@
         background-image:
             linear-gradient(to right, #000000 1px, transparent 1px),
             linear-gradient(to bottom, #000000 1px, transparent 1px);
-    }
-
-    /* Tactile Soft Raised Neomorphic Chassis Shadow Layers */
-    .shadow-neumorphic-outer {
-        box-shadow:
-            14px 14px 32px #bdc7d4,
-            -14px -14px 32px #ffffff,
-            inset 1px 1px 0px rgba(255, 255, 255, 0.9);
-    }
-
-    /* Deep Recessed Inverted Neomorphic Well Insets */
-    .shadow-neumorphic-inner {
-        box-shadow:
-            inset 6px 6px 14px #cad4e2,
-            inset -6px -6px 14px #ffffff;
     }
 
     /* Analog Mechanical Convex Button Press Shading offsets */

@@ -23,3 +23,11 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vscode/
 pocketbase/
+
+# Claude Code (local-only settings)
+.claude/settings.local.json
+
+# Impeccable design hook (local-only cache/config)
+.impeccable/hook.cache.json
+.impeccable/hook.pending.json
+.impeccable/config.local.json

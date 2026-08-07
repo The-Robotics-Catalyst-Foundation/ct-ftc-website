@@ -26,12 +26,20 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME_LENGTH = 100;
 
 export const actions: Actions = {
 	volunteer: async ({ request, params, cookies, getClientAddress }) => {
 		const form = await request.formData();
+		const name = String(form.get('name') ?? '').trim();
 		const email = String(form.get('email') ?? '').trim();
 
+		if (!name) {
+			return fail(400, { error: 'Enter your name.' });
+		}
+		if (name.length > MAX_NAME_LENGTH) {
+			return fail(400, { error: 'Name is too long.' });
+		}
 		if (!EMAIL_PATTERN.test(email)) {
 			return fail(400, { error: 'Enter a valid email address.' });
 		}
@@ -52,15 +60,9 @@ export const actions: Actions = {
 		}
 
 		try {
-			// Logged in the same `contact` collection the contact form already
-			// writes to (public createRule already permits it) so every RSVP
-			// is a reviewable, named record - not just an anonymous click.
-			await pb.collection('contact').create({
-				name: '',
-				email,
-				category: 'volunteer',
-				message: `RSVP'd to volunteer at event ID ${id}.`
-			});
+			// A real, queryable record per event - not just a message string - so
+			// admins can see who's actually coming (see admin/(app)/volunteers).
+			await pb.collection('volunteer_signups').create({ event: id, name, email });
 
 			const updated = await pb.collection('events').update(id, { 'volunteersAttending+': 1 });
 
