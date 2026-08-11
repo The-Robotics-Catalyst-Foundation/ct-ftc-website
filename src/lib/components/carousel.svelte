@@ -4,8 +4,12 @@
 
   // Component Props (Accepts objects or raw string URLs fallback)
   let { images = [
-    { src: 'https://cdn.singultech.app/mainSlideshow/robotinaction_1.jpg', alt: 'Robot in action' },
-    { src: 'https://s3.us-west-1.amazonaws.com/ftcsim.org/Competition+Fields/2025_2026/Competition_2025_2026_Mecanum.jpeg', alt: 'Competition Field' }
+    { src: 'https://singul.tech/img/16hk3gnuwemftl4', alt: 'CT FTC robotics action' },
+    { src: 'https://singul.tech/img/w8nw2xvh42jpqut', alt: 'CT FTC robotics action' },
+    { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-QmfJsw4/0/KWhL6kCnJG3FrNDMhHDM2QWPjLXrkngzzCHSpf4rw/M/WolcottFTC26_01011-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' },
+    { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-cTsLWh7/0/LnQ9pTjBgr4nRLV46hqbfqC5Z6VX3h223JDBWbSzq/M/WolcottFTC26_01019-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' },
+    { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-ZNMKNjL/0/LXBxqTqL4QCbCLrHjpVqkh3VGTD4xhc6hKfBFZTWQ/M/WolcottFTC26_01125-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' },
+    { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-4vK5Ctj/0/M2kJmBJmPKm7jTgjwSfRtp8VXKb3D7vF72fwQbkzW/M/WolcottFTC26_01144-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' }
   ] } = $props();
 
   // State Management

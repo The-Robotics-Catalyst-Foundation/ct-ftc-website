@@ -6,7 +6,13 @@
 
 	let message = $state(data.defaultTemplate);
 	let selectedEventId = $state('');
+	let selectedTemplate = $state(data.templates[0]?.id ?? 'simple');
 	let busy = $state(false);
+	let showSubscribers = $state(false);
+
+	let previewHtml = $state('');
+	let previewLoading = $state(false);
+	let previewTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	function formatDate(value: string) {
 		if (!value) return 'TBD';
@@ -23,20 +29,83 @@
 			.replace('{Date}', formatDate(event.date_time))
 			.replace('{Event Link}', eventLink);
 	}
+
+	async function refreshPreview() {
+		previewLoading = true;
+		try {
+			const res = await fetch('/admin/newsletter/preview', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ message, template: selectedTemplate, eventId: selectedEventId })
+			});
+			if (res.ok) {
+				const payload = await res.json();
+				previewHtml = payload.html;
+			}
+		} finally {
+			previewLoading = false;
+		}
+	}
+
+	function schedulePreview() {
+		if (previewTimeout) clearTimeout(previewTimeout);
+		previewTimeout = setTimeout(refreshPreview, 350);
+	}
+
+	$effect(() => {
+		// Re-render the preview whenever the message, template, or selected
+		// event changes - reads them so the effect re-runs on each change.
+		message;
+		selectedTemplate;
+		selectedEventId;
+		schedulePreview();
+	});
 </script>
 
-<div class="mx-auto max-w-3xl space-y-6">
+<div class="mx-auto max-w-6xl space-y-6">
 	<div>
 		<h1 class="text-2xl font-bold tracking-tight text-text-main">Newsletter</h1>
 		<p class="mt-1 text-sm text-text-muted">Broadcast an update to everyone subscribed for volunteer opportunities.</p>
 	</div>
 
-	<div class="glass-panel p-5 flex items-center justify-between">
-		<div>
-			<p class="admin-label">Subscribers</p>
-			<p class="text-3xl font-black text-text-main">{data.subscriberCount}</p>
+	<div class="glass-panel p-5">
+		<div class="flex items-center justify-between gap-4">
+			<div>
+				<p class="admin-label">Subscribers</p>
+				<p class="text-3xl font-black text-text-main">{data.subscriberCount}</p>
+			</div>
+			<div class="flex items-center gap-2">
+				<span class="role-badge event_manager">volunteer_newsletter</span>
+				{#if data.subscriberCount}
+					<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={() => (showSubscribers = !showSubscribers)}>
+						{showSubscribers ? 'Hide list' : 'Show list'}
+					</button>
+				{/if}
+			</div>
 		</div>
-		<span class="role-badge event_manager">volunteer_newsletter</span>
+
+		{#if showSubscribers && data.subscribers.length}
+			<div class="mt-4 max-h-64 overflow-y-auto rounded-lg border border-black/10">
+				<table class="w-full text-left text-sm">
+					<thead class="sticky top-0 bg-white/90 backdrop-blur">
+						<tr class="text-xs font-black uppercase tracking-wide text-text-muted">
+							<th class="px-3 py-2">Email</th>
+							<th class="px-3 py-2">Subscribed</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each data.subscribers as subscriber (subscriber.id)}
+							<tr class="border-t border-black/5">
+								<td class="px-3 py-2 font-semibold text-text-main">{subscriber.email}</td>
+								<td class="px-3 py-2 text-text-muted">
+									{subscriber.created ? new Date(subscriber.created).toLocaleDateString() : '—'}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
 	</div>
 
 	{#if form?.error}
@@ -46,41 +115,76 @@
 		<div class="success-banner">Broadcast sent to {form.sentCount} subscriber{form.sentCount === 1 ? '' : 's'}.</div>
 	{/if}
 
-	<div class="glass-panel p-6 space-y-4">
-		<div>
-			<label for="event" class="admin-label">Fill in from an upcoming event</label>
-			<div class="flex gap-2">
-				<select id="event" bind:value={selectedEventId} class="glass-input">
-					<option value="">Choose an event…</option>
-					{#each data.events as event (event.id)}
-						<option value={event.id}>{event.name}</option>
-					{/each}
-				</select>
-				<button type="button" class="btn-secondary shrink-0" onclick={applyEvent} disabled={!selectedEventId}>
-					Fill in
-				</button>
+	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+		<div class="glass-panel space-y-4 p-6">
+			<div>
+				<label for="event" class="admin-label">Fill in from an upcoming event</label>
+				<div class="flex gap-2">
+					<select id="event" bind:value={selectedEventId} class="glass-input">
+						<option value="">Choose an event…</option>
+						{#each data.events as event (event.id)}
+							<option value={event.id}>{event.name}</option>
+						{/each}
+					</select>
+					<button type="button" class="btn-secondary shrink-0" onclick={applyEvent} disabled={!selectedEventId}>
+						Fill in
+					</button>
+				</div>
 			</div>
+
+			<div>
+				<p class="admin-label mb-2">Email design</p>
+				<div class="space-y-2">
+					{#each data.templates as template (template.id)}
+						<label
+							class="flex cursor-pointer items-start gap-3 rounded-lg border-2 p-3 transition-colors {selectedTemplate === template.id
+								? 'border-[#1d4ed8] bg-[#eff6ff]'
+								: 'border-black/10 hover:bg-black/[0.02]'}"
+						>
+							<input type="radio" name="template-choice" value={template.id} bind:group={selectedTemplate} class="mt-1 h-4 w-4 accent-[#1d4ed8]" />
+							<span>
+								<span class="block text-sm font-bold text-text-main">{template.name}</span>
+								<span class="block text-xs text-text-muted">{template.description}</span>
+							</span>
+						</label>
+					{/each}
+				</div>
+			</div>
+
+			<form
+				method="POST"
+				action="?/send"
+				use:enhance={() => {
+					busy = true;
+					return async ({ update }) => {
+						await update();
+						busy = false;
+					};
+				}}
+				class="space-y-3"
+			>
+				<input type="hidden" name="template" value={selectedTemplate} />
+				<input type="hidden" name="eventId" value={selectedEventId} />
+				<div>
+					<label for="message" class="admin-label">Message</label>
+					<textarea id="message" name="message" rows="6" class="glass-input" bind:value={message}></textarea>
+				</div>
+				<button type="submit" disabled={busy || !data.subscriberCount} class="btn-primary">
+					{busy ? 'Sending…' : `Send to ${data.subscriberCount} subscriber${data.subscriberCount === 1 ? '' : 's'}`}
+				</button>
+			</form>
 		</div>
 
-		<form
-			method="POST"
-			action="?/send"
-			use:enhance={() => {
-				busy = true;
-				return async ({ update }) => {
-					await update();
-					busy = false;
-				};
-			}}
-			class="space-y-3"
-		>
-			<div>
-				<label for="message" class="admin-label">Message</label>
-				<textarea id="message" name="message" rows="5" class="glass-input" bind:value={message}></textarea>
+		<div class="glass-panel flex flex-col p-6">
+			<div class="mb-3 flex items-center justify-between">
+				<p class="admin-label">Live preview</p>
+				{#if previewLoading}
+					<span class="text-xs font-semibold text-text-muted">Updating…</span>
+				{/if}
 			</div>
-			<button type="submit" disabled={busy || !data.subscriberCount} class="btn-primary">
-				{busy ? 'Sending…' : `Send to ${data.subscriberCount} subscriber${data.subscriberCount === 1 ? '' : 's'}`}
-			</button>
-		</form>
+			<div class="flex-1 overflow-hidden rounded-xl border-2 border-black/10 bg-[#eef2f7]">
+				<iframe title="Email preview" srcdoc={previewHtml} class="h-[560px] w-full border-0"></iframe>
+			</div>
+		</div>
 	</div>
 </div>

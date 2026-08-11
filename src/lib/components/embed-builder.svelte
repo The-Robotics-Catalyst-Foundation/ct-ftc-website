@@ -11,7 +11,6 @@
 		location,
 		dateTime,
 		description,
-		volunteersCurrent,
 		volunteersNeeded
 	}: {
 		id: string;
@@ -21,7 +20,6 @@
 		location?: string;
 		dateTime?: string;
 		description?: string;
-		volunteersCurrent?: number;
 		volunteersNeeded?: number;
 	} = $props();
 
@@ -93,7 +91,6 @@
 					{location}
 					{dateTime}
 					{description}
-					{volunteersCurrent}
 					{volunteersNeeded}
 					showName={showEventName}
 					showActions={false}

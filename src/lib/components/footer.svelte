@@ -43,7 +43,7 @@
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d={social.icon}/></svg>
             </a>
           {/each}
-          <a href="mailto:info@ctftc.org" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label="Email Support">
+          <a href="mailto:contact@connecticutftc.org" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label="Email Support">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           </a>
         </div>

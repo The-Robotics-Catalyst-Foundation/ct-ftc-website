@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { ROLES, requireRole } from '$lib/server/auth';
+import { pbErrorMessage } from '$lib/server/pb-error';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -37,9 +38,17 @@ export const actions: Actions = {
 
 		try {
 			await locals.pb.collection('users').create(out);
+		} catch (err: any) {
+			return fail(400, { error: pbErrorMessage(err, 'Failed to create account.') });
+		}
+
+		// The account exists even if the invite email fails to send (e.g. mail
+		// isn't configured in PocketBase yet) - surface that separately so an
+		// admin doesn't think account creation itself failed.
+		try {
 			await locals.pb.collection('users').requestPasswordReset(email);
 		} catch (err: any) {
-			return fail(400, { error: err?.message ?? 'Failed to invite account.' });
+			return fail(500, { error: `Account created, but the invite email failed to send: ${pbErrorMessage(err, 'unknown error')}. Ask them to use "Forgot password" on the admin login page instead.` });
 		}
 	},
 
@@ -70,7 +79,7 @@ export const actions: Actions = {
 		try {
 			await locals.pb.collection('users').update(id, out);
 		} catch (err: any) {
-			return fail(400, { error: err?.message ?? 'Failed to update account.' });
+			return fail(400, { error: pbErrorMessage(err, 'Failed to update account.') });
 		}
 	},
 
@@ -87,7 +96,7 @@ export const actions: Actions = {
 		try {
 			await locals.pb.collection('users').delete(id);
 		} catch (err: any) {
-			return fail(400, { error: err?.message ?? 'Failed to delete account.' });
+			return fail(400, { error: pbErrorMessage(err, 'Failed to delete account.') });
 		}
 	}
 };

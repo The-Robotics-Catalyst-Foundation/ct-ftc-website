@@ -1,5 +1,7 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
+    import { Radar } from '@lucide/svelte';
+    import { robolystEventUrl } from '$lib/robolyst';
 
     interface EventItem {
         id: string | number;
@@ -7,7 +9,6 @@
         type?: string;
         startDate?: string;
         location?: string;
-        volunteersCurrent?: number;
         volunteersNeeded?: number;
         slug?: string;
     }
@@ -108,10 +109,9 @@
         {:else}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full pb-12">
                 {#each activeEvents as event (event.id)}
-                    {@const current = event.volunteersCurrent ?? 0}
                     {@const required = event.volunteersNeeded ?? 0}
-                    {@const pct = required > 0 ? Math.min((current / required) * 100, 100) : 0}
-                    {@const needsVolunteers = required > current}
+                    {@const needsVolunteers = required > 0}
+                    {@const robolystUrl = robolystEventUrl(event.startDate, event.slug)}
 
                     <a
                         href="/events/{event.slug || event.id}"
@@ -159,31 +159,30 @@
                         </div>
 
                         <div class="mt-8 pt-5 border-t-4 border-slate-900">
-                            <div class="flex justify-between items-center text-sm mb-3 font-black uppercase">
-                                <span>Volunteers</span>
+                            <div class="flex justify-between items-center text-sm font-black uppercase">
+                                <span>Volunteers needed</span>
                                 {#if required === 0}
                                     <span class="text-slate-500">None</span>
-                                {:else if pct >= 100}
-                                    <span class="text-slate-900 bg-[#86efac] border-2 border-slate-900 px-2 py-0.5">Filled ✓</span>
                                 {:else}
-                                    <span>{current} / {required}</span>
+                                    <span class="text-slate-900 bg-[#fde047] border-2 border-slate-900 px-2 py-0.5">{required}</span>
                                 {/if}
-                            </div>
-
-                            <div class="w-full h-4 bg-slate-100 border-2 border-slate-900 overflow-hidden relative">
-                                <div
-                                    class="h-full border-r-2 border-slate-900 transition-all duration-700 ease-out absolute left-0 top-0"
-                                    class:bg-[#fde047]={pct < 50}
-                                    class:bg-[#93c5fd]={pct >= 50 && pct < 100}
-                                    class:bg-[#86efac]={pct >= 100}
-                                    style="width: {required > 0 ? pct : 0}%"
-                                ></div>
                             </div>
                         </div>
 
-                        <div class="mt-8">
+                        <div class="mt-8 flex gap-2">
+                            {#if robolystUrl}
+                                <button
+                                    type="button"
+                                    onclick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(robolystUrl, '_blank', 'noopener,noreferrer'); }}
+                                    class="flex shrink-0 items-center justify-center gap-1.5 bg-white text-slate-900 font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg shadow-[3px_3px_0_0_rgba(15,23,42,1)] hover:bg-slate-100 active:translate-x-[1px] active:translate-y-[1px] active:shadow-[2px_2px_0_0_rgba(15,23,42,1)] transition-all duration-150"
+                                    aria-label="View on Robolyst"
+                                    title="View on Robolyst"
+                                >
+                                    <Radar class="h-4 w-4" strokeWidth={2.5} />
+                                </button>
+                            {/if}
                             <span
-                                class="flex items-center justify-center w-full bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg group-hover:bg-[#fde047] group-hover:text-slate-900 transition-colors duration-200"
+                                class="flex flex-1 items-center justify-center bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg group-hover:bg-[#fde047] group-hover:text-slate-900 transition-colors duration-200"
                             >
                                 View Details
                             </span>

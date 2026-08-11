@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import { Calendar, MapPin, Users, Share2, CodeXml } from '@lucide/svelte';
+	import { Calendar, MapPin, Users, Share2, CodeXml, Radar } from '@lucide/svelte';
 	import Modal from './modal.svelte';
 	import EmbedBuilder from './embed-builder.svelte';
+	import { robolystEventUrl } from '$lib/robolyst';
 
 	let {
 		id,
@@ -13,7 +14,6 @@
 		location,
 		dateTime,
 		description,
-		volunteersCurrent,
 		volunteersNeeded,
 		showName = true,
 		showActions = true
@@ -25,7 +25,6 @@
 		location?: string;
 		dateTime?: string;
 		description?: string;
-		volunteersCurrent?: number;
 		volunteersNeeded?: number;
 		showName?: boolean;
 		showActions?: boolean;
@@ -66,7 +65,8 @@
 
 	const dateSlug = $derived(formatDateSlug(dateTime));
 	const dateLabel = $derived(formatDateOnly(dateTime));
-	const hasVolunteerInfo = $derived(volunteersNeeded !== undefined && volunteersNeeded !== null);
+	const hasVolunteerInfo = $derived(!!volunteersNeeded);
+	const robolystUrl = $derived(robolystEventUrl(dateTime, slug));
 
 	let embedOpen = $state(false);
 	let shareCopied = $state(false);
@@ -112,7 +112,7 @@
 			{#if hasVolunteerInfo}
 				<div class="flex items-center gap-2.5">
 					<Users class="h-4 w-4 shrink-0 text-slate-500" strokeWidth={2.5} />
-					<span>{volunteersCurrent ?? 0} / {volunteersNeeded} volunteers</span>
+					<span>{volunteersNeeded} volunteers needed</span>
 				</div>
 			{/if}
 		</div>
@@ -122,8 +122,8 @@
 		{/if}
 
 		<div class="event-card-footer">
-			{#if showActions}
-				<div class="flex items-center gap-2">
+			<div class="flex items-center gap-2">
+				{#if showActions}
 					<button type="button" class="event-card-action-btn" onclick={copyPhotosLink}>
 						<Share2 class="h-3.5 w-3.5" strokeWidth={2.5} />
 						{shareCopied ? 'Copied!' : 'Share Photos'}
@@ -132,8 +132,14 @@
 						<CodeXml class="h-3.5 w-3.5" strokeWidth={2.5} />
 						Embed
 					</button>
-				</div>
-			{/if}
+				{/if}
+				{#if robolystUrl}
+					<a href={robolystUrl} target="_blank" rel="noopener noreferrer" class="event-card-action-btn">
+						<Radar class="h-3.5 w-3.5" strokeWidth={2.5} />
+						Robolyst
+					</a>
+				{/if}
+			</div>
 			<a href={eventPath} class="event-card-cta">See in CTFTC Website &rarr;</a>
 		</div>
 	</div>
@@ -141,7 +147,7 @@
 
 {#if showActions}
 	<Modal open={embedOpen} onClose={() => (embedOpen = false)} title="Embed this event">
-		<EmbedBuilder {id} {slug} {name} {type} {location} {dateTime} {description} />
+		<EmbedBuilder {id} {slug} {name} {type} {location} {dateTime} {description} {volunteersNeeded} />
 	</Modal>
 {/if}
 

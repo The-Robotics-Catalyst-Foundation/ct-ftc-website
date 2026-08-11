@@ -18,6 +18,7 @@ const FROM = env.RESEND_FROM_EMAIL || 'CT FIRST Tech Challenge <ctftc@singul.tec
 export async function sendBulkEmail(opts: {
 	subject: string;
 	text: string;
+	html?: string;
 	recipients: string[];
 }): Promise<string[]> {
 	const ids: string[] = [];
@@ -26,7 +27,8 @@ export async function sendBulkEmail(opts: {
 			from: FROM,
 			to,
 			subject: opts.subject,
-			text: opts.text
+			text: opts.text,
+			...(opts.html ? { html: opts.html } : {})
 		});
 		if (error) {
 			throw new Error(`Failed to send to ${to}: ${error.message}`);

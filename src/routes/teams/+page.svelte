@@ -5,7 +5,6 @@
     // --- SVELTE 5 STATE RUNES ---
     let isLoaded = $state(false);
     let scrollY = $state(0);
-    let iframeHeight = $state('850px');
     let helpOpen = $state(false);
     let helpWrapper = $state();
 
@@ -116,18 +115,11 @@
     </section>
 
     <section class="relative z-20 mx-auto max-w-7xl px-6 py-16">
-        <div class="overflow-hidden rounded-[2.5rem] bg-black p-6">
-            <iframe
-                src="https://robolyst.org/embed/ftc/location/Connecticut/teams/raw-list"
-                title="CT FTC Team Atlas"
-                width="100%"
-                height={iframeHeight}
-                frameborder="0"
-                scrolling="no"
-                allowfullscreen
-                style="overflow: hidden;"
-                class="block w-full rounded-2xl border-0"
-            ></iframe>
+        <div class="box-shadow-flat overflow-hidden rounded-[2.5rem] border-4 border-black bg-white p-6">
+            <div data-robolyst-embed="https://robolyst.org/e/bpaqkx8" data-height="400">
+                <a href="https://robolyst.org/location/Connecticut">Robolyst — Connecticut</a>
+            </div>
+            <script src="https://robolyst.org/embed.js" async></script>
         </div>
     </section>
 

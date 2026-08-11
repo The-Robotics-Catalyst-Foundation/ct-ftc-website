@@ -26,7 +26,6 @@ export const load: PageServerLoad = async () => {
                 startDate: record.date_time || '', // Maps 'date_time' to frontend
                 registerLink: record.registerLink || '#',
                 volunteerLink: record.volunteerLink || '#',
-                volunteersCurrent: record.volunteersAttending ?? 0, // Maps 'volunteersAttending'
                 volunteersNeeded: record.volunteersNeeded ?? 0
             })),
             past: pastRecords.map(record => ({
@@ -38,7 +37,6 @@ export const load: PageServerLoad = async () => {
                 startDate: record.date_time || '',
                 registerLink: record.registerLink || '#',
                 volunteerLink: record.volunteerLink || '#',
-                volunteersCurrent: record.volunteersAttending ?? 0,
                 volunteersNeeded: record.volunteersNeeded ?? 0
             }))
         };

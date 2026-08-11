@@ -4,7 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - BODY_SIZE_LIMIT=50M
+      # Bulk event-photo uploads are chunked client-side into batches of 20
+      # files (see admin events upload-photos endpoint) - this just needs to
+      # comfortably cover one batch of full-size JPEGs, not the whole set.
+      - BODY_SIZE_LIMIT=200M
   pocketbase:
     build:
       context: .

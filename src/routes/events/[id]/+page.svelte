@@ -3,9 +3,10 @@
   import { page } from '$app/stores';
   import { pb } from '$lib/pocketbase';
   import { fade, fly } from 'svelte/transition';
-  import { Share2, CodeXml } from '@lucide/svelte';
+  import { Share2, CodeXml, Radar } from '@lucide/svelte';
   import Modal from '$lib/components/modal.svelte';
   import EmbedBuilder from '$lib/components/embed-builder.svelte';
+  import { robolystEventUrl } from '$lib/robolyst';
 
   // --- SVELTE 5 STATE RUNES ---
   let event: any = $state(null);
@@ -131,6 +132,7 @@
 
   // Safe extraction of PocketBase PDF URL
   let pdfUrl = $derived(event && event.event_pdf ? pb.files.getURL(event, event.event_pdf) : null);
+  let robolystUrl = $derived(event ? robolystEventUrl(event.date_time, event.slug) : null);
 </script>
 
 <svelte:window bind:scrollY onmousemove={handleMouseMove} />
@@ -161,6 +163,17 @@
         </nav>
 
         <div class="flex items-center gap-2">
+          {#if robolystUrl}
+            <a
+              href={robolystUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border-2 border-black rounded-xl box-shadow-mini text-xs font-black uppercase tracking-wide text-slate-700 hover:text-[#2563eb] transition-all active:translate-y-[2px]"
+            >
+              <Radar class="w-3.5 h-3.5" strokeWidth={2.5} />
+              Robolyst
+            </a>
+          {/if}
           {#if event.pics && event.pics.length > 0}
             <button
               type="button"
@@ -424,6 +437,7 @@
       type={event.type}
       location={event.location}
       dateTime={event.date_time}
+      volunteersNeeded={event.volunteersNeeded}
     />
   </Modal>
 

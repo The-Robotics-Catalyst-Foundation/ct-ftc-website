@@ -80,7 +80,7 @@
         </h1>
 
         <p class="text-slate-800 text-base md:text-xl font-bold leading-relaxed max-w-xl bg-white/40 backdrop-blur-sm p-4 border-2 border-black rounded-xl">
-          FIRST Tech Challenge is a robotics competition for students in grades 7–12 to compete head to x, by designing, building, and programming a robot to compete in an alliance format against other teams.
+          FIRST Tech Challenge is a robotics competition for students in grades 7–12, who design, build, and program a robot to compete in an alliance format against other teams.
         </p>
 
         <div class="flex flex-wrap gap-6 pt-4">

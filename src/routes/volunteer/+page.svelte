@@ -148,7 +148,7 @@
           Go to FIRST Dashboard <span class="text-base">↗</span>
         </a>
         <p class="text-xs font-semibold text-slate-500">
-          Questions? Email <a href="mailto:youssefmmacary@gmail.com" class="text-[#2563eb] font-black hover:underline">youssefmmacary@gmail.com</a>
+          Questions? Email <a href="mailto:contact@connecticutftc.org" class="text-[#2563eb] font-black hover:underline">contact@connecticutftc.org</a>
         </p>
       </div>
 

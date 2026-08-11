@@ -19,7 +19,6 @@
 		type={data.event.type}
 		location={data.event.location}
 		dateTime={data.event.dateTime}
-		volunteersCurrent={data.event.volunteersCurrent}
 		volunteersNeeded={data.event.volunteersNeeded}
 		showName={data.showName}
 		showActions={false}

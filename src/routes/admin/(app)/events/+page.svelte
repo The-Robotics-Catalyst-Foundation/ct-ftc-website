@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
-	import { ExternalLink } from '@lucide/svelte';
+	import { ExternalLink, Radar } from '@lucide/svelte';
+	import { robolystEventUrl } from '$lib/robolyst';
 	import Sheet from '$lib/components/sheet.svelte';
 	import Modal from '$lib/components/modal.svelte';
 	import type { PageData, ActionData } from './$types';
@@ -30,6 +32,65 @@
 	let editingId = $state<string | null>(null);
 	let uploadingId = $state<string | null>(null);
 	let busy = $state(false);
+
+	// Uploads are chunked client-side so 200+ photos don't ride in one giant
+	// request - each batch is its own POST, so one slow/failed batch doesn't
+	// lose progress already saved by the batches before it.
+	const UPLOAD_BATCH_SIZE = 20;
+	let uploadFiles = $state<FileList | null>(null);
+	let uploadProgress = $state<{ done: number; total: number } | null>(null);
+	let uploadError = $state('');
+
+	function startUpload(eventId: string) {
+		uploadingId = eventId;
+		uploadFiles = null;
+		uploadProgress = null;
+		uploadError = '';
+	}
+
+	function cancelUpload() {
+		uploadingId = null;
+		uploadFiles = null;
+		uploadProgress = null;
+		uploadError = '';
+	}
+
+	async function uploadPhotos(eventId: string) {
+		if (!uploadFiles?.length) return;
+		const files = Array.from(uploadFiles);
+
+		// Resume after a partial failure instead of re-uploading the batches
+		// that already succeeded (which would duplicate those photos).
+		const startAt = uploadError ? (uploadProgress?.done ?? 0) : 0;
+
+		busy = true;
+		uploadError = '';
+		uploadProgress = { done: startAt, total: files.length };
+
+		for (let i = startAt; i < files.length; i += UPLOAD_BATCH_SIZE) {
+			const batch = files.slice(i, i + UPLOAD_BATCH_SIZE);
+			const formData = new FormData();
+			formData.append('id', eventId);
+			for (const file of batch) formData.append('pics', file);
+
+			try {
+				const res = await fetch('/admin/events/upload-photos', { method: 'POST', body: formData });
+				const result = await res.json();
+				if (!res.ok || result.error) {
+					uploadError = `Uploaded ${uploadProgress.done} of ${files.length} before failing: ${result.error ?? 'Unknown error'}`;
+					break;
+				}
+				uploadProgress = { done: uploadProgress.done + batch.length, total: files.length };
+			} catch {
+				uploadError = `Uploaded ${uploadProgress.done} of ${files.length} before a network error interrupted the upload.`;
+				break;
+			}
+		}
+
+		busy = false;
+		await invalidateAll();
+		if (!uploadError) cancelUpload();
+	}
 
 	const editingEvent = $derived(data.events.find((e) => e.id === editingId) ?? null);
 
@@ -144,10 +205,6 @@
 			<label for="volunteersNeeded" class="admin-label">Volunteers needed</label>
 			<input id="volunteersNeeded" name="volunteersNeeded" type="number" min="0" class="glass-input" />
 		</div>
-		<div>
-			<label for="volunteersAttending" class="admin-label">Volunteers attending</label>
-			<input id="volunteersAttending" name="volunteersAttending" type="number" min="0" class="glass-input" />
-		</div>
 		<div class="sm:col-span-2">
 			<label for="event_pdf" class="admin-label">Sponsorship / info PDF</label>
 			<input id="event_pdf" name="event_pdf" type="file" accept="application/pdf" class="glass-input" />
@@ -157,8 +214,8 @@
 			<input id="imgLink" name="imgLink" type="url" placeholder="https://..." class="glass-input" />
 		</div>
 		<div class="sm:col-span-2">
-			<label for="code" class="admin-label">Event code (used as URL slug)</label>
-			<input id="code" name="code" placeholder="Leave blank to auto-generate" class="glass-input" />
+			<label for="code" class="admin-label">Event code (URL slug + Robolyst code)</label>
+			<input id="code" name="code" placeholder="e.g. USCTSTQ - leave blank to auto-generate" class="glass-input" />
 		</div>
 		<div class="flex gap-2 sm:col-span-2">
 			<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Saving…' : 'Create event'}</button>
@@ -266,23 +323,37 @@
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				{#each filteredEvents as event (event.id)}
 			<div class="glass-panel relative overflow-hidden">
-				<div class="flex items-center justify-between gap-2 border-b-2 border-black px-5 py-3 pr-14 {TYPE_STYLES[typeKey(event.type)] ?? 'bg-slate-200'}">
+				<div class="flex items-center justify-between gap-2 border-b-2 border-black px-5 py-3 pr-24 {TYPE_STYLES[typeKey(event.type)] ?? 'bg-slate-200'}">
 					<span class="role-badge border-2 border-black bg-white text-text-main">
 						{event.type || 'Tournament'}
 					</span>
 					<span class="rounded-md border border-black/10 bg-white/90 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-text-main">{dateSlug(event.date_time)}</span>
 				</div>
 
-				<a
-					href="/events/{event.slug || event.id}"
-					target="_blank"
-					rel="noreferrer"
-					aria-label="View on frontend"
-					title="View on frontend"
-					class="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] transition-all hover:-translate-y-0.5 active:translate-y-0"
-				>
-					<ExternalLink class="h-3.5 w-3.5 text-text-main" strokeWidth={2.5} />
-				</a>
+				<div class="absolute right-3 top-3 z-10 flex items-center gap-2">
+					{#if robolystEventUrl(event.date_time, event.slug)}
+						<a
+							href={robolystEventUrl(event.date_time, event.slug)}
+							target="_blank"
+							rel="noreferrer"
+							aria-label="View on Robolyst"
+							title="View on Robolyst"
+							class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] transition-all hover:-translate-y-0.5 active:translate-y-0"
+						>
+							<Radar class="h-3.5 w-3.5 text-text-main" strokeWidth={2.5} />
+						</a>
+					{/if}
+					<a
+						href="/events/{event.slug || event.id}"
+						target="_blank"
+						rel="noreferrer"
+						aria-label="View on frontend"
+						title="View on frontend"
+						class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] transition-all hover:-translate-y-0.5 active:translate-y-0"
+					>
+						<ExternalLink class="h-3.5 w-3.5 text-text-main" strokeWidth={2.5} />
+					</a>
+				</div>
 
 				<div class="p-5">
 					<div class="flex items-start justify-between gap-3">
@@ -313,7 +384,7 @@
 					</div>
 
 					<div class="mt-3 flex items-center gap-2 text-xs text-text-muted">
-						<span class="role-badge event_manager">{event.volunteersAttending ?? 0}/{event.volunteersNeeded ?? 0} volunteers</span>
+						<span class="role-badge event_manager">{event.volunteersNeeded ?? 0} volunteers needed</span>
 						<span class="role-badge photographer">{event.pics?.length ?? 0} photos</span>
 					</div>
 
@@ -355,27 +426,37 @@
 						{/if}
 
 						{#if uploadingId === event.id}
-							<form
-								method="POST"
-								action="?/uploadPhotos"
-								enctype="multipart/form-data"
-								use:enhance={() => {
-									busy = true;
-									return async ({ update }) => {
-										await update();
-										busy = false;
-										uploadingId = null;
-									};
-								}}
-								class="flex items-center gap-2"
-							>
-								<input type="hidden" name="id" value={event.id} />
-								<input name="pics" type="file" accept="image/*" multiple class="glass-input text-xs" />
-								<button type="submit" disabled={busy} class="btn-primary px-3 py-1.5 text-xs">Upload</button>
-								<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={() => (uploadingId = null)}>Cancel</button>
-							</form>
+							<div class="flex flex-col gap-2">
+								<div class="flex items-center gap-2">
+									<input
+										type="file"
+										accept="image/*"
+										multiple
+										class="glass-input text-xs"
+										onchange={(e) => (uploadFiles = e.currentTarget.files)}
+									/>
+									<button
+										type="button"
+										disabled={busy || !uploadFiles?.length}
+										class="btn-primary px-3 py-1.5 text-xs shrink-0"
+										onclick={() => uploadPhotos(event.id)}
+									>
+										{#if busy}
+											{uploadProgress?.done}/{uploadProgress?.total}…
+										{:else if uploadError}
+											Resume ({uploadProgress?.done}/{uploadProgress?.total})
+										{:else}
+											Upload
+										{/if}
+									</button>
+									<button type="button" class="btn-secondary px-3 py-1.5 text-xs shrink-0" onclick={cancelUpload}>Cancel</button>
+								</div>
+								{#if uploadError}
+									<p class="text-xs font-semibold text-rose-600">{uploadError}</p>
+								{/if}
+							</div>
 						{:else}
-							<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={() => (uploadingId = event.id)}>
+							<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={() => startUpload(event.id)}>
 								Add photos
 							</button>
 						{/if}
@@ -436,15 +517,9 @@
 					<label for="edit-date" class="admin-label">Date &amp; time</label>
 					<input id="edit-date" name="date_time" type="datetime-local" class="glass-input" value={toLocalInput(editingEvent.date_time)} />
 				</div>
-				<div class="grid grid-cols-2 gap-3">
-					<div>
-						<label for="edit-needed" class="admin-label">Volunteers needed</label>
-						<input id="edit-needed" name="volunteersNeeded" type="number" min="0" class="glass-input" value={editingEvent.volunteersNeeded} />
-					</div>
-					<div>
-						<label for="edit-attending" class="admin-label">Volunteers attending</label>
-						<input id="edit-attending" name="volunteersAttending" type="number" min="0" class="glass-input" value={editingEvent.volunteersAttending} />
-					</div>
+				<div>
+					<label for="edit-needed" class="admin-label">Volunteers needed</label>
+					<input id="edit-needed" name="volunteersNeeded" type="number" min="0" class="glass-input" value={editingEvent.volunteersNeeded} />
 				</div>
 				<div>
 					<label for="edit-pdf" class="admin-label">Sponsorship / info PDF</label>
@@ -455,7 +530,7 @@
 					<input id="edit-imglink" name="imgLink" type="url" class="glass-input" value={editingEvent.imgLink} />
 				</div>
 				<div>
-					<label for="edit-code" class="admin-label">Event code (used as URL slug)</label>
+					<label for="edit-code" class="admin-label">Event code (URL slug + Robolyst code)</label>
 					<input id="edit-code" name="code" class="glass-input" value={editingEvent.slug} />
 				</div>
 				<div class="flex gap-2">

@@ -24,7 +24,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			type: record.type || 'Tournament',
 			location: record.location || '',
 			dateTime: record.date_time || '',
-			volunteersCurrent: record.volunteersAttending ?? 0,
 			volunteersNeeded: record.volunteersNeeded ?? 0
 		},
 		showName: url.searchParams.get('name') !== '0'
