@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			id: record.id,
 			slug: record.slug || '',
 			name: record.name || 'Untitled Event',
-			type: record.type || 'Tournament',
+			type: record.type || 'Scrimmage',
 			location: record.location || '',
 			dateTime: record.date_time || '',
 			volunteersNeeded: record.volunteersNeeded ?? 0

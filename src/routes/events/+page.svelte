@@ -40,8 +40,7 @@
     const typeStyles: Record<string, string> = {
         scrimmage: 'bg-[#FF8C00] text-slate-900 border-2 border-slate-900',
         qualifier: 'bg-[#0066FF] text-white border-2 border-slate-900',
-        championship: 'bg-[#FFD700] text-slate-900 border-2 border-slate-900',
-        tournament: 'bg-[#c4b5fd] text-slate-900 border-2 border-slate-900'
+        championship: 'bg-[#FFD700] text-slate-900 border-2 border-slate-900'
     };
 
     // Top accent bar color per event type - same mapping as the badge, just
@@ -49,12 +48,11 @@
     const typeAccent: Record<string, string> = {
         scrimmage: '#FF8C00',
         qualifier: '#0066FF',
-        championship: '#FFD700',
-        tournament: '#c4b5fd'
+        championship: '#FFD700'
     };
 
     function typeKey(type?: string): string {
-        return (type || 'tournament').trim().toLowerCase();
+        return (type || 'scrimmage').trim().toLowerCase();
     }
 </script>
 
@@ -122,7 +120,7 @@
                             style="background-color: {typeAccent[typeKey(event.type)] ?? '#cbd5e1'}"
                         >
                             <span class="px-3 py-1 text-xs font-black uppercase tracking-wide {typeStyles[typeKey(event.type)] || 'bg-slate-200 text-slate-900 border-2 border-slate-900'}">
-                                {event.type || 'Tournament'}
+                                {event.type || 'Scrimmage'}
                             </span>
                             {#if needsVolunteers && currentTab === 'upcoming'}
                                 <span class="text-xs font-black uppercase tracking-wide text-slate-900 bg-[#fca5a5] border-2 border-slate-900 px-3 py-1">

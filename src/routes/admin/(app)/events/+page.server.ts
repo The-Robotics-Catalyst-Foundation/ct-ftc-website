@@ -24,7 +24,7 @@ function randomSlug(): string {
 function eventFormData(form: FormData) {
 	const out = new FormData();
 	out.append('name', String(form.get('name') ?? ''));
-	out.append('type', String(form.get('type') ?? 'Tournament'));
+	out.append('type', String(form.get('type') ?? 'Scrimmage'));
 	out.append('location', String(form.get('location') ?? ''));
 
 	const dateTime = String(form.get('date_time') ?? '');

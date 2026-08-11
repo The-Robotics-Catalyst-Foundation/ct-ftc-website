@@ -2,6 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { pb } from '$lib/pocketbase';
 import { checkRateLimit } from '$lib/server/rate-limit';
 import { sendBulkEmail } from '$lib/server/email';
+import { notifyAdmins } from '$lib/server/push';
 import type { Actions } from './$types';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,6 +47,12 @@ export const actions: Actions = {
 		} catch (err) {
 			console.error('Failed to notify admins of new contact message:', err);
 		}
+
+		notifyAdmins({
+			title: `New contact message from ${name}`,
+			body: message.length > 120 ? `${message.slice(0, 117)}...` : message,
+			url: '/admin/messages'
+		}).catch((err) => console.error('Failed to push-notify admins of new contact message:', err));
 
 		return { success: true };
 	}

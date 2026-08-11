@@ -36,8 +36,7 @@
 	const TYPE_STYLES: Record<string, { accent: string; badge: string }> = {
 		scrimmage: { accent: '#FF8C00', badge: 'bg-[#FF8C00] text-slate-900' },
 		qualifier: { accent: '#0066FF', badge: 'bg-[#0066FF] text-white' },
-		championship: { accent: '#FFD700', badge: 'bg-[#FFD700] text-slate-900' },
-		tournament: { accent: '#c4b5fd', badge: 'bg-[#c4b5fd] text-slate-900' }
+		championship: { accent: '#FFD700', badge: 'bg-[#FFD700] text-slate-900' }
 	};
 	const DEFAULT_TYPE_STYLE = { accent: '#cbd5e1', badge: 'bg-slate-200 text-slate-900' };
 
@@ -91,7 +90,7 @@
 
 <article class="event-card" style="--accent: {typeStyle.accent}">
 	<div class="event-card-header">
-		<span class="event-card-badge {typeStyle.badge}">{type || 'Tournament'}</span>
+		<span class="event-card-badge {typeStyle.badge}">{type || 'Scrimmage'}</span>
 		<span class="event-card-date-slug">{dateSlug}</span>
 	</div>
 

@@ -58,7 +58,7 @@
 			<h1 class="text-2xl font-bold tracking-tight text-text-main">Users</h1>
 			<p class="mt-1 text-sm text-text-muted">Provision staff accounts. There is no public sign-up.</p>
 		</div>
-		<div class="hidden md:block">
+		<div>
 			<button type="button" class="btn-primary" onclick={() => (showCreate = true)}>New account</button>
 		</div>
 	</div>
@@ -142,8 +142,6 @@
 		{/each}
 	</div>
 </div>
-
-<button type="button" class="fab-button" onclick={() => (showCreate = true)} aria-label="New account">+</button>
 
 <Sheet open={showCreate} onClose={() => (showCreate = false)} title="New account">
 	{@render createUserForm()}

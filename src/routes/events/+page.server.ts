@@ -21,7 +21,7 @@ export const load: PageServerLoad = async () => {
                 id: record.id,
                 slug: record.slug || '',
                 name: record.name || 'Untitled Event',
-                type: record.type || 'Tournament', // If 'type' doesn't exist yet, it safely fallbacks
+                type: record.type || 'Scrimmage', // If 'type' doesn't exist yet, it safely fallbacks
                 location: record.location || 'Location Pending',
                 startDate: record.date_time || '', // Maps 'date_time' to frontend
                 registerLink: record.registerLink || '#',
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async () => {
                 id: record.id,
                 slug: record.slug || '',
                 name: record.name || 'Untitled Event',
-                type: record.type || 'Tournament',
+                type: record.type || 'Scrimmage',
                 location: record.location || 'Location Pending',
                 startDate: record.date_time || '',
                 registerLink: record.registerLink || '#',

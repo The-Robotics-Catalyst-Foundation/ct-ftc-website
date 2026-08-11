@@ -116,7 +116,7 @@
 
     <section class="relative z-20 mx-auto max-w-7xl px-6 py-16">
         <div class="box-shadow-flat overflow-hidden rounded-[2.5rem] border-4 border-black bg-white p-6">
-            <div data-robolyst-embed="https://robolyst.org/e/bpaqkx8" data-height="400">
+            <div data-robolyst-embed="https://robolyst.org/e/up37jdf" data-height="600">
                 <a href="https://robolyst.org/location/Connecticut">Robolyst — Connecticut</a>
             </div>
             <script src="https://robolyst.org/embed.js" async></script>

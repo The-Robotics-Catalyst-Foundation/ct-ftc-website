@@ -141,11 +141,7 @@
         const popupHtml = `
           <div class="team-map-popup">
             <div class="team-map-popup-title">${escapeHtml(group.city)}</div>
-            <ul class="team-map-popup-list">
-              ${group.teams
-                .map((t) => `<li><span>#${t.teamNumber}</span> ${escapeHtml(t.name)}</li>`)
-                .join('')}
-            </ul>
+            <div class="team-map-popup-count">${count} team${count === 1 ? '' : 's'}</div>
           </div>
         `;
 
@@ -340,22 +336,9 @@
     color: #000;
     margin-bottom: 0.35rem;
   }
-  :global(.team-map-popup-list) {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    max-height: 140px;
-    overflow-y: auto;
+  :global(.team-map-popup-count) {
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #334155;
-  }
-  :global(.team-map-popup-list li) {
-    padding: 0.15rem 0;
-  }
-  :global(.team-map-popup-list li span) {
     font-weight: 900;
     color: #2563eb;
-    margin-right: 0.25rem;
   }
 </style>

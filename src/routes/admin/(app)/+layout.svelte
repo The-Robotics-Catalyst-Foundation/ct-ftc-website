@@ -1,26 +1,39 @@
 <script lang="ts">
     import '../admin.css';
+    import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import { enhance } from '$app/forms';
-    import Sheet from '$lib/components/sheet.svelte';
+    import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
+    import { LayoutDashboard, CalendarDays, MessageSquare, Mail, Users, Bell, BellOff } from '@lucide/svelte';
     import Modal from '$lib/components/modal.svelte';
+    import { subscribeToPush, syncPushSubscription } from '$lib/client/push';
     import type { LayoutData } from './$types';
 
     let { data, children }: { data: LayoutData; children: import('svelte').Snippet } = $props();
 
-    let mobileNavOpen = $state(false);
     let profileMenuOpen = $state(false);
     let settingsOpen = $state(false);
     let settingsBusy = $state(false);
     let settingsError = $state('');
+    let pushState = $state<'granted' | 'denied' | 'unsupported' | 'idle'>(
+        typeof Notification !== 'undefined' ? (Notification.permission as 'granted' | 'denied' | 'idle') : 'idle'
+    );
+
+    onMount(() => {
+        if (data.role === 'admin') syncPushSubscription();
+    });
+
+    async function enablePush() {
+        pushState = await subscribeToPush(PUBLIC_VAPID_PUBLIC_KEY);
+    }
 
     const navItems = $derived(
         [
-            { href: '/admin/dashboard', label: 'Dashboard', roles: ['admin', 'event_manager', 'photographer'], badge: 0 },
-            { href: '/admin/events', label: 'Events', roles: ['admin', 'event_manager', 'photographer'], badge: 0 },
-            { href: '/admin/messages', label: 'Messages', roles: ['admin', 'event_manager'], badge: data.unrespondedCount },
-            { href: '/admin/newsletter', label: 'Newsletter', roles: ['admin', 'event_manager'], badge: 0 },
-            { href: '/admin/users', label: 'Users', roles: ['admin'], badge: 0 }
+            { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'event_manager', 'photographer'], badge: 0 },
+            { href: '/admin/events', label: 'Events', icon: CalendarDays, roles: ['admin', 'event_manager', 'photographer'], badge: 0 },
+            { href: '/admin/messages', label: 'Messages', icon: MessageSquare, roles: ['admin', 'event_manager'], badge: data.unrespondedCount },
+            { href: '/admin/newsletter', label: 'Newsletter', icon: Mail, roles: ['admin', 'event_manager'], badge: 0 },
+            { href: '/admin/users', label: 'Users', icon: Users, roles: ['admin'], badge: 0 }
         ].filter((item) => item.roles.includes(data.role))
     );
 
@@ -37,7 +50,6 @@
         settingsError = '';
         settingsOpen = true;
         profileMenuOpen = false;
-        mobileNavOpen = false;
     }
 </script>
 
@@ -85,15 +97,16 @@
             {@render navLinks()}
         </nav>
 
-        <div class="relative hidden md:block">
+        <div class="relative">
             <button
                 type="button"
                 onclick={() => (profileMenuOpen = !profileMenuOpen)}
                 aria-expanded={profileMenuOpen}
-                class="flex items-center gap-2 rounded-xl border-2 border-black bg-white px-2 py-1.5 shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-[1px]"
+                aria-label="Account menu"
+                class="dock-tap flex items-center gap-2 rounded-xl border-2 border-black bg-white px-2 py-1.5 shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-[1px]"
             >
                 {@render avatar('h-8 w-8')}
-                <span class="max-w-[10rem] truncate text-xs font-black text-text-main">{data.name || data.email}</span>
+                <span class="hidden max-w-[10rem] truncate text-xs font-black text-text-main sm:inline">{data.name || data.email}</span>
             </button>
 
             {#if profileMenuOpen}
@@ -122,46 +135,28 @@
                 </div>
             {/if}
         </div>
-
-        <button
-            type="button"
-            onclick={() => (mobileNavOpen = true)}
-            aria-label="Open menu"
-            aria-expanded={mobileNavOpen}
-            class="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-[2px] md:hidden"
-        >
-            <span class="h-0.5 w-5 rounded-full bg-black"></span>
-            <span class="h-0.5 w-5 rounded-full bg-black"></span>
-            <span class="h-0.5 w-5 rounded-full bg-black"></span>
-        </button>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-4">
+    <main class="flex-1 overflow-y-auto p-4 pb-24 md:pb-4">
         {@render children()}
     </main>
+
+    <nav class="admin-dock md:hidden" aria-label="Primary">
+        {#each navItems as item (item.href)}
+            {@const Icon = item.icon}
+            {@const active = $page.url.pathname.startsWith(item.href)}
+            <a href={item.href} class="admin-dock-item dock-tap" aria-current={active ? 'page' : undefined}>
+                <span class="admin-dock-icon" class:active>
+                    <Icon class="h-5 w-5" strokeWidth={2.5} />
+                    {#if item.badge > 0}
+                        <span class="admin-dock-badge">{item.badge}</span>
+                    {/if}
+                </span>
+                <span class="admin-dock-label" class:active>{item.label}</span>
+            </a>
+        {/each}
+    </nav>
 </div>
-
-<Sheet open={mobileNavOpen} onClose={() => (mobileNavOpen = false)} title="Menu">
-    <div class="space-y-4">
-        <div class="flex items-center gap-3">
-            {@render avatar('h-11 w-11')}
-            <div class="min-w-0">
-                <p class="truncate text-sm font-black text-text-main">{data.name || data.email}</p>
-                <span class="role-badge {data.role} mt-1">{roleLabel[data.role]}</span>
-            </div>
-        </div>
-
-        <nav class="space-y-2">
-            {@render navLinks(() => (mobileNavOpen = false))}
-        </nav>
-
-        <button type="button" class="btn-secondary w-full" onclick={openSettings}>Settings</button>
-
-        <form method="POST" action="/admin/logout">
-            <button type="submit" class="btn-secondary w-full">Sign out</button>
-        </form>
-    </div>
-</Sheet>
 
 <Modal open={settingsOpen} onClose={() => (settingsOpen = false)} title="Account settings">
     {#if settingsError}
@@ -201,4 +196,28 @@
             {settingsBusy ? 'Saving…' : 'Save changes'}
         </button>
     </form>
+
+    {#if data.role === 'admin'}
+        <div class="mt-5 border-t-2 border-border-subtle pt-4">
+            <p class="admin-label mb-2">Notifications</p>
+            {#if pushState === 'granted'}
+                <p class="flex items-center gap-2 text-sm font-bold text-text-main">
+                    <Bell class="h-4 w-4 text-emerald-600" strokeWidth={2.5} />
+                    Push notifications are on for new contact messages.
+                </p>
+            {:else if pushState === 'denied'}
+                <p class="flex items-center gap-2 text-sm font-bold text-rose-600">
+                    <BellOff class="h-4 w-4" strokeWidth={2.5} />
+                    Blocked in browser settings - enable notifications for this site to turn it back on.
+                </p>
+            {:else if pushState === 'unsupported'}
+                <p class="text-sm font-semibold text-text-muted">Push notifications aren't supported in this browser.</p>
+            {:else}
+                <button type="button" class="btn-secondary w-full" onclick={enablePush}>
+                    <Bell class="h-4 w-4" strokeWidth={2.5} />
+                    Enable push notifications
+                </button>
+            {/if}
+        </div>
+    {/if}
 </Modal>

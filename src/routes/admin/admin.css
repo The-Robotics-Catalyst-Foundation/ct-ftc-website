@@ -176,13 +176,11 @@
 	color: #1a1a1a;
 }
 
-/* --- Phone-view primitives: FAB + bottom sheet. Self-contained media
-   queries (not Tailwind's `md:` utilities) so they don't fight admin.css's
-   own `display` rules on the same elements regardless of stylesheet order. */
-
-.fab-button {
-	display: none;
-}
+/* --- Phone-view primitive: bottom sheet. Self-contained media query (not
+   Tailwind's `md:` utilities) so it doesn't fight admin.css's own `display`
+   rules on the same elements regardless of stylesheet order. No FAB - the
+   bottom dock nav already claims that corner of the screen, so a floating
+   "New" button would overlap it. */
 
 .sheet-backdrop,
 .sheet-panel {
@@ -190,31 +188,6 @@
 }
 
 @media (max-width: 767px) {
-	.fab-button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		position: fixed;
-		bottom: 1.5rem;
-		right: 1.5rem;
-		z-index: 60;
-		width: 3.5rem;
-		height: 3.5rem;
-		background: var(--color-ftc-blue);
-		color: #fff;
-		font-size: 1.75rem;
-		font-weight: 800;
-		line-height: 1;
-		border: 3px solid #000;
-		border-radius: 999px;
-		box-shadow: 4px 4px 0px 0px #000;
-		transition: box-shadow 0.15s ease, transform 0.1s ease;
-	}
-	.fab-button:active {
-		transform: translate(3px, 3px);
-		box-shadow: 1px 1px 0px 0px #000;
-	}
-
 	.sheet-backdrop {
 		display: block;
 		position: fixed;
@@ -282,4 +255,120 @@
 .sheet-close:active {
 	transform: translate(1px, 1px);
 	box-shadow: 1px 1px 0px 0px #000;
+}
+
+/* Bottom dock nav (mobile only) - the one deliberately Apple-flavored corner
+   of this otherwise flat-brutalist admin skin. A floating inset glass pill
+   (iOS 18/26 "Liquid Glass" tab bar, same shape Instagram's mobile nav picked
+   up) rather than a flat bar flush with the screen edges - it reads as an
+   object floating over content, not a fixed strip claiming the edge. */
+.admin-dock {
+	position: fixed;
+	left: 0.75rem;
+	right: 0.75rem;
+	bottom: calc(0.75rem + env(safe-area-inset-bottom));
+	z-index: 40;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	padding: 0.55rem 0.4rem;
+	border-radius: 1.75rem;
+	background: rgba(255, 255, 255, 0.55);
+	backdrop-filter: blur(28px) saturate(190%);
+	-webkit-backdrop-filter: blur(28px) saturate(190%);
+	border: 1px solid rgba(255, 255, 255, 0.65);
+	/* bright top edge = light catching the material, not a hard divider */
+	box-shadow:
+		0 12px 32px rgba(15, 23, 42, 0.18),
+		inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.admin-dock-item {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.15rem;
+	padding: 0.3rem 0;
+	border-radius: 1.25rem;
+	text-decoration: none;
+	transition: background-color 150ms ease;
+}
+.admin-dock-item[aria-current='page'] {
+	background: rgba(255, 255, 255, 0.55);
+}
+
+.admin-dock-icon {
+	position: relative;
+	display: flex;
+	color: var(--color-text-muted);
+	transition: color 150ms ease;
+}
+.admin-dock-icon.active {
+	color: var(--color-ftc-blue);
+}
+
+.admin-dock-badge {
+	position: absolute;
+	top: -0.3rem;
+	right: -0.45rem;
+	display: flex;
+	min-width: 1.05rem;
+	height: 1.05rem;
+	align-items: center;
+	justify-content: center;
+	border-radius: 9999px;
+	border: 1.5px solid #fff;
+	background: #e11d48;
+	padding: 0 0.2rem;
+	font-size: 0.55rem;
+	font-weight: 900;
+	color: #fff;
+}
+
+.admin-dock-label {
+	font-size: 0.6rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	color: var(--color-text-muted);
+	transition: color 150ms ease;
+}
+.admin-dock-label.active {
+	color: var(--color-text-main);
+}
+
+/* Tap feedback that starts the instant a finger lands, not on release -
+   critically damped (no bounce) since this is a plain tap, not a flick. */
+.dock-tap {
+	transition: transform 100ms ease-out;
+}
+.dock-tap:active {
+	transform: scale(0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dock-tap {
+		transition: none;
+	}
+	.dock-tap:active {
+		transform: none;
+	}
+}
+
+/* On a phone, admin staff are tapping through cards fast - a stray long-press
+   selection or a mistimed double-tap zooming the whole layout reads as the
+   app being broken. touch-action: manipulation drops double-tap-to-zoom
+   (pinch-zoom still works) and the input-to-feedback delay; user-select is
+   off everywhere except the actual text-entry surfaces. */
+.admin-shell {
+	touch-action: manipulation;
+	-webkit-user-select: none;
+	user-select: none;
+}
+.admin-shell input,
+.admin-shell textarea,
+.admin-shell [contenteditable] {
+	-webkit-user-select: text;
+	user-select: text;
 }

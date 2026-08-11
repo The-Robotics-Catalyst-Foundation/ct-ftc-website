@@ -1,0 +1,13 @@
+{
+  "name": "CT FTC Admin",
+  "short_name": "CTFTC Admin",
+  "description": "Connecticut FIRST Tech Challenge admin console",
+  "start_url": "/admin/dashboard",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#0b0b10",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    { "src": "/logo.png", "sizes": "2000x2000", "type": "image/png", "purpose": "any" }
+  ]
+}

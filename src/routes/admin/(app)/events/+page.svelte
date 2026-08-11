@@ -12,16 +12,15 @@
 
 	const canManage = $derived(data.role === 'admin' || data.role === 'event_manager');
 
-	const TYPE_OPTIONS = ['Tournament', 'Scrimmage', 'Qualifier', 'Championship'];
+	const TYPE_OPTIONS = ['Scrimmage', 'Qualifier', 'Championship'];
 	// Keyed lowercase since PocketBase data casing isn't guaranteed to match.
 	const TYPE_STYLES: Record<string, string> = {
 		scrimmage: 'bg-[#FF8C00]',
 		qualifier: 'bg-[#0066FF]',
-		championship: 'bg-[#FFD700]',
-		tournament: 'bg-[#c4b5fd]'
+		championship: 'bg-[#FFD700]'
 	};
 	function typeKey(type: string): string {
-		return (type || 'tournament').trim().toLowerCase();
+		return (type || 'scrimmage').trim().toLowerCase();
 	}
 
 	// Events can carry hundreds of photos - only preview a handful on the card
@@ -128,7 +127,7 @@
 				if (statusFilter === 'upcoming' && !isUpcoming) return false;
 				if (statusFilter === 'past' && isUpcoming) return false;
 			}
-			if (typeFilter.length > 0 && !typeFilter.includes(event.type || 'Tournament')) return false;
+			if (typeFilter.length > 0 && !typeFilter.includes(event.type || 'Scrimmage')) return false;
 			return true;
 		});
 
@@ -233,7 +232,7 @@
 			</p>
 		</div>
 		{#if canManage}
-			<div class="hidden md:block">
+			<div>
 				<button type="button" class="btn-primary" onclick={() => (showCreate = true)}>New event</button>
 			</div>
 		{/if}
@@ -263,56 +262,58 @@
 				/>
 			</div>
 
-			<div>
-				<p class="admin-label mb-2">Status</p>
-				<div class="space-y-1.5">
-					{#each [{ value: 'all', label: 'All' }, { value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }] as opt}
-						<label class="flex items-center gap-2 text-sm font-semibold text-text-main">
-							<input
-								type="radio"
-								name="status-filter"
-								value={opt.value}
-								checked={statusFilter === opt.value}
-								onchange={() => (statusFilter = opt.value as typeof statusFilter)}
-								class="h-4 w-4 accent-[#1d4ed8]"
-							/>
-							{opt.label}
-						</label>
-					{/each}
+			<div class="hidden md:block md:space-y-5">
+				<div>
+					<p class="admin-label mb-2">Status</p>
+					<div class="space-y-1.5">
+						{#each [{ value: 'all', label: 'All' }, { value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }] as opt}
+							<label class="flex items-center gap-2 text-sm font-semibold text-text-main">
+								<input
+									type="radio"
+									name="status-filter"
+									value={opt.value}
+									checked={statusFilter === opt.value}
+									onchange={() => (statusFilter = opt.value as typeof statusFilter)}
+									class="h-4 w-4 accent-[#1d4ed8]"
+								/>
+								{opt.label}
+							</label>
+						{/each}
+					</div>
 				</div>
-			</div>
 
-			<div>
-				<p class="admin-label mb-2">Type</p>
-				<div class="space-y-1.5">
-					{#each TYPE_OPTIONS as opt}
-						<label class="flex items-center gap-2 text-sm font-semibold text-text-main">
-							<input
-								type="checkbox"
-								checked={typeFilter.includes(opt)}
-								onchange={() => toggleTypeFilter(opt)}
-								class="h-4 w-4 accent-[#1d4ed8]"
-							/>
-							{opt}
-						</label>
-					{/each}
+				<div class="mt-5">
+					<p class="admin-label mb-2">Type</p>
+					<div class="space-y-1.5">
+						{#each TYPE_OPTIONS as opt}
+							<label class="flex items-center gap-2 text-sm font-semibold text-text-main">
+								<input
+									type="checkbox"
+									checked={typeFilter.includes(opt)}
+									onchange={() => toggleTypeFilter(opt)}
+									class="h-4 w-4 accent-[#1d4ed8]"
+								/>
+								{opt}
+							</label>
+						{/each}
+					</div>
 				</div>
-			</div>
 
-			<div>
-				<label for="event-sort" class="admin-label">Sort by</label>
-				<select id="event-sort" bind:value={sortBy} class="glass-input">
-					<option value="date-desc">Date (newest first)</option>
-					<option value="date-asc">Date (oldest first)</option>
-					<option value="name-asc">Name (A–Z)</option>
-					<option value="name-desc">Name (Z–A)</option>
-					<option value="volunteers-needed">Volunteers needed</option>
-				</select>
-			</div>
+				<div class="mt-5">
+					<label for="event-sort" class="admin-label">Sort by</label>
+					<select id="event-sort" bind:value={sortBy} class="glass-input">
+						<option value="date-desc">Date (newest first)</option>
+						<option value="date-asc">Date (oldest first)</option>
+						<option value="name-asc">Name (A–Z)</option>
+						<option value="name-desc">Name (Z–A)</option>
+						<option value="volunteers-needed">Volunteers needed</option>
+					</select>
+				</div>
 
-			{#if hasActiveFilters}
-				<button type="button" class="btn-secondary w-full text-xs" onclick={resetFilters}>Clear filters</button>
-			{/if}
+				{#if hasActiveFilters}
+					<button type="button" class="btn-secondary mt-5 w-full text-xs" onclick={resetFilters}>Clear filters</button>
+				{/if}
+			</div>
 		</aside>
 
 		<div class="min-w-0 flex-1">
@@ -325,7 +326,7 @@
 			<div class="glass-panel relative overflow-hidden">
 				<div class="flex items-center justify-between gap-2 border-b-2 border-black px-5 py-3 pr-24 {TYPE_STYLES[typeKey(event.type)] ?? 'bg-slate-200'}">
 					<span class="role-badge border-2 border-black bg-white text-text-main">
-						{event.type || 'Tournament'}
+						{event.type || 'Scrimmage'}
 					</span>
 					<span class="rounded-md border border-black/10 bg-white/90 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-text-main">{dateSlug(event.date_time)}</span>
 				</div>
@@ -474,8 +475,6 @@
 </div>
 
 {#if canManage}
-	<button type="button" class="fab-button" onclick={() => (showCreate = true)} aria-label="New event">+</button>
-
 	<Sheet open={showCreate} onClose={() => (showCreate = false)} title="New event">
 		{@render createEventForm()}
 	</Sheet>
@@ -503,7 +502,7 @@
 				</div>
 				<div>
 					<label for="edit-type" class="admin-label">Event type</label>
-					<select id="edit-type" name="type" class="glass-input" value={editingEvent.type || 'Tournament'}>
+					<select id="edit-type" name="type" class="glass-input" value={editingEvent.type || 'Scrimmage'}>
 						{#each TYPE_OPTIONS as opt}
 							<option value={opt}>{opt}</option>
 						{/each}
