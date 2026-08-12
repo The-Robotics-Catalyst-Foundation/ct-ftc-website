@@ -26,8 +26,10 @@ export const actions: Actions = {
 
 		// PocketBase requires a password to create the account, but the
 		// invitee never sees it - they set their own via the emailed
-		// password-reset link (see /admin/set-password).
-		const tempPassword = crypto.randomUUID() + crypto.randomUUID();
+		// password-reset link (see /admin/set-password). A single UUID (36
+		// chars) is plenty of entropy and stays under PocketBase's 71-char
+		// (bcrypt-backed) password length limit.
+		const tempPassword = crypto.randomUUID();
 
 		const out = new FormData();
 		out.append('email', email);

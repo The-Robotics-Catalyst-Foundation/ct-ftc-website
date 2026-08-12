@@ -285,6 +285,16 @@
 		inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
+/* Self-contained media query (not Tailwind's `md:hidden`) - a plain CSS
+   `display: flex` above at equal specificity can beat a media-scoped
+   Tailwind utility depending on stylesheet order, which was showing the
+   dock alongside the desktop header nav ("double nav") on wide screens. */
+@media (min-width: 768px) {
+	.admin-dock {
+		display: none;
+	}
+}
+
 .admin-dock-item {
 	display: flex;
 	flex: 1;

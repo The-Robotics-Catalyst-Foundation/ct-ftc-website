@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Sheet from '$lib/components/sheet.svelte';
+	import { adminCreateAction } from '$lib/client/adminCreate';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -8,6 +10,11 @@
 	let showCreate = $state(false);
 	let editingId = $state<string | null>(null);
 	let busy = $state(false);
+
+	onMount(() => {
+		adminCreateAction.set({ label: 'New account', run: () => (showCreate = true) });
+		return () => adminCreateAction.set(null);
+	});
 
 	const roleLabel: Record<string, string> = {
 		admin: 'Admin',

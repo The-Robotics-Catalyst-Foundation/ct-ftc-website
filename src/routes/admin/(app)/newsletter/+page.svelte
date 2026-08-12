@@ -19,6 +19,19 @@
 		return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 
+	// Replaces the old hardcoded "2 weeks away" copy with the actual gap
+	// between today and the event date, so the prefilled message stays
+	// accurate no matter how far out the event is or how late this gets sent.
+	function formatTimeUntil(value: string): string {
+		if (!value) return 'coming up';
+		const days = Math.ceil((new Date(value).getTime() - Date.now()) / 86400000);
+		if (days <= 0) return 'today';
+		if (days === 1) return '1 day';
+		if (days < 14) return `${days} days`;
+		const weeks = Math.round(days / 7);
+		return `${weeks} week${weeks === 1 ? '' : 's'}`;
+	}
+
 	function applyEvent() {
 		const event = data.events.find((e) => e.id === selectedEventId);
 		if (!event) return;
@@ -27,6 +40,7 @@
 			.replace('{Event Name}', event.name)
 			.replace('{Location}', event.location || 'Location TBD')
 			.replace('{Date}', formatDate(event.date_time))
+			.replace('{Time Until}', formatTimeUntil(event.date_time))
 			.replace('{Event Link}', eventLink);
 	}
 

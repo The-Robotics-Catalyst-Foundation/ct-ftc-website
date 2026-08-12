@@ -1,13 +1,13 @@
 import { fail } from '@sveltejs/kit';
 import { requireRole } from '$lib/server/auth';
 import { sendBulkEmail } from '$lib/server/email';
-import { NEWSLETTER_TEMPLATES, getTemplate } from '$lib/server/newsletter-templates';
+import { NEWSLETTER_TEMPLATES, getTemplate, composeMessage } from '$lib/server/newsletter-templates';
 import type { PageServerLoad, Actions } from './$types';
 
 const CAN_MANAGE = ['admin', 'event_manager'] as const;
 
 const DEFAULT_TEMPLATE =
-	'Hello Volunteers, an event {Event Name} is 2 weeks away at {Location} on {Date}. Sign up here: {Event Link}';
+	'An event {Event Name} is {Time Until} away at {Location} on {Date}. Sign up here: {Event Link}';
 
 function formatDate(value: string) {
 	if (!value) return 'Date TBD';
@@ -72,12 +72,13 @@ export const actions: Actions = {
 			}
 		}
 
+		const fullMessage = composeMessage(message);
 		const template = getTemplate(templateId);
-		const { subject, html } = template.render({ message, event: eventInfo, origin: url.origin });
+		const { subject, html } = template.render({ message: fullMessage, event: eventInfo, origin: url.origin });
 
 		let resendIds: string[];
 		try {
-			resendIds = await sendBulkEmail({ subject, text: message, html, recipients });
+			resendIds = await sendBulkEmail({ subject, text: fullMessage, html, recipients });
 		} catch (err: any) {
 			return fail(500, { error: err?.message ?? 'Failed to send the broadcast.' });
 		}
@@ -91,7 +92,7 @@ export const actions: Actions = {
 			await locals.pb.collection('newsletter_sends').create({
 				sentAt: new Date().toISOString(),
 				recipientCount: recipients.length,
-				message,
+				message: fullMessage,
 				resendIds,
 				openCount: 0
 			});

@@ -4,12 +4,24 @@
     import { page } from '$app/stores';
     import { enhance } from '$app/forms';
     import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
-    import { LayoutDashboard, CalendarDays, MessageSquare, Mail, Users, Bell, BellOff } from '@lucide/svelte';
+    import { LayoutDashboard, CalendarDays, MessageSquare, Mail, Users, Bell, BellOff, Plus } from '@lucide/svelte';
     import Modal from '$lib/components/modal.svelte';
     import { subscribeToPush, syncPushSubscription } from '$lib/client/push';
+    import { adminCreateAction } from '$lib/client/adminCreate';
     import type { LayoutData } from './$types';
 
     let { data, children }: { data: LayoutData; children: import('svelte').Snippet } = $props();
+
+    let scrolled = $state(false);
+
+    onMount(() => {
+        const onScroll = () => {
+            scrolled = window.scrollY > 0;
+        };
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    });
 
     let profileMenuOpen = $state(false);
     let settingsOpen = $state(false);
@@ -36,6 +48,10 @@
             { href: '/admin/users', label: 'Users', icon: Users, roles: ['admin'], badge: 0 }
         ].filter((item) => item.roles.includes(data.role))
     );
+
+    // Dashboard stays reachable on mobile via the logo tap - dropping it from
+    // the dock frees a slot for the profile picture on small screens.
+    const mobileNavItems = $derived(navItems.filter((item) => item.href !== '/admin/dashboard'));
 
     const roleLabel: Record<string, string> = {
         admin: 'Admin',
@@ -65,6 +81,24 @@
     </div>
 {/snippet}
 
+{#snippet profileMenuItems()}
+    <p class="px-3 pb-2 pt-1 text-[10px] font-black uppercase tracking-widest text-text-muted">
+        {roleLabel[data.role]}
+    </p>
+    <button
+        type="button"
+        class="block w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-text-main transition-colors hover:bg-bg-surface"
+        onclick={openSettings}
+    >
+        Settings
+    </button>
+    <form method="POST" action="/admin/logout">
+        <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-rose-600 transition-colors hover:bg-rose-50">
+            Logout
+        </button>
+    </form>
+{/snippet}
+
 {#snippet navLinks(onNavigate?: (e: MouseEvent) => void)}
     {#each navItems as item (item.href)}
         <a
@@ -87,7 +121,11 @@
 {/snippet}
 
 <div class="admin-shell flex min-h-screen flex-col font-sans">
-    <header class="glass-panel m-4 flex items-center justify-between gap-4 px-5 py-3">
+    <header
+        class="glass-panel sticky top-0 z-30 mx-4 mb-4 flex items-center justify-between gap-4 px-5 py-3 transition-[margin-top] duration-200 ease-out md:static md:mt-4"
+        class:mt-4={!scrolled}
+        class:mt-0={scrolled}
+    >
         <a href="/admin/dashboard" class="flex shrink-0 items-center gap-2">
             <img src="/ctftc.png" alt="CT FIRST Tech Challenge" class="h-12 w-18 rounded-full border-2 border-white  object-contain p-1 invert" />
             <span class="hidden text-sm font-black uppercase tracking-wide text-text-main sm:inline">CT FTC Admin</span>
@@ -97,7 +135,19 @@
             {@render navLinks()}
         </nav>
 
-        <div class="relative">
+        {#if $adminCreateAction}
+            <button
+                type="button"
+                onclick={() => $adminCreateAction?.run()}
+                aria-label={$adminCreateAction.label}
+                title={$adminCreateAction.label}
+                class="dock-tap flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-[#2563eb] text-white shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-[1px] md:hidden"
+            >
+                <Plus class="h-5 w-5" strokeWidth={3} />
+            </button>
+        {/if}
+
+        <div class="relative hidden md:block">
             <button
                 type="button"
                 onclick={() => (profileMenuOpen = !profileMenuOpen)}
@@ -117,21 +167,7 @@
                     onclick={() => (profileMenuOpen = false)}
                 ></button>
                 <div class="absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border-2 border-black bg-white p-2 shadow-[4px_4px_0px_0px_#000]">
-                    <p class="px-3 pb-2 pt-1 text-[10px] font-black uppercase tracking-widest text-text-muted">
-                        {roleLabel[data.role]}
-                    </p>
-                    <button
-                        type="button"
-                        class="block w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-text-main transition-colors hover:bg-bg-surface"
-                        onclick={openSettings}
-                    >
-                        Settings
-                    </button>
-                    <form method="POST" action="/admin/logout">
-                        <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-rose-600 transition-colors hover:bg-rose-50">
-                            Logout
-                        </button>
-                    </form>
+                    {@render profileMenuItems()}
                 </div>
             {/if}
         </div>
@@ -141,8 +177,8 @@
         {@render children()}
     </main>
 
-    <nav class="admin-dock md:hidden" aria-label="Primary">
-        {#each navItems as item (item.href)}
+    <nav class="admin-dock" aria-label="Primary">
+        {#each mobileNavItems as item (item.href)}
             {@const Icon = item.icon}
             {@const active = $page.url.pathname.startsWith(item.href)}
             <a href={item.href} class="admin-dock-item dock-tap" aria-current={active ? 'page' : undefined}>
@@ -155,6 +191,31 @@
                 <span class="admin-dock-label" class:active>{item.label}</span>
             </a>
         {/each}
+
+        <div class="admin-dock-item relative">
+            <button
+                type="button"
+                onclick={() => (profileMenuOpen = !profileMenuOpen)}
+                aria-expanded={profileMenuOpen}
+                aria-label="Account menu"
+                class="dock-tap flex w-full flex-col items-center gap-0.5"
+            >
+                {@render avatar('h-6 w-6')}
+                <span class="admin-dock-label">Account</span>
+            </button>
+
+            {#if profileMenuOpen}
+                <button
+                    type="button"
+                    class="fixed inset-0 z-40 cursor-default"
+                    aria-label="Close menu"
+                    onclick={() => (profileMenuOpen = false)}
+                ></button>
+                <div class="absolute bottom-full right-0 z-50 mb-3 w-52 rounded-xl border-2 border-black bg-white p-2 shadow-[4px_4px_0px_0px_#000]">
+                    {@render profileMenuItems()}
+                </div>
+            {/if}
+        </div>
     </nav>
 </div>
 

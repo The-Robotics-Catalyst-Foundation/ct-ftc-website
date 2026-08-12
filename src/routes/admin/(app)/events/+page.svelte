@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
 	import { ExternalLink, Radar } from '@lucide/svelte';
 	import { robolystEventUrl } from '$lib/robolyst';
+	import { adminCreateAction } from '$lib/client/adminCreate';
 	import Sheet from '$lib/components/sheet.svelte';
 	import Modal from '$lib/components/modal.svelte';
 	import type { PageData, ActionData } from './$types';
@@ -11,6 +13,12 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const canManage = $derived(data.role === 'admin' || data.role === 'event_manager');
+
+	onMount(() => {
+		if (!canManage) return;
+		adminCreateAction.set({ label: 'New event', run: () => (showCreate = true) });
+		return () => adminCreateAction.set(null);
+	});
 
 	const TYPE_OPTIONS = ['Scrimmage', 'Qualifier', 'Championship'];
 	// Keyed lowercase since PocketBase data casing isn't guaranteed to match.

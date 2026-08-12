@@ -47,9 +47,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// public-site requests. httpOnly + secure + sameSite=strict are the
 	// library defaults - this cookie is unreadable by any client-side JS,
 	// which is what actually stops XSS from being able to steal the session.
+	//
+	// exportToCookie defaults the cookie's `expires` to the JWT's own `exp`
+	// claim, which logs the installed admin PWA out whenever it isn't opened
+	// within that window. Pin it to the ~400-day cap most browsers honor
+	// instead - authRefresh() above keeps sliding the underlying PocketBase
+	// token forward on every request, so as long as this is opened at least
+	// once per PocketBase token lifetime, the session effectively never
+	// expires. The true ceiling is the auth collection's token duration
+	// setting on the PocketBase server itself, which this app can't reach.
 	response.headers.append(
 		'set-cookie',
-		pb.authStore.exportToCookie({ secure: !dev, path: '/admin' }, AUTH_COOKIE_KEY)
+		pb.authStore.exportToCookie(
+			{ secure: !dev, path: '/admin', expires: new Date(Date.now() + 400 * 24 * 60 * 60 * 1000) },
+			AUTH_COOKIE_KEY
+		)
 	);
 
 	return response;

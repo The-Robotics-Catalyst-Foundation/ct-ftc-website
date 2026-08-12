@@ -27,6 +27,12 @@ function escapeHtml(input: string): string {
 		.replace(/'/g, '&#39;');
 }
 
+// Wraps whatever an admin types with a standard greeting and sign-off, so
+// every broadcast reads as a proper letter regardless of template chosen.
+export function composeMessage(message: string): string {
+	return `Dear Volunteers,\n\n${message.trim()}\n\nThank you,\nSincerely,\nCT FTC`;
+}
+
 // Plain-text message -> paragraph HTML, one <p> per blank-line-separated
 // block, single newlines within a block become <br>.
 function messageToHtml(message: string): string {

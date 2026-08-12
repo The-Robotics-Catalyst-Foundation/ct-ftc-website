@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { requireRole } from '$lib/server/auth';
-import { getTemplate } from '$lib/server/newsletter-templates';
+import { getTemplate, composeMessage } from '$lib/server/newsletter-templates';
 import type { RequestHandler } from './$types';
 
 const CAN_MANAGE = ['admin', 'event_manager'] as const;
@@ -32,6 +32,6 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 		}
 	}
 
-	const { html } = getTemplate(templateId).render({ message, event: eventInfo, origin: url.origin });
+	const { html } = getTemplate(templateId).render({ message: composeMessage(message), event: eventInfo, origin: url.origin });
 	return json({ html });
 };

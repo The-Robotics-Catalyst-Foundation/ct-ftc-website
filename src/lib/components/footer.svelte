@@ -83,9 +83,9 @@
 
         <div class="flex items-center gap-3">
           <p class="text-sm md:text-base font-bold text-slate-700">
-            Hosted by <a href="https://robotics-catalyst.org" target="_blank" rel="noopener noreferrer" class="text-[#2563eb] hover:underline font-black">Robotics Catalyst Fdn.</a>
+            Hosted by <a href="https://robolyst.org" target="_blank" rel="noopener noreferrer" class="text-[#2563eb] hover:underline font-black">Robolyst</a>
           </p>
-          <img src="/robolyst-small.png" alt="Robotics-Catalyst Logo" class="w-10 h-10 object-contain">
+          <img src="https://robolyst.org/icon.svg" alt="Robotics-Catalyst Logo" class="w-10 h-10 object-contain">
         </div>
       </div>
     </div>
