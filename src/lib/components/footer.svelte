@@ -55,6 +55,7 @@
           <li><a href="/events" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Event Schedule</a></li>
           <li><a href="/teams" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Team Directory</a></li>
           <li><a href="/volunteer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Volunteer Registry</a></li>
+          <li><a href="https://robolyst.org" target="_blank" rel="noopener noreferrer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Robolyst</a></li>
         </ul>
       </div>
 

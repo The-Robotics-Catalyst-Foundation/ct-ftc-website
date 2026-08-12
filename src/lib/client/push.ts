@@ -9,15 +9,20 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
 
 async function postSubscription(sub: PushSubscription): Promise<void> {
 	const json = sub.toJSON();
-	await fetch('/admin/push/subscribe', {
+	const res = await fetch('/admin/push/subscribe', {
 		method: 'POST',
 		headers: { 'content-type': 'application/json' },
 		body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys })
 	});
+	if (!res.ok) {
+		throw new Error(`Failed to save push subscription (${res.status})`);
+	}
 }
 
 /** Explicit opt-in: requests Notification permission, then subscribes. */
-export async function subscribeToPush(vapidPublicKey: string): Promise<'granted' | 'denied' | 'unsupported'> {
+export async function subscribeToPush(
+	vapidPublicKey: string
+): Promise<'granted' | 'denied' | 'unsupported' | 'error'> {
 	if (!('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported';
 
 	const permission = await Notification.requestPermission();
@@ -31,7 +36,13 @@ export async function subscribeToPush(vapidPublicKey: string): Promise<'granted'
 			applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
 		});
 	}
-	await postSubscription(sub);
+
+	try {
+		await postSubscription(sub);
+	} catch (err) {
+		console.error('Failed to persist push subscription:', err);
+		return 'error';
+	}
 	return 'granted';
 }
 
@@ -43,5 +54,10 @@ export async function syncPushSubscription(): Promise<void> {
 
 	const registration = await navigator.serviceWorker.ready;
 	const sub = await registration.pushManager.getSubscription();
-	if (sub) await postSubscription(sub).catch(() => {});
+	if (!sub) return;
+	try {
+		await postSubscription(sub);
+	} catch (err) {
+		console.error('Failed to re-sync push subscription:', err);
+	}
 }

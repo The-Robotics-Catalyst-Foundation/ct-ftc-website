@@ -15,7 +15,7 @@
     let settingsOpen = $state(false);
     let settingsBusy = $state(false);
     let settingsError = $state('');
-    let pushState = $state<'granted' | 'denied' | 'unsupported' | 'idle'>(
+    let pushState = $state<'granted' | 'denied' | 'unsupported' | 'error' | 'idle'>(
         typeof Notification !== 'undefined' ? (Notification.permission as 'granted' | 'denied' | 'idle') : 'idle'
     );
 
@@ -212,6 +212,17 @@
                 </p>
             {:else if pushState === 'unsupported'}
                 <p class="text-sm font-semibold text-text-muted">Push notifications aren't supported in this browser.</p>
+            {:else if pushState === 'error'}
+                <div class="space-y-2">
+                    <p class="flex items-center gap-2 text-sm font-bold text-rose-600">
+                        <BellOff class="h-4 w-4" strokeWidth={2.5} />
+                        Couldn't save your subscription - try again.
+                    </p>
+                    <button type="button" class="btn-secondary w-full" onclick={enablePush}>
+                        <Bell class="h-4 w-4" strokeWidth={2.5} />
+                        Retry
+                    </button>
+                </div>
             {:else}
                 <button type="button" class="btn-secondary w-full" onclick={enablePush}>
                     <Bell class="h-4 w-4" strokeWidth={2.5} />

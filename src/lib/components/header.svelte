@@ -5,6 +5,8 @@
   let logo = '/ctftc.png';
   let ftcLogo = 'https://wpafbstem.com/FTC/img/FTC_logo.png';
   let isMobileMenuOpen = $state(false);
+  let scrollY = $state(0);
+  let atTop = $derived(scrollY <= 4);
 
   const navLinks = [
     { name: 'Events', href: '/events' },
@@ -20,12 +22,21 @@
     isMobileMenuOpen = false;
   }
 
+  $effect(() => {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  });
 </script>
 
-<div class="fixed top-4 left-0 right-0 z-[200] px-4 md:px-6 flex justify-center pointer-events-none">
+<svelte:window bind:scrollY />
+
+<div class="fixed left-0 right-0 z-[200] flex justify-center pointer-events-none transition-all duration-300 {atTop ? 'top-0 px-0' : 'top-4 px-4 md:px-6'}">
   <nav
     id="site-nav"
-    class="w-full max-w-5xl pointer-events-auto bg-[#eef2f7]/90 backdrop-blur-xl border-3 border-black shadow-neumorphic-nav rounded-2xl md:rounded-full px-3 py-2.5 md:py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 relative box-shadow-flat transition-all"
+    class="pointer-events-auto bg-[#eef2f7]/90 backdrop-blur-xl border-3 border-black shadow-neumorphic-nav px-3 py-2.5 md:py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 relative box-shadow-flat transition-all duration-300 {atTop ? 'w-full rounded-none' : 'w-full max-w-5xl rounded-2xl md:rounded-full'}"
   >
     <div class="flex items-center justify-between w-full md:w-auto">
       <a
@@ -77,39 +88,39 @@
     >
         Contact
     </a>
-
-    {#if isMobileMenuOpen}
-      <div
-        transition:slide={{ duration: 250 }}
-        class="w-full md:hidden flex flex-col gap-2 pt-2 pb-1 border-t-2 border-dashed border-black/10 mt-1"
-      >
-        {#each navLinks as link}
-          <a
-            href={link.href}
-            onclick={closeMenu}
-            class="w-full p-3 rounded-xl font-black text-sm uppercase tracking-wide border-2 transition-all flex items-center justify-between
-            {$page.url.pathname.startsWith(link.href)
-              ? 'bg-[#2563eb] text-white border-black shadow-inner'
-              : 'bg-white text-slate-700 border-black box-shadow-mini active:translate-y-[2px]'}"
-          >
-            <span>{link.name}</span>
-            <span class="opacity-30 font-mono text-[10px]">&lt;//01&gt;</span>
-          </a>
-        {/each}
-
-        <a
-          href="https://atlas.robotics-catalyst.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          onclick={closeMenu}
-          class="w-full p-3 bg-[#facc15] text-black border-2 border-black font-black text-sm uppercase tracking-widest text-center rounded-xl box-shadow-mini active:translate-y-[2px] transition-all block mt-2"
-        >
-          Launch Atlas Deck &nearr;
-        </a>
-      </div>
-    {/if}
   </nav>
 </div>
+
+{#if isMobileMenuOpen}
+  <div
+    transition:slide={{ duration: 250 }}
+    class="fixed inset-0 z-[190] md:hidden bg-[#eef2f7] flex flex-col items-stretch justify-center gap-3 px-6 pt-24 pb-10"
+  >
+    {#each navLinks as link}
+      <a
+        href={link.href}
+        onclick={closeMenu}
+        class="w-full p-5 rounded-2xl font-black text-xl uppercase tracking-wide border-2 transition-all flex items-center justify-between
+        {$page.url.pathname.startsWith(link.href)
+          ? 'bg-[#2563eb] text-white border-black shadow-inner'
+          : 'bg-white text-slate-700 border-black box-shadow-mini active:translate-y-[2px]'}"
+      >
+        <span>{link.name}</span>
+        <span class="opacity-30 font-mono text-xs">&lt;//01&gt;</span>
+      </a>
+    {/each}
+
+    <a
+      href="/contact"
+      target="_blank"
+      rel="noopener noreferrer"
+      onclick={closeMenu}
+      class="w-full p-5 bg-[#facc15] text-black border-2 border-black font-black text-xl uppercase tracking-widest text-center rounded-2xl box-shadow-mini active:translate-y-[2px] transition-all block mt-2"
+    >
+      Contact
+    </a>
+  </div>
+{/if}
 
 <div class="h-28 md:h-24"></div>
 

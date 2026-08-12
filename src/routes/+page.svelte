@@ -75,7 +75,7 @@
 
       <div class="lg:col-span-6 space-y-8 text-left" style="transform: translateY({parallaxHeroY}px)">
         <h1 class="text-5xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Tech Challenge Logo" class="w-full object-contain max-h-32"> <br />
+          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Tech Challenge Logo" width="744" height="188" class="w-full object-contain max-h-32"> <br />
           <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-2 box-shadow-flat transform rotate-1">Right Here in Connecticut!</span>
         </h1>
 
@@ -116,7 +116,7 @@
               type="submit"
               class="brutalist-btn bg-white text-black text-xs font-black uppercase tracking-wider px-4 py-3 border-l-[3px] border-black transition-colors hover:bg-[#eef2f7] whitespace-nowrap"
             >
-                
+
               Search Town &rarr;
             </button>
           </form>
@@ -131,7 +131,7 @@
 
       <div class="bg-white border-[3px] border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group">
         <div>
-          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Logo" class="h-14 w-auto object-contain mb-6" />
+          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Logo" width="744" height="188" loading="lazy" class="h-14 w-auto object-contain mb-6" />
           <h3 class="text-xl font-black text-black uppercase mb-3">What is FIRST?</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed">
             FIRST (For Inspiration and Recognition of Science and Technology) is a global nonprofit founded by inventor Dean Kamen in 1989. It runs a family of robotics programs for students from kindergarten through high school, all built around inspiring young people to become science and technology leaders.
@@ -141,7 +141,7 @@
 
       <div class="bg-white border-[3px] border-black p-8 rounded-2xl box-shadow-flat hover:translate-y-[-4px] hover:box-shadow-flat-hover transition-all text-left flex flex-col justify-between group">
         <div>
-          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Tech Challenge Logo" class="h-14 w-auto object-contain mb-6" />
+          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Tech Challenge Logo" width="744" height="188" loading="lazy" class="h-14 w-auto object-contain mb-6" />
           <h3 class="text-xl font-black text-black uppercase mb-3">What is FTC?</h3>
           <p class="text-slate-600 text-sm font-semibold leading-relaxed">
             FIRST Tech Challenge (FTC) is FIRST's program for students in grades 7&ndash;12. Teams design, build, and program a robot from scratch each season, then compete head-to-head in alliance matches while also keeping an engineering notebook and running community outreach.
@@ -172,7 +172,7 @@
             target="_blank"
             rel="noopener noreferrer"
             aria-label={social.name}
-            class="w-11 h-11 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-black hover:text-[#2563eb] hover:-translate-y-0.5 transition-all"
+            class="w-16 h-15 rounded-xl bg-[#eef2f7] shadow-neumorphic-outer border border-white/60 flex items-center justify-center text-black hover:text-[#2563eb] hover:-translate-y-0.5 transition-all md:w-30"
           >
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d={social.icon} /></svg>
           </a>

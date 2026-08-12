@@ -23,6 +23,7 @@
 
   let title = $derived($page.data.title ? `${$page.data.title} | CTFTC` : 'Connecticut FIRST Tech Challenge');
   let description = $derived($page.data.description || 'Connecticut FIRST Tech Challenge - Inspiring the Next Generation of Innovators and Engineers. Explore our events, teams, and volunteer opportunities to get involved in the excitement of robotics competitions across the state.');
+  let image = $derived($page.data.image ? $page.url.origin + $page.data.image : `${$page.url.origin}/ctftc.png`);
 
   let isAdminRoute = $derived($page.url.pathname.startsWith('/admin'));
 
@@ -50,7 +51,9 @@
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={$page.url.origin + $page.url.pathname} />
+  <meta property="og:image" content={image} />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={image} />
   <link rel="canonical" href={$page.url.origin + $page.url.pathname} />
 
   {#if isAdminRoute}

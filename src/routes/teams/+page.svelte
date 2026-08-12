@@ -34,10 +34,6 @@
 
 <svelte:window bind:scrollY onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
-<svelte:head>
-    <title>CT Team Explorer Control Deck - CT FTC</title>
-</svelte:head>
-
 <main class="relative min-h-screen overflow-x-hidden bg-[#eef2f7] pb-24 text-[#1a1a1a]">
     <div class="bg-grid-pattern pointer-events-none absolute inset-0 opacity-[0.03]"></div>
 

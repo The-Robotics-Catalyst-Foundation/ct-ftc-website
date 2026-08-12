@@ -24,6 +24,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const response = await resolve(event);
 
+	// Baseline cache for public GET pages that don't already set their own
+	// Cache-Control (e.g. via a load function's setHeaders) - keeps repeat
+	// navigations off PocketBase without touching per-route caching decisions.
+	if (
+		event.request.method === 'GET' &&
+		!event.url.pathname.startsWith('/admin') &&
+		!response.headers.has('cache-control')
+	) {
+		response.headers.set('cache-control', 'public, max-age=60, stale-while-revalidate=300');
+	}
+
 	// Admin panel is never meant to be indexed - belt-and-suspenders with the
 	// <meta name="robots"> tag and robots.txt Disallow, since crawlers that
 	// ignore one of the three often still respect this response header.

@@ -1,7 +1,16 @@
 import type { PageServerLoad } from './$types';
 import { pb } from '$lib/pocketbase';
 
-export const load: PageServerLoad = async () => {
+const CACHE_TTL_MS = 60 * 1000;
+let cache: { fetchedAt: number; data: { upcoming: unknown[]; past: unknown[] } } | null = null;
+
+export const load: PageServerLoad = async ({ setHeaders }) => {
+    setHeaders({ 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
+
+    if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
+        return { ...cache.data, title: 'Events', description: 'Upcoming and past Connecticut FIRST Tech Challenge competitions, scrimmages, and meetups.' };
+    }
+
     try {
         // 1. Fetch upcoming events (Comparing against your actual 'date_time' field)
         const upcomingRecords = await pb.collection('events').getFullList({
@@ -16,7 +25,7 @@ export const load: PageServerLoad = async () => {
         });
 
         // 3. Map your exact PocketBase schema fields cleanly to the frontend expectations
-        return {
+        const data = {
             upcoming: upcomingRecords.map(record => ({
                 id: record.id,
                 slug: record.slug || '',
@@ -40,11 +49,16 @@ export const load: PageServerLoad = async () => {
                 volunteersNeeded: record.volunteersNeeded ?? 0
             }))
         };
+
+        cache = { fetchedAt: Date.now(), data };
+        return { ...data, title: 'Events', description: 'Upcoming and past Connecticut FIRST Tech Challenge competitions, scrimmages, and meetups.' };
     } catch (err) {
         console.error('Error loading events from PocketBase data layer:', err);
         return {
             upcoming: [],
-            past: []
+            past: [],
+            title: 'Events',
+            description: 'Upcoming and past Connecticut FIRST Tech Challenge competitions, scrimmages, and meetups.'
         };
     }
 };

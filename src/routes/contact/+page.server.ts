@@ -3,10 +3,15 @@ import { pb } from '$lib/pocketbase';
 import { checkRateLimit } from '$lib/server/rate-limit';
 import { sendBulkEmail } from '$lib/server/email';
 import { notifyAdmins } from '$lib/server/push';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VALID_CATEGORIES = ['general', 'team', 'volunteer', 'sponsorship'];
+
+export const load: PageServerLoad = () => ({
+	title: 'Contact Us',
+	description: 'Get in touch with Connecticut FIRST Tech Challenge - questions, team support, volunteering, and sponsorship.'
+});
 
 export const actions: Actions = {
 	default: async ({ request, getClientAddress }) => {

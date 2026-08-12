@@ -105,14 +105,14 @@
 						</div>
 					</form>
 				{:else}
-					<div class="flex items-center justify-between gap-3">
-						<div>
-							<p class="font-semibold text-text-main">{user.name || user.email}</p>
-							<p class="text-sm text-text-muted">{user.email}</p>
+					<div class="flex flex-wrap items-center justify-between gap-3">
+						<div class="min-w-0">
+							<p class="truncate font-semibold text-text-main">{user.name || user.email}</p>
+							<p class="truncate text-sm text-text-muted">{user.email}</p>
 						</div>
-						<div class="flex items-center gap-2">
+						<div class="flex flex-wrap items-center gap-2">
 							<span class="role-badge {user.authLevel}">{roleLabel[user.authLevel] ?? 'No role'}</span>
-							<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={() => (editingId = user.id)}>Edit</button>
+							<button type="button" class="btn-secondary px-3 py-2 text-xs" onclick={() => (editingId = user.id)}>Edit</button>
 							{#if user.id !== data.userId}
 								<form
 									method="POST"
@@ -130,7 +130,7 @@
 									}}
 								>
 									<input type="hidden" name="id" value={user.id} />
-									<button type="submit" disabled={busy} class="btn-danger px-3 py-1.5 text-xs">Remove</button>
+									<button type="submit" disabled={busy} class="btn-danger px-3 py-2 text-xs">Remove</button>
 								</form>
 							{/if}
 						</div>

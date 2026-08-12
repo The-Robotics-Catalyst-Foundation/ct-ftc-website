@@ -8,8 +8,10 @@
   import EmbedBuilder from '$lib/components/embed-builder.svelte';
   import { robolystEventUrl } from '$lib/robolyst';
 
+  let { data } = $props();
+
   // --- SVELTE 5 STATE RUNES ---
-  let event: any = $state(null);
+  let event: any = $state(data.event);
   let isLoaded = $state(false);
   let scrollY = $state(0);
   let mousePos = $state({ x: 0, y: 0 });
@@ -17,6 +19,8 @@
   let embedOpen = $state(false);
   let shareCopied = $state(false);
   let shareCopyTimeout: ReturnType<typeof setTimeout> | null = null;
+  let eventShareCopied = $state(false);
+  let eventShareCopyTimeout: ReturnType<typeof setTimeout> | null = null;
 
   async function copyPhotosLink() {
     if (!event) return;
@@ -31,8 +35,30 @@
     }
   }
 
+  async function shareEvent() {
+    if (!event) return;
+    const url = `${$page.url.origin}/events/${event.slug || event.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: event.name, url });
+      } catch {
+        // user cancelled the native share sheet
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      eventShareCopied = true;
+      if (eventShareCopyTimeout) clearTimeout(eventShareCopyTimeout);
+      eventShareCopyTimeout = setTimeout(() => (eventShareCopied = false), 1800);
+    } catch {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
   onDestroy(() => {
     if (shareCopyTimeout) clearTimeout(shareCopyTimeout);
+    if (eventShareCopyTimeout) clearTimeout(eventShareCopyTimeout);
   });
 
   const eventJsonLd = $derived(
@@ -95,30 +121,11 @@
   }
 
   onMount(() => {
-    let timer: ReturnType<typeof setInterval> | undefined;
+    updateCountdown(event.date_time);
+    const timer = setInterval(() => updateCountdown(event.date_time), 60000);
+    setTimeout(() => (isLoaded = true), 50);
 
-    async function fetchEventNode() {
-      const id = $page.params.id;
-      if (!id) return;
-      try {
-        try {
-          event = await pb.collection('events').getOne(id);
-        } catch {
-          event = await pb.collection('events').getFirstListItem(pb.filter('slug = {:slug}', { slug: id }));
-        }
-        updateCountdown(event.date_time);
-        timer = setInterval(() => updateCountdown(event.date_time), 60000);
-        setTimeout(() => (isLoaded = true), 50);
-      } catch (e) {
-        console.error('Failed to fetch event data:', e);
-      }
-    }
-
-    fetchEventNode();
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   });
 
   // --- DERIVED PROPERTY RUNES ---
@@ -138,11 +145,7 @@
 <svelte:window bind:scrollY onmousemove={handleMouseMove} />
 
 <svelte:head>
-  {#if event}
-    <title>{event.name} | Connecticut FTC</title>
-    <meta name="description" content={`${event.name} - ${event.location || 'Connecticut FTC event'} on ${event.date_time ? new Date(event.date_time).toLocaleDateString() : 'TBD'}.`} />
-    {@html `<script type="application/ld+json">${eventJsonLd}</script>`}
-  {/if}
+  {@html `<script type="application/ld+json">${eventJsonLd}</script>`}
 </svelte:head>
 
 {#if event}
@@ -163,6 +166,14 @@
         </nav>
 
         <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick={shareEvent}
+            class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border-2 border-black rounded-xl box-shadow-mini text-xs font-black uppercase tracking-wide text-slate-700 hover:text-[#2563eb] transition-all active:translate-y-[2px]"
+          >
+            <Share2 class="w-3.5 h-3.5" strokeWidth={2.5} />
+            {eventShareCopied ? 'Copied!' : 'Share Event'}
+          </button>
           {#if robolystUrl}
             <a
               href={robolystUrl}

@@ -85,7 +85,7 @@
 		</div>
 
 		{#if showSubscribers && data.subscribers.length}
-			<div class="mt-4 max-h-64 overflow-y-auto rounded-lg border border-black/10">
+			<div class="mt-4 max-h-64 overflow-x-auto overflow-y-auto rounded-lg border border-black/10">
 				<table class="w-full text-left text-sm">
 					<thead class="sticky top-0 bg-white/90 backdrop-blur">
 						<tr class="text-xs font-black uppercase tracking-wide text-text-muted">

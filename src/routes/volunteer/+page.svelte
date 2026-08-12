@@ -1,9 +1,9 @@
 <script>
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import { slide, fly } from 'svelte/transition';
   import { enhance } from '$app/forms';
   import Head from '$lib/components/head.svelte';
-  import { Wrench, Scale, ClipboardList, Coffee } from '@lucide/svelte';
+  import { Wrench, Scale, ClipboardList, Coffee, Mail } from '@lucide/svelte';
 
   let { form: newsletterForm } = $props();
 
@@ -62,6 +62,8 @@
   // Parallax Values
   let parallaxHeroY = $derived(scrollY * 0.3);
   let backgroundScrollX = $derived(scrollY * 0.05);
+
+  let showFloatingCta = $derived(isLoaded && scrollY > 500);
 
   onMount(() => {
     setTimeout(() => isLoaded = true, 100);
@@ -155,7 +157,7 @@
     </div>
   </section>
 
-  <section class="max-w-4xl mx-auto px-6 pb-16 relative z-20">
+  <section id="newsletter" class="max-w-4xl mx-auto px-6 pb-16 relative z-20 scroll-mt-28">
     <div class="bg-black text-white rounded-[2.5rem] p-8 md:p-12 box-shadow-flat border-3 border-black text-center space-y-5">
       <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight">
         Sign up for updates and notifications on volunteer opportunities in CT
@@ -254,6 +256,17 @@
       Have more questions? See our <a href="/faq" class="text-[#2563eb] font-black hover:underline">full FAQ</a>.
     </p>
   </section>
+
+  {#if showFloatingCta}
+    <a
+      href="#newsletter"
+      transition:fly={{ y: 20, duration: 200 }}
+      class="fixed bottom-6 right-6 z-[150] skeuo-button bg-[#facc15] text-black text-xs md:text-sm font-black uppercase tracking-wider pl-4 pr-5 py-4 rounded-2xl border-2 border-black box-shadow-flat hover:translate-y-[1px] active:translate-y-[4px] transition-all flex items-center gap-2"
+    >
+      <Mail class="w-4 h-4" strokeWidth={2.5} />
+      Get Updates
+    </a>
+  {/if}
 </main>
 
 <style>

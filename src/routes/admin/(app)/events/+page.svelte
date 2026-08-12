@@ -358,9 +358,9 @@
 
 				<div class="p-5">
 					<div class="flex items-start justify-between gap-3">
-						<div>
-							<h3 class="font-semibold text-text-main">{event.name}</h3>
-							<p class="text-sm text-text-muted">{event.location}</p>
+						<div class="min-w-0">
+							<h3 class="truncate font-semibold text-text-main">{event.name}</h3>
+							<p class="truncate text-sm text-text-muted">{event.location}</p>
 							<p class="mt-1 text-xs text-text-muted">
 								{event.date_time ? new Date(event.date_time).toLocaleString() : 'No date set'}
 							</p>
@@ -371,20 +371,20 @@
 									href={pb.files.getUrl(event, event.event_pdf)}
 									target="_blank"
 									rel="noreferrer"
-									class="btn-secondary px-3 py-1.5 text-xs"
+									class="btn-secondary px-3 py-2 text-xs"
 								>
 									PDF
 								</a>
 							{/if}
 							{#if event.imgLink}
-								<a href={event.imgLink} target="_blank" rel="noreferrer" class="btn-secondary px-3 py-1.5 text-xs">
+								<a href={event.imgLink} target="_blank" rel="noreferrer" class="btn-secondary px-3 py-2 text-xs">
 									Photos
 								</a>
 							{/if}
 						</div>
 					</div>
 
-					<div class="mt-3 flex items-center gap-2 text-xs text-text-muted">
+					<div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-text-muted">
 						<span class="role-badge event_manager">{event.volunteersNeeded ?? 0} volunteers needed</span>
 						<span class="role-badge photographer">{event.pics?.length ?? 0} photos</span>
 					</div>
