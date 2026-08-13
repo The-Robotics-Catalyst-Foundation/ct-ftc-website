@@ -4,7 +4,7 @@ import { checkRateLimit } from '$lib/server/rate-limit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (roleOf(locals.user)) throw redirect(303, '/admin/dashboard');
+	if (roleOf(locals.user)) throw redirect(303, '/admin/events');
 };
 
 export const actions: Actions = {
@@ -32,6 +32,6 @@ export const actions: Actions = {
 			return fail(400, { error: 'Invalid email or password.' });
 		}
 
-		throw redirect(303, '/admin/dashboard');
+		throw redirect(303, '/admin/events');
 	}
 };

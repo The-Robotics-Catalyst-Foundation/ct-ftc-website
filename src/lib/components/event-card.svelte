@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import { Calendar, MapPin, Users, Share2, CodeXml, Radar } from '@lucide/svelte';
+	import { Calendar, MapPin, Users, Share2, CodeXml } from '@lucide/svelte';
 	import Modal from './modal.svelte';
 	import EmbedBuilder from './embed-builder.svelte';
 	import { robolystEventUrl } from '$lib/robolyst';
@@ -9,6 +9,7 @@
 	let {
 		id,
 		slug,
+		eventCode,
 		name,
 		type,
 		location,
@@ -20,6 +21,7 @@
 	}: {
 		id: string;
 		slug?: string;
+		eventCode?: string;
 		name: string;
 		type?: string;
 		location?: string;
@@ -65,7 +67,7 @@
 	const dateSlug = $derived(formatDateSlug(dateTime));
 	const dateLabel = $derived(formatDateOnly(dateTime));
 	const hasVolunteerInfo = $derived(!!volunteersNeeded);
-	const robolystUrl = $derived(robolystEventUrl(dateTime, slug));
+	const robolystUrl = $derived(robolystEventUrl(dateTime, eventCode));
 
 	let embedOpen = $state(false);
 	let shareCopied = $state(false);
@@ -134,7 +136,7 @@
 				{/if}
 				{#if robolystUrl}
 					<a href={robolystUrl} target="_blank" rel="noopener noreferrer" class="event-card-action-btn">
-						<Radar class="h-3.5 w-3.5" strokeWidth={2.5} />
+						<img src="/robolyst-icon.svg" alt="" class="h-3.5 w-3.5 object-contain" />
 						Robolyst
 					</a>
 				{/if}

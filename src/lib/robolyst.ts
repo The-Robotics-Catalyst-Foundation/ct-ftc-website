@@ -8,18 +8,11 @@ export function ftcSeasonForDate(date: Date): number {
 	return date.getUTCMonth() + 1 >= SEASON_KICKOFF_MONTH ? year : year - 1;
 }
 
-// Events created with no admin-supplied code get a random 8-char hex slug
-// (see randomSlug() in admin/events/+page.server.ts) purely to keep the URL
-// unique - that's never a real FTC event code, so treat it as "no code".
-const AUTO_GENERATED_SLUG = /^[0-9a-f]{8}$/;
-
-// The event's own URL slug doubles as the Robolyst/FTC event code - both are
-// the same plain alphanumeric code (e.g. "USCTSTQ"), just cased differently:
-// slugify() lowercases it for the site's own /events/{slug} URL, so it's
-// upper-cased back here to match FTC's own casing for the Robolyst link.
-export function robolystEventUrl(dateTime?: string, slug?: string): string | null {
-	const code = slug?.trim();
-	if (!code || AUTO_GENERATED_SLUG.test(code)) return null;
+// Built from the event's own `eventCode` field (the real FTC event code,
+// e.g. "USCTSTQ") - upper-cased to match FTC's own casing for the link.
+export function robolystEventUrl(dateTime?: string, eventCode?: string): string | null {
+	const code = eventCode?.trim();
+	if (!code) return null;
 	const season = ftcSeasonForDate(dateTime ? new Date(dateTime) : new Date());
 	return `https://robolyst.org/event/${season}/ftc/${code.toUpperCase()}`;
 }

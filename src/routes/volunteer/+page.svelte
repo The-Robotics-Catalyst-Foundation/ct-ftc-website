@@ -3,9 +3,9 @@
   import { slide, fly } from 'svelte/transition';
   import { enhance } from '$app/forms';
   import Head from '$lib/components/head.svelte';
-  import { Wrench, Scale, ClipboardList, Coffee, Mail } from '@lucide/svelte';
+  import { Wrench, Scale, ClipboardList, Coffee, Mail, Calendar, MapPin, ChevronLeft, ChevronRight } from '@lucide/svelte';
 
-  let { form: newsletterForm } = $props();
+  let { data, form: newsletterForm } = $props();
 
   // State Management
   let isLoaded = $state(false);
@@ -13,6 +13,21 @@
   let newsletterBusy = $state(false);
   /** @type {string | null} */
   let activeRoleCategory = $state('tech');
+
+  /** @type {HTMLDivElement | undefined} */
+  let carouselEl = $state();
+
+  /** @param {string} value */
+  function formatEventDate(value) {
+    if (!value) return 'Date TBD';
+    return new Date(value).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  /** @param {1 | -1} direction */
+  function scrollCarousel(direction) {
+    if (!carouselEl) return;
+    carouselEl.scrollBy({ left: direction * (carouselEl.clientWidth * 0.85), behavior: 'smooth' });
+  }
 
   const roleCategories = [
     {
@@ -144,13 +159,51 @@
         </div>
       </div>
 
+      {#if data.events.length > 0}
+        <div class="pt-4 pb-8">
+          <h3 class="text-center md:text-left text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Upcoming Events Needing Volunteers</h3>
+          <div class="relative">
+            <div bind:this={carouselEl} class="volunteer-carousel">
+              {#each data.events as event (event.id)}
+                <div class="volunteer-event-card">
+                  <h4 class="text-lg font-black text-black uppercase leading-tight">{event.name}</h4>
+                  <div class="mt-3 space-y-1.5 text-xs font-bold text-slate-600">
+                    <div class="flex items-center gap-2">
+                      <Calendar class="w-3.5 h-3.5 shrink-0 text-slate-400" strokeWidth={2.5} />
+                      <span>{formatEventDate(event.date_time)}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <MapPin class="w-3.5 h-3.5 shrink-0 text-slate-400" strokeWidth={2.5} />
+                      <span class="truncate">{event.location}</span>
+                    </div>
+                  </div>
+                  <a
+                    href={event.volunteerLink || '/volunteer'}
+                    target={event.volunteerLink ? '_blank' : undefined}
+                    rel={event.volunteerLink ? 'noopener noreferrer' : undefined}
+                    class="skeuo-button bg-[#2563eb] text-white text-xs font-black uppercase tracking-wider px-5 py-3 rounded-xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] inline-flex items-center justify-center gap-2 transition-all mt-4 w-full"
+                  >
+                    Register Now
+                  </a>
+                </div>
+              {/each}
+            </div>
+
+            {#if data.events.length > 1}
+              <button type="button" onclick={() => scrollCarousel(-1)} aria-label="Previous events" class="volunteer-carousel-arrow left-0 -translate-x-1/2">
+                <ChevronLeft class="w-4 h-4" strokeWidth={3} />
+              </button>
+              <button type="button" onclick={() => scrollCarousel(1)} aria-label="Next events" class="volunteer-carousel-arrow right-0 translate-x-1/2">
+                <ChevronRight class="w-4 h-4" strokeWidth={3} />
+              </button>
+            {/if}
+          </div>
+        </div>
+      {/if}
+
       <div class="text-center pt-4 space-y-4">
-        <a href="https://www.firstinspires.org" target="_blank" rel="noopener noreferrer"
-           class="skeuo-button bg-[#2563eb] text-white text-sm font-black uppercase tracking-wider px-10 py-5 rounded-2xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[4px] inline-flex items-center gap-3 transition-all">
-          Go to FIRST Dashboard <span class="text-base">↗</span>
-        </a>
         <p class="text-xs font-semibold text-slate-500">
-          Questions? Email <a href="mailto:contact@connecticutftc.org" class="text-[#2563eb] font-black hover:underline">contact@connecticutftc.org</a>
+          Questions? Email <a href="mailto:youseffmmacary@gmail.com" class="text-[#2563eb] font-black hover:underline">youseffmmacary@gmail.com</a>
         </p>
       </div>
 
@@ -304,5 +357,65 @@
 
   .box-shadow-flat {
     box-shadow: 5px 5px 0px 0px #000000;
+  }
+
+  .volunteer-carousel {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 1px;
+    padding: 0.25rem 0.25rem 0.75rem;
+    scrollbar-width: none;
+  }
+
+  .volunteer-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .volunteer-event-card {
+    flex: 0 0 260px;
+    scroll-snap-align: start;
+    background: #fff;
+    border: 3px solid #000;
+    border-radius: 1rem;
+    box-shadow: 5px 5px 0px 0px #000;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .volunteer-carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0px 0px #000;
+    color: #000;
+    transition: transform 0.15s ease;
+  }
+
+  .volunteer-carousel-arrow:hover {
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .volunteer-carousel-arrow:active {
+    transform: translateY(-50%) translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  .volunteer-carousel-arrow.left-0 {
+    transform: translateY(-50%) translateX(-50%);
+  }
+
+  .volunteer-carousel-arrow.right-0 {
+    transform: translateY(-50%) translateX(50%);
   }
 </style>

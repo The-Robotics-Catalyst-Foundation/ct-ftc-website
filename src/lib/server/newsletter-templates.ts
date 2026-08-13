@@ -48,7 +48,7 @@ const FOOTER = (origin: string) => `
 		<td style="padding:24px 32px;background:#0f172a;color:#94a3b8;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;text-align:center;">
 			<p style="margin:0 0 6px;">CT FIRST Tech Challenge &mdash; Connecticut's volunteer-run robotics community</p>
 			<p style="margin:0;">
-				<a href="mailto:contact@connecticutftc.org" style="color:#93c5fd;text-decoration:none;">contact@connecticutftc.org</a>
+				<a href="mailto:youseffmmacary@gmail.com" style="color:#93c5fd;text-decoration:none;">youseffmmacary@gmail.com</a>
 				&nbsp;&middot;&nbsp;
 				<a href="${origin}/volunteer" style="color:#93c5fd;text-decoration:none;">Manage volunteer info</a>
 			</p>

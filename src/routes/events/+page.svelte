@@ -1,6 +1,5 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
-    import { Radar } from '@lucide/svelte';
     import { robolystEventUrl } from '$lib/robolyst';
 
     interface EventItem {
@@ -11,6 +10,7 @@
         location?: string;
         volunteersNeeded?: number;
         slug?: string;
+        eventCode?: string;
     }
 
     interface PageData {
@@ -109,7 +109,7 @@
                 {#each activeEvents as event (event.id)}
                     {@const required = event.volunteersNeeded ?? 0}
                     {@const needsVolunteers = required > 0}
-                    {@const robolystUrl = robolystEventUrl(event.startDate, event.slug)}
+                    {@const robolystUrl = robolystEventUrl(event.startDate, event.eventCode)}
 
                     <a
                         href="/events/{event.slug || event.id}"
@@ -176,7 +176,7 @@
                                     aria-label="View on Robolyst"
                                     title="View on Robolyst"
                                 >
-                                    <Radar class="h-4 w-4" strokeWidth={2.5} />
+                                    <img src="/robolyst-icon.svg" alt="" class="h-4 w-4 object-contain" />
                                 </button>
                             {/if}
                             <span

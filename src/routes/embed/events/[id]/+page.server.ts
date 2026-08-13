@@ -20,6 +20,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		event: {
 			id: record.id,
 			slug: record.slug || '',
+			eventCode: record.eventCode || '',
 			name: record.name || 'Untitled Event',
 			type: record.type || 'Scrimmage',
 			location: record.location || '',

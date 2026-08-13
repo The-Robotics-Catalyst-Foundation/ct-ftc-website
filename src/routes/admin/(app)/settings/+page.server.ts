@@ -2,7 +2,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async () => {
-	throw redirect(302, '/admin/dashboard');
+	throw redirect(302, '/admin/events');
 };
 
 export const actions: Actions = {

@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
-	import { ExternalLink, Radar } from '@lucide/svelte';
+	import { ExternalLink, LayoutGrid, Table2, ArrowUp, ArrowDown } from '@lucide/svelte';
 	import { robolystEventUrl } from '$lib/robolyst';
 	import { adminCreateAction } from '$lib/client/adminCreate';
 	import Sheet from '$lib/components/sheet.svelte';
@@ -20,7 +20,13 @@
 		return () => adminCreateAction.set(null);
 	});
 
-	const TYPE_OPTIONS = ['Scrimmage', 'Qualifier', 'Championship'];
+	// Values must match the PocketBase `type` select field's options exactly
+	// (lowercase) - labels stay capitalized for display.
+	const TYPE_OPTIONS = [
+		{ value: 'scrimmage', label: 'Scrimmage' },
+		{ value: 'qualifier', label: 'Qualifier' },
+		{ value: 'championship', label: 'Championship' }
+	];
 	// Keyed lowercase since PocketBase data casing isn't guaranteed to match.
 	const TYPE_STYLES: Record<string, string> = {
 		scrimmage: 'bg-[#FF8C00]',
@@ -35,7 +41,22 @@
 	// itself rather than rendering every thumbnail.
 	const PHOTO_PREVIEW_LIMIT = 8;
 
+	function defaultSeasonYear(): number {
+		const now = new Date();
+		const year = now.getFullYear();
+		return now.getMonth() + 1 >= 8 ? year : year - 1;
+	}
+	const currentSeasonYear = defaultSeasonYear();
+	// FTC seasons are labeled by the two calendar years they span (e.g. the
+	// season that kicks off in 2025 runs through mid-2026, so it's shown as
+	// "2025-2026") even though the API itself just wants the starting year.
+	const SEASON_OPTIONS = Array.from({ length: 6 }, (_, i) => currentSeasonYear - i).map((year) => ({
+		year,
+		label: `${year}-${year + 1}`
+	}));
+
 	let showCreate = $state(false);
+	let showImport = $state(false);
 	let editingId = $state<string | null>(null);
 	let uploadingId = $state<string | null>(null);
 	let busy = $state(false);
@@ -101,12 +122,37 @@
 
 	const editingEvent = $derived(data.events.find((e) => e.id === editingId) ?? null);
 
-	// --- Search / filter / sort (client-side - data.events is already the
-	// full list from the server load, no need to round-trip for this) ---
+	// --- Tabs / search / filter / sort (client-side - data.events is already
+	// the full list from the server load, no need to round-trip for this) ---
+	let activeTab = $state<'upcoming' | 'past'>('upcoming');
 	let searchQuery = $state('');
-	let statusFilter = $state<'all' | 'upcoming' | 'past'>('all');
+	let seasonFilter = $state<number | 'all'>('all');
 	let typeFilter = $state<string[]>([]);
+	let dateFrom = $state('');
+	let dateTo = $state('');
 	let sortBy = $state<'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' | 'volunteers-needed'>('date-desc');
+	let viewMode = $state<'cards' | 'sheet'>('cards');
+
+	// Clicking a sheet-view column header sorts by that column, flipping
+	// direction on a second click of the same column (like a spreadsheet).
+	function sortByColumn(ascKey: typeof sortBy, descKey: typeof sortBy) {
+		sortBy = sortBy === descKey ? ascKey : descKey;
+	}
+
+	function isUpcoming(event: any): boolean {
+		return !!event.date_time && new Date(event.date_time).getTime() >= Date.now();
+	}
+
+	// Same Aug-kickoff convention as the season import - a January 2026
+	// qualifier belongs to the "2025-2026" season, not "2026".
+	function seasonOf(dateValue: string): number {
+		const d = new Date(dateValue);
+		const year = d.getFullYear();
+		return d.getMonth() + 1 >= 8 ? year : year - 1;
+	}
+
+	const upcomingCount = $derived(data.events.filter(isUpcoming).length);
+	const pastCount = $derived(data.events.length - upcomingCount);
 
 	function toggleTypeFilter(type: string) {
 		typeFilter = typeFilter.includes(type) ? typeFilter.filter((t) => t !== type) : [...typeFilter, type];
@@ -114,15 +160,18 @@
 
 	function resetFilters() {
 		searchQuery = '';
-		statusFilter = 'all';
+		seasonFilter = 'all';
 		typeFilter = [];
+		dateFrom = '';
+		dateTo = '';
 		sortBy = 'date-desc';
 	}
 
-	const hasActiveFilters = $derived(!!searchQuery.trim() || statusFilter !== 'all' || typeFilter.length > 0);
+	const hasActiveFilters = $derived(
+		!!searchQuery.trim() || seasonFilter !== 'all' || typeFilter.length > 0 || !!dateFrom || !!dateTo
+	);
 
 	const filteredEvents = $derived.by(() => {
-		const now = Date.now();
 		const query = searchQuery.trim().toLowerCase();
 
 		let list = data.events.filter((event) => {
@@ -130,12 +179,17 @@
 				const haystack = `${event.name ?? ''} ${event.location ?? ''}`.toLowerCase();
 				if (!haystack.includes(query)) return false;
 			}
-			if (statusFilter !== 'all') {
-				const isUpcoming = !!event.date_time && new Date(event.date_time).getTime() >= now;
-				if (statusFilter === 'upcoming' && !isUpcoming) return false;
-				if (statusFilter === 'past' && isUpcoming) return false;
-			}
-			if (typeFilter.length > 0 && !typeFilter.includes(event.type || 'Scrimmage')) return false;
+
+			if (activeTab === 'upcoming' && !isUpcoming(event)) return false;
+			if (activeTab === 'past' && isUpcoming(event)) return false;
+
+			if (typeFilter.length > 0 && !typeFilter.includes(event.type || 'scrimmage')) return false;
+
+			if (seasonFilter !== 'all' && (!event.date_time || seasonOf(event.date_time) !== seasonFilter)) return false;
+
+			if (dateFrom && (!event.date_time || new Date(event.date_time) < new Date(dateFrom))) return false;
+			if (dateTo && (!event.date_time || new Date(event.date_time) > new Date(`${dateTo}T23:59:59`))) return false;
+
 			return true;
 		});
 
@@ -196,7 +250,7 @@
 			<label for="type" class="admin-label">Event type</label>
 			<select id="type" name="type" class="glass-input">
 				{#each TYPE_OPTIONS as opt}
-					<option value={opt}>{opt}</option>
+					<option value={opt.value}>{opt.label}</option>
 				{/each}
 			</select>
 		</div>
@@ -222,7 +276,7 @@
 		</div>
 		<div class="sm:col-span-2">
 			<label for="code" class="admin-label">Event code (URL slug + Robolyst code)</label>
-			<input id="code" name="code" placeholder="e.g. USCTSTQ - leave blank to auto-generate" class="glass-input" />
+			<input id="code" name="eventCode" placeholder="e.g. USCTSTQ - leave blank to auto-generate" class="glass-input" />
 		</div>
 		<div class="flex gap-2 sm:col-span-2">
 			<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Saving…' : 'Create event'}</button>
@@ -231,8 +285,37 @@
 	</form>
 {/snippet}
 
+{#snippet importSeasonForm()}
+	<form
+		method="POST"
+		action="?/importSeason"
+		use:enhance={() => {
+			busy = true;
+			return async ({ update }) => {
+				await update();
+				busy = false;
+			};
+		}}
+		class="flex flex-wrap items-end gap-3"
+	>
+		<div>
+			<label for="season" class="admin-label">Season</label>
+			<select id="season" name="season" class="glass-input w-40">
+				{#each SEASON_OPTIONS as opt}
+					<option value={opt.year}>{opt.label}</option>
+				{/each}
+			</select>
+		</div>
+		<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Pulling…' : 'Pull events'}</button>
+		<button type="button" class="btn-secondary" onclick={() => (showImport = false)}>Close</button>
+	</form>
+	<p class="mt-2 text-xs text-text-muted">
+		Pulls all Connecticut events for that FTC season from the official FTC Events API and adds any that aren't already in your list. Existing events (matched by code) are left untouched.
+	</p>
+{/snippet}
+
 <div class="mx-auto max-w-7xl">
-	<div class="mb-6 flex items-center justify-between">
+	<div class="mb-6 flex items-center justify-between gap-3">
 		<div>
 			<h1 class="text-2xl font-bold tracking-tight text-text-main">Events</h1>
 			<p class="mt-1 text-sm text-text-muted">
@@ -240,7 +323,8 @@
 			</p>
 		</div>
 		{#if canManage}
-			<div>
+			<div class="flex shrink-0 gap-2">
+				<button type="button" class="btn-secondary" onclick={() => (showImport = true)}>Import season</button>
 				<button type="button" class="btn-primary" onclick={() => (showCreate = true)}>New event</button>
 			</div>
 		{/if}
@@ -248,6 +332,27 @@
 
 	{#if form?.error}
 		<div class="error-banner mb-5">{form.error}</div>
+	{:else if form?.imported !== undefined}
+		<div class="mb-5 rounded-xl border-2 border-emerald-600 bg-emerald-50 p-3 text-sm font-bold text-emerald-700">
+			Imported {form.imported} new event{form.imported === 1 ? '' : 's'} out of {form.total} found for that season.
+		</div>
+		{#if form.errors?.length}
+			<div class="mb-5 rounded-xl border-2 border-rose-600 bg-rose-50 p-3 text-xs font-bold text-rose-700 space-y-1.5">
+				<p>{form.errors.length} event{form.errors.length === 1 ? '' : 's'} failed to import:</p>
+				<ul class="list-disc space-y-1 pl-4 font-semibold">
+					{#each form.errors as errMsg}
+						<li>{errMsg}</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
+	{/if}
+
+	{#if canManage && showImport}
+		<div class="glass-panel mb-6 p-6">
+			<h2 class="mb-4 text-sm font-semibold text-text-main">Import season</h2>
+			{@render importSeasonForm()}
+		</div>
 	{/if}
 
 	{#if showCreate}
@@ -256,6 +361,29 @@
 			{@render createEventForm()}
 		</div>
 	{/if}
+
+	<div class="mb-6 flex gap-1 border-b-2 border-black">
+		<button
+			type="button"
+			onclick={() => (activeTab = 'upcoming')}
+			class="-mb-0.5 border-b-4 px-4 py-2.5 text-sm font-black uppercase tracking-wide transition-colors {activeTab ===
+			'upcoming'
+				? 'border-[#2563eb] text-[#2563eb]'
+				: 'border-transparent text-text-muted hover:text-text-main'}"
+		>
+			Upcoming ({upcomingCount})
+		</button>
+		<button
+			type="button"
+			onclick={() => (activeTab = 'past')}
+			class="-mb-0.5 border-b-4 px-4 py-2.5 text-sm font-black uppercase tracking-wide transition-colors {activeTab ===
+			'past'
+				? 'border-[#2563eb] text-[#2563eb]'
+				: 'border-transparent text-text-muted hover:text-text-main'}"
+		>
+			Past ({pastCount})
+		</button>
+	</div>
 
 	<div class="flex flex-col gap-6 md:flex-row">
 		<aside class="glass-panel h-fit w-full shrink-0 space-y-5 p-5 md:w-60">
@@ -272,22 +400,13 @@
 
 			<div class="hidden md:block md:space-y-5">
 				<div>
-					<p class="admin-label mb-2">Status</p>
-					<div class="space-y-1.5">
-						{#each [{ value: 'all', label: 'All' }, { value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }] as opt}
-							<label class="flex items-center gap-2 text-sm font-semibold text-text-main">
-								<input
-									type="radio"
-									name="status-filter"
-									value={opt.value}
-									checked={statusFilter === opt.value}
-									onchange={() => (statusFilter = opt.value as typeof statusFilter)}
-									class="h-4 w-4 accent-[#1d4ed8]"
-								/>
-								{opt.label}
-							</label>
+					<label for="season-filter" class="admin-label">Season</label>
+					<select id="season-filter" bind:value={seasonFilter} class="glass-input">
+						<option value="all">All seasons</option>
+						{#each SEASON_OPTIONS as opt}
+							<option value={opt.year}>{opt.label}</option>
 						{/each}
-					</div>
+					</select>
 				</div>
 
 				<div class="mt-5">
@@ -297,13 +416,21 @@
 							<label class="flex items-center gap-2 text-sm font-semibold text-text-main">
 								<input
 									type="checkbox"
-									checked={typeFilter.includes(opt)}
-									onchange={() => toggleTypeFilter(opt)}
+									checked={typeFilter.includes(opt.value)}
+									onchange={() => toggleTypeFilter(opt.value)}
 									class="h-4 w-4 accent-[#1d4ed8]"
 								/>
-								{opt}
+								{opt.label}
 							</label>
 						{/each}
+					</div>
+				</div>
+
+				<div class="mt-5">
+					<p class="admin-label mb-2">Date range</p>
+					<div class="space-y-2">
+						<input type="date" bind:value={dateFrom} aria-label="From date" class="glass-input" />
+						<input type="date" bind:value={dateTo} aria-label="To date" class="glass-input" />
 					</div>
 				</div>
 
@@ -325,31 +452,144 @@
 		</aside>
 
 		<div class="min-w-0 flex-1">
-			<p class="mb-3 text-xs font-bold text-text-muted">
-				{filteredEvents.length} event{filteredEvents.length === 1 ? '' : 's'}
-			</p>
+			<div class="mb-3 flex items-center justify-between">
+				<p class="text-xs font-bold text-text-muted">
+					{filteredEvents.length} event{filteredEvents.length === 1 ? '' : 's'}
+				</p>
+				<div class="inline-flex overflow-hidden rounded-lg border-2 border-black">
+					<button
+						type="button"
+						onclick={() => (viewMode = 'cards')}
+						aria-label="Card view"
+						class="flex h-7 w-8 items-center justify-center transition-colors {viewMode === 'cards'
+							? 'bg-[#2563eb] text-white'
+							: 'bg-white text-text-main hover:bg-slate-50'}"
+					>
+						<LayoutGrid class="h-3.5 w-3.5" strokeWidth={2.5} />
+					</button>
+					<button
+						type="button"
+						onclick={() => (viewMode = 'sheet')}
+						aria-label="Sheet view"
+						class="flex h-7 w-8 items-center justify-center border-l-2 border-black transition-colors {viewMode === 'sheet'
+							? 'bg-[#2563eb] text-white'
+							: 'bg-white text-text-main hover:bg-slate-50'}"
+					>
+						<Table2 class="h-3.5 w-3.5" strokeWidth={2.5} />
+					</button>
+				</div>
+			</div>
 
+			{#if viewMode === 'sheet'}
+				<div class="glass-panel overflow-x-auto p-0">
+					<table class="w-full min-w-[760px] border-collapse text-sm">
+						<thead>
+							<tr class="border-b-2 border-black bg-[#eef2f7] text-left text-[11px] font-black uppercase tracking-wide text-text-muted">
+								<th class="cursor-pointer select-none px-4 py-2.5" onclick={() => sortByColumn('name-asc', 'name-desc')}>
+									<span class="inline-flex items-center gap-1">
+										Name
+										{#if sortBy === 'name-asc'}<ArrowUp class="h-3 w-3" />{:else if sortBy === 'name-desc'}<ArrowDown class="h-3 w-3" />{/if}
+									</span>
+								</th>
+								<th class="px-4 py-2.5">Type</th>
+								<th class="px-4 py-2.5">Location</th>
+								<th class="cursor-pointer select-none px-4 py-2.5" onclick={() => sortByColumn('date-asc', 'date-desc')}>
+									<span class="inline-flex items-center gap-1">
+										Date
+										{#if sortBy === 'date-asc'}<ArrowUp class="h-3 w-3" />{:else if sortBy === 'date-desc'}<ArrowDown class="h-3 w-3" />{/if}
+									</span>
+								</th>
+								<th class="cursor-pointer select-none px-4 py-2.5" onclick={() => (sortBy = 'volunteers-needed')}>
+									<span class="inline-flex items-center gap-1">
+										Volunteers
+										{#if sortBy === 'volunteers-needed'}<ArrowDown class="h-3 w-3" />{/if}
+									</span>
+								</th>
+								<th class="px-4 py-2.5">Code</th>
+								<th class="px-4 py-2.5 text-right">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each filteredEvents as event (event.id)}
+								<tr class="border-b border-black/10 hover:bg-[#eef2f7]/60">
+									<td class="px-4 py-2.5 font-semibold text-text-main">{event.name}</td>
+									<td class="px-4 py-2.5">
+										<span class="role-badge border border-black/20 bg-white text-text-main">{event.type || 'scrimmage'}</span>
+									</td>
+									<td class="max-w-[14rem] truncate px-4 py-2.5 text-text-muted">{event.location || '—'}</td>
+									<td class="whitespace-nowrap px-4 py-2.5 text-text-muted">
+										{event.date_time ? new Date(event.date_time).toLocaleDateString() : 'TBD'}
+									</td>
+									<td class="px-4 py-2.5 text-text-muted">{event.volunteersNeeded ?? 0}</td>
+									<td class="px-4 py-2.5 font-mono text-xs text-text-muted">{event.eventCode || '—'}</td>
+									<td class="px-4 py-2.5">
+										<div class="flex items-center justify-end gap-1.5">
+											<a
+												href="/events/{event.slug || event.id}"
+												target="_blank"
+												rel="noreferrer"
+												aria-label="View on frontend"
+												title="View on frontend"
+												class="flex h-7 w-7 items-center justify-center rounded-lg border border-black/20 transition-colors hover:bg-slate-50"
+											>
+												<ExternalLink class="h-3.5 w-3.5" strokeWidth={2.5} />
+											</a>
+											{#if canManage}
+												<button type="button" class="btn-secondary px-2 py-1 text-xs" onclick={() => (editingId = event.id)}>Edit</button>
+												<form
+													method="POST"
+													action="?/deleteEvent"
+													use:enhance={({ cancel }) => {
+														if (!confirm('Delete this event? This cannot be undone.')) {
+															cancel();
+															return;
+														}
+														busy = true;
+														return async ({ update }) => {
+															await update();
+															busy = false;
+														};
+													}}
+												>
+													<input type="hidden" name="id" value={event.id} />
+													<button type="submit" disabled={busy} class="btn-danger px-2 py-1 text-xs">Delete</button>
+												</form>
+											{/if}
+										</div>
+									</td>
+								</tr>
+							{:else}
+								<tr>
+									<td colspan="7" class="px-4 py-6 text-center text-sm text-text-muted">
+										{data.events.length === 0 ? 'No events yet.' : 'No events match your filters.'}
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{:else}
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				{#each filteredEvents as event (event.id)}
 			<div class="glass-panel relative overflow-hidden">
 				<div class="flex items-center justify-between gap-2 border-b-2 border-black px-5 py-3 pr-24 {TYPE_STYLES[typeKey(event.type)] ?? 'bg-slate-200'}">
 					<span class="role-badge border-2 border-black bg-white text-text-main">
-						{event.type || 'Scrimmage'}
+						{event.type || 'scrimmage'}
 					</span>
 					<span class="rounded-md border border-black/10 bg-white/90 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-text-main">{dateSlug(event.date_time)}</span>
 				</div>
 
 				<div class="absolute right-3 top-3 z-10 flex items-center gap-2">
-					{#if robolystEventUrl(event.date_time, event.slug)}
+					{#if robolystEventUrl(event.date_time, event.eventCode)}
 						<a
-							href={robolystEventUrl(event.date_time, event.slug)}
+							href={robolystEventUrl(event.date_time, event.eventCode)}
 							target="_blank"
 							rel="noreferrer"
 							aria-label="View on Robolyst"
 							title="View on Robolyst"
 							class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000] transition-all hover:-translate-y-0.5 active:translate-y-0"
 						>
-							<Radar class="h-3.5 w-3.5 text-text-main" strokeWidth={2.5} />
+							<img src="/robolyst-icon.svg" alt="" class="h-3.5 w-3.5 object-contain" />
 						</a>
 					{/if}
 					<a
@@ -478,6 +718,7 @@
 			</p>
 		{/each}
 			</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -510,9 +751,9 @@
 				</div>
 				<div>
 					<label for="edit-type" class="admin-label">Event type</label>
-					<select id="edit-type" name="type" class="glass-input" value={editingEvent.type || 'Scrimmage'}>
+					<select id="edit-type" name="type" class="glass-input" value={editingEvent.type || 'scrimmage'}>
 						{#each TYPE_OPTIONS as opt}
-							<option value={opt}>{opt}</option>
+							<option value={opt.value}>{opt.label}</option>
 						{/each}
 					</select>
 				</div>
@@ -538,7 +779,7 @@
 				</div>
 				<div>
 					<label for="edit-code" class="admin-label">Event code (URL slug + Robolyst code)</label>
-					<input id="edit-code" name="code" class="glass-input" value={editingEvent.slug} />
+					<input id="edit-code" name="eventCode" class="glass-input" value={editingEvent.eventCode} />
 				</div>
 				<div class="flex gap-2">
 					<button type="submit" disabled={busy} class="btn-primary">Save</button>

@@ -9,11 +9,11 @@ interface TownGroup {
 	teams: { teamNumber: number; name: string }[];
 }
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
 	let teamGroups: TownGroup[] = [];
 
 	try {
-		const teams = await getCtTeams();
+		const teams = await getCtTeams(3);
 		const byKey = new Map<string, TownGroup>();
 
 		for (const team of teams) {
@@ -34,5 +34,12 @@ export const load: PageServerLoad = async () => {
 		console.error('Failed to load CT FTC teams for the hero map:', err);
 	}
 
-	return { teamGroups };
+	let sponsors: { id: string; Name: string; Website?: string; Logo?: string }[] = [];
+	try {
+		sponsors = await locals.pb.collection('sponsors').getFullList({ sort: 'Name' });
+	} catch (err) {
+		console.error('Failed to load sponsors for the homepage reel:', err);
+	}
+
+	return { teamGroups, sponsors };
 };

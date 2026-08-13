@@ -1,9 +1,31 @@
 import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { pb } from '$lib/pocketbase';
 import { checkRateLimit } from '$lib/server/rate-limit';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const load: PageServerLoad = async () => {
+	let events: { id: string; name: string; location: string; date_time: string; volunteerLink: string }[] = [];
+
+	try {
+		const records = await pb.collection('events').getFullList({
+			filter: 'date_time >= @now',
+			sort: 'date_time'
+		});
+		events = records.map((record) => ({
+			id: record.id,
+			name: record.name || 'Untitled Event',
+			location: record.location || 'Location TBD',
+			date_time: record.date_time || '',
+			volunteerLink: record.volunteerLink || ''
+		}));
+	} catch (err) {
+		console.error('Failed to load upcoming events for the volunteer carousel:', err);
+	}
+
+	return { events };
+};
 
 export const actions: Actions = {
 	subscribe: async ({ request, getClientAddress }) => {

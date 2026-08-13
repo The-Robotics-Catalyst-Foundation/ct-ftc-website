@@ -4,7 +4,7 @@
     import { page } from '$app/stores';
     import { enhance } from '$app/forms';
     import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
-    import { LayoutDashboard, CalendarDays, MessageSquare, Mail, Users, Bell, BellOff, Plus } from '@lucide/svelte';
+    import { CalendarDays, MessageSquare, Mail, Users, Handshake, Bell, BellOff, Plus } from '@lucide/svelte';
     import Modal from '$lib/components/modal.svelte';
     import { subscribeToPush, syncPushSubscription } from '$lib/client/push';
     import { adminCreateAction } from '$lib/client/adminCreate';
@@ -41,17 +41,17 @@
 
     const navItems = $derived(
         [
-            { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'event_manager', 'photographer'], badge: 0 },
             { href: '/admin/events', label: 'Events', icon: CalendarDays, roles: ['admin', 'event_manager', 'photographer'], badge: 0 },
             { href: '/admin/messages', label: 'Messages', icon: MessageSquare, roles: ['admin', 'event_manager'], badge: data.unrespondedCount },
             { href: '/admin/newsletter', label: 'Newsletter', icon: Mail, roles: ['admin', 'event_manager'], badge: 0 },
+            { href: '/admin/sponsors', label: 'Sponsors', icon: Handshake, roles: ['admin'], badge: 0 },
             { href: '/admin/users', label: 'Users', icon: Users, roles: ['admin'], badge: 0 }
         ].filter((item) => item.roles.includes(data.role))
     );
 
-    // Dashboard stays reachable on mobile via the logo tap - dropping it from
+    // Events stays reachable on mobile via the logo tap - dropping it from
     // the dock frees a slot for the profile picture on small screens.
-    const mobileNavItems = $derived(navItems.filter((item) => item.href !== '/admin/dashboard'));
+    const mobileNavItems = $derived(navItems.filter((item) => item.href !== '/admin/events'));
 
     const roleLabel: Record<string, string> = {
         admin: 'Admin',
@@ -126,7 +126,7 @@
         class:mt-4={!scrolled}
         class:mt-0={scrolled}
     >
-        <a href="/admin/dashboard" class="flex shrink-0 items-center gap-2">
+        <a href="/admin/events" class="flex shrink-0 items-center gap-2">
             <img src="/ctftc.png" alt="CT FIRST Tech Challenge" class="h-12 w-18 rounded-full border-2 border-white  object-contain p-1 invert" />
             <span class="hidden text-sm font-black uppercase tracking-wide text-text-main sm:inline">CT FTC Admin</span>
         </a>

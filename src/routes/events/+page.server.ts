@@ -29,6 +29,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
             upcoming: upcomingRecords.map(record => ({
                 id: record.id,
                 slug: record.slug || '',
+                eventCode: record.eventCode || '',
                 name: record.name || 'Untitled Event',
                 type: record.type || 'Scrimmage', // If 'type' doesn't exist yet, it safely fallbacks
                 location: record.location || 'Location Pending',
@@ -40,6 +41,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
             past: pastRecords.map(record => ({
                 id: record.id,
                 slug: record.slug || '',
+                eventCode: record.eventCode || '',
                 name: record.name || 'Untitled Event',
                 type: record.type || 'Scrimmage',
                 location: record.location || 'Location Pending',

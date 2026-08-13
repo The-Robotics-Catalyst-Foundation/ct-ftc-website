@@ -35,6 +35,14 @@
     };
   });
 
+  // Inquiry Topic Chips
+  const topics = [
+    { value: 'general', label: 'General Inquiry' },
+    { value: 'team', label: 'Team Support' },
+    { value: 'volunteer', label: 'Volunteering' },
+    { value: 'sponsorship', label: 'Sponsorship' }
+  ];
+
   // Social Channels Array
   const socials = [
     { 
@@ -98,7 +106,7 @@
             </div>
             <div class="space-y-1">
               <h4 class="font-black text-black uppercase text-sm tracking-tight">Email Addresses</h4>
-              <p class="text-slate-600 text-xs font-bold"> <a href="mailto:contact@connecticutftc.org" class="text-[#2563eb] hover:underline">contact@connecticutftc.org</a></p>
+              <p class="text-slate-600 text-xs font-bold"> <a href="mailto:robcormier@firstpartners.org" class="text-[#2563eb] hover:underline">robcormier@firstpartners.org</a></p>
             </div>
           </div>
         </div>
@@ -169,15 +177,24 @@
               </div>
 
               <div class="space-y-2 text-left">
-                <label for="cat" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Inquiry Topic</label>
-                <div class="relative">
-                  <select id="cat" name="category" bind:value={category} disabled={isSubmitting} class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none appearance-none focus:border-[#2563eb] transition-colors cursor-pointer disabled:opacity-50">
-                    <option value="general">General Inquiry</option>
-                    <option value="team">Team Support</option>
-                    <option value="volunteer">Volunteering</option>
-                    <option value="sponsorship">Sponsorship</option>
-                  </select>
-                  <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none font-black text-xs opacity-60">▼</div>
+                <span id="cat-label" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Inquiry Topic</span>
+                <input type="hidden" name="category" value={category} />
+                <div role="radiogroup" aria-labelledby="cat-label" class="flex flex-wrap gap-2">
+                  {#each topics as topic}
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={category === topic.value}
+                      disabled={isSubmitting}
+                      onclick={() => (category = topic.value)}
+                      class="px-4 py-2 rounded-full border-2 border-black text-xs font-black uppercase tracking-wide transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                        {category === topic.value
+                          ? 'bg-[#2563eb] text-white box-shadow-flat'
+                          : 'bg-white text-black hover:bg-[#eef2f7]'}"
+                    >
+                      {topic.label}
+                    </button>
+                  {/each}
                 </div>
               </div>
 

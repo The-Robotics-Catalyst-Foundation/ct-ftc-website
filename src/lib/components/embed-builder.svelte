@@ -6,6 +6,7 @@
 	let {
 		id,
 		slug,
+		eventCode,
 		name,
 		type,
 		location,
@@ -15,6 +16,7 @@
 	}: {
 		id: string;
 		slug?: string;
+		eventCode?: string;
 		name: string;
 		type?: string;
 		location?: string;
@@ -86,6 +88,7 @@
 				<EventCard
 					{id}
 					{slug}
+					{eventCode}
 					{name}
 					{type}
 					{location}

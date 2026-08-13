@@ -1,5 +1,6 @@
 <script>
   import { browser } from '$app/environment';
+  import { pb } from '$lib/pocketbase';
   import Head from '$lib/components/head.svelte';
   import Carousel from '$lib/components/carousel.svelte';
   import TeamMap from '$lib/components/team-map.svelte';
@@ -271,6 +272,42 @@
     </div>
   </section>
 
+  {#if data.sponsors?.length}
+    <section class="py-16 px-6 border-t-4 border-black bg-white overflow-hidden">
+      <div class="max-w-7xl mx-auto text-center mb-8">
+        <span class="text-xs font-black text-[#2563eb] bg-[#eef2f7] border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Thank You</span>
+        <h3 class="text-2xl font-black text-black uppercase tracking-tight mt-3">Our Sponsors</h3>
+      </div>
+      <div class="sponsor-marquee">
+        <div class="sponsor-track" style="animation-duration: {Math.max(data.sponsors.length * 8, 20)}s">
+          {#each [...data.sponsors, ...data.sponsors] as sponsor, i (sponsor.id + '-' + i)}
+            {#if sponsor.Website}
+              <a
+                href={sponsor.Website}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="sponsor-chip"
+                tabindex={i < data.sponsors.length ? 0 : -1}
+              >
+                {#if sponsor.Logo}
+                  <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
+                {/if}
+                <span class="sponsor-name">{sponsor.Name}</span>
+              </a>
+            {:else}
+              <div class="sponsor-chip" aria-hidden={i >= data.sponsors.length}>
+                {#if sponsor.Logo}
+                  <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
+                {/if}
+                <span class="sponsor-name">{sponsor.Name}</span>
+              </div>
+            {/if}
+          {/each}
+        </div>
+      </div>
+    </section>
+  {/if}
+
 </main>
 
 <style>
@@ -329,5 +366,70 @@
 
   .box-shadow-flat-hover {
     box-shadow: 10px 10px 0px 0px #000000;
+  }
+
+  /* Sponsor Reel - Continuous Left-to-Right Sliding Marquee */
+  .sponsor-marquee {
+    width: 100%;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .sponsor-track {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: max-content;
+    animation-name: sponsor-scroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .sponsor-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes sponsor-scroll {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0%);
+    }
+  }
+
+  .sponsor-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1.5rem;
+    border: 2px solid #000;
+    border-radius: 9999px;
+    background: #eef2f7;
+    box-shadow: 4px 4px 0px 0px #000;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  a.sponsor-chip:hover {
+    transform: translateY(-2px);
+  }
+
+  .sponsor-logo {
+    height: 2.25rem;
+    width: 2.25rem;
+    object-fit: contain;
+    border-radius: 0.4rem;
+    background: white;
+  }
+
+  .sponsor-name {
+    font-weight: 900;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #1a1a1a;
   }
 </style>

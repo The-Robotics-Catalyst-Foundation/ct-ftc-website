@@ -7,6 +7,33 @@ export interface FtcTeam {
 	schoolName: string;
 }
 
+export interface FtcEvent {
+	code: string;
+	name: string;
+	typeName: string;
+	venue: string;
+	city: string;
+	stateprov: string;
+	dateStart: string;
+	dateEnd: string;
+}
+
+interface RawEvent {
+	code: string;
+	name?: string;
+	typeName?: string;
+	venue?: string;
+	city?: string;
+	stateprov?: string;
+	dateStart?: string;
+	dateEnd?: string;
+}
+
+interface EventsResponse {
+	events: RawEvent[];
+	eventCount: number;
+}
+
 interface RawTeam {
 	teamNumber: number;
 	nameShort?: string;
@@ -34,7 +61,7 @@ function currentSeason(): number {
 	return now.getUTCMonth() + 1 >= 8 ? year : year - 1;
 }
 
-let cache: { season: number; teams: FtcTeam[]; fetchedAt: number } | null = null;
+let cache: { key: string; teams: FtcTeam[]; fetchedAt: number } | null = null;
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 async function fetchPage(season: number, page: number): Promise<TeamsResponse> {
@@ -55,13 +82,7 @@ async function fetchPage(season: number, page: number): Promise<TeamsResponse> {
 	return res.json();
 }
 
-export async function getCtTeams(): Promise<FtcTeam[]> {
-	const season = currentSeason();
-
-	if (cache && cache.season === season && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
-		return cache.teams;
-	}
-
+async function fetchSeasonTeams(season: number): Promise<FtcTeam[]> {
 	const teams: FtcTeam[] = [];
 	let page = 1;
 	let pageTotal = 1;
@@ -80,6 +101,67 @@ export async function getCtTeams(): Promise<FtcTeam[]> {
 		page += 1;
 	} while (page <= pageTotal);
 
-	cache = { season, teams, fetchedAt: Date.now() };
 	return teams;
+}
+
+// Pulls CT teams across the last `seasonsBack` seasons (default 3) rather than
+// just the current one, so the homepage map still shows teams that competed
+// recently but haven't registered yet for the season currently in progress.
+export async function getCtTeams(seasonsBack = 3): Promise<FtcTeam[]> {
+	const latestSeason = currentSeason();
+	const cacheKey = `${latestSeason}:${seasonsBack}`;
+
+	if (cache && cache.key === cacheKey && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
+		return cache.teams;
+	}
+
+	const seasons = Array.from({ length: seasonsBack }, (_, i) => latestSeason - i);
+
+	// Oldest season first so that when a team appears in more than one
+	// season, the most recent season's name/city overwrites older data.
+	const byTeamNumber = new Map<number, FtcTeam>();
+	for (const season of [...seasons].reverse()) {
+		try {
+			const teams = await fetchSeasonTeams(season);
+			for (const team of teams) byTeamNumber.set(team.teamNumber, team);
+		} catch (err) {
+			console.error(`Failed to fetch FTC teams for season ${season}:`, err);
+		}
+	}
+
+	const teams = Array.from(byTeamNumber.values());
+	cache = { key: cacheKey, teams, fetchedAt: Date.now() };
+	return teams;
+}
+
+export async function getCtEvents(season: number): Promise<FtcEvent[]> {
+	const token = Buffer.from(`${FTC_API_USERNAME}:${FTC_API_KEY}`).toString('base64');
+	// Unlike /teams, the /events endpoint's `state` query param is silently
+	// ignored by the FTC API - it always returns every event worldwide for
+	// the season, so CT has to be filtered client-side below.
+	const url = `${BASE_URL}/${season}/events`;
+
+	const res = await fetch(url, {
+		headers: {
+			Authorization: `Basic ${token}`,
+			Accept: 'application/json'
+		}
+	});
+
+	if (!res.ok) {
+		throw new Error(`FTC Events API returned ${res.status} for season ${season}`);
+	}
+
+	const data: EventsResponse = await res.json();
+
+	return data.events.filter((e) => e.stateprov === 'CT').map((e) => ({
+		code: e.code,
+		name: e.name || e.code,
+		typeName: e.typeName ?? '',
+		venue: e.venue ?? '',
+		city: e.city ?? '',
+		stateprov: e.stateprov ?? '',
+		dateStart: e.dateStart ?? '',
+		dateEnd: e.dateEnd ?? ''
+	}));
 }

@@ -15,6 +15,7 @@
 	<EventCard
 		id={data.event.id}
 		slug={data.event.slug}
+		eventCode={data.event.eventCode}
 		name={data.event.name}
 		type={data.event.type}
 		location={data.event.location}

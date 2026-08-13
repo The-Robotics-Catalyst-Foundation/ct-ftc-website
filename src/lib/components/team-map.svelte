@@ -138,29 +138,66 @@
         badge.textContent = String(count);
         el.appendChild(badge);
 
+        const teamsHtml = group.teams
+          .map(
+            (t) => `
+              <li>
+                <a href="https://robolyst.org/team/ftc/${t.teamNumber}" target="_blank" rel="noopener noreferrer">
+                  <span class="team-map-popup-num">#${t.teamNumber}</span> ${escapeHtml(t.name)}
+                </a>
+              </li>
+            `
+          )
+          .join('');
+
         const popupHtml = `
           <div class="team-map-popup">
             <div class="team-map-popup-title">${escapeHtml(group.city)}</div>
-            <div class="team-map-popup-count">${count} team${count === 1 ? '' : 's'}</div>
+            <ul class="team-map-popup-teams">${teamsHtml}</ul>
           </div>
         `;
 
-        const popup = new maplibregl.Popup({ offset: 18, closeButton: false, maxWidth: '240px' }).setHTML(
+        const popup = new maplibregl.Popup({ offset: 18, closeButton: false, maxWidth: '260px' }).setHTML(
           popupHtml
         );
 
         new maplibregl.Marker({ element: el }).setLngLat([group.lng, group.lat]).addTo(map!);
 
         // Popup opens on hover (desktop) and stays tappable on touch devices,
-        // rather than MapLibre's default click-to-toggle on the marker.
-        const showPopup = () => popup.setLngLat([group.lng, group.lat]).addTo(map!);
-        const hidePopup = () => popup.remove();
+        // rather than MapLibre's default click-to-toggle on the marker. Since
+        // the popup now holds clickable team links, closing is delayed and
+        // cancelled if the pointer moves from the pin into the popup itself.
+        let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+        const cancelHide = () => {
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+          }
+        };
+
+        const scheduleHide = () => {
+          cancelHide();
+          hideTimeout = setTimeout(() => popup.remove(), 150);
+        };
+
+        const showPopup = () => {
+          cancelHide();
+          popup.setLngLat([group.lng, group.lat]).addTo(map!);
+          const popupEl = popup.getElement();
+          popupEl?.addEventListener('mouseenter', cancelHide);
+          popupEl?.addEventListener('mouseleave', scheduleHide);
+        };
 
         el.addEventListener('mouseenter', showPopup);
-        el.addEventListener('mouseleave', hidePopup);
+        el.addEventListener('mouseleave', scheduleHide);
         el.addEventListener('click', () => {
-          if (popup.isOpen()) hidePopup();
-          else showPopup();
+          if (popup.isOpen()) {
+            cancelHide();
+            popup.remove();
+          } else {
+            showPopup();
+          }
         });
       } catch (err) {
         console.error('Failed to add team map pin for', group.city, err);
@@ -336,9 +373,30 @@
     color: #000;
     margin-bottom: 0.35rem;
   }
-  :global(.team-map-popup-count) {
+  :global(.team-map-popup-teams) {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-height: 9rem;
+    overflow-y: auto;
+  }
+  :global(.team-map-popup-teams a) {
+    display: block;
     font-size: 0.75rem;
-    font-weight: 900;
+    font-weight: 800;
+    color: #1a1a1a;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  :global(.team-map-popup-teams a:hover) {
     color: #2563eb;
+    text-decoration: underline;
+  }
+  :global(.team-map-popup-num) {
+    color: #2563eb;
+    font-weight: 900;
   }
 </style>
