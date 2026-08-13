@@ -61,11 +61,6 @@
 
 <svelte:window bind:scrollY on:mousemove={handleMouseMove} />
 
-<Head
-  title="Home"
-  description="Connecticut FIRST Tech Challenge - Inspiring the Next Generation of Innovators and Engineers. Explore our events, teams, and volunteer opportunities to get involved in the excitement of robotics competitions across the state."
-/>
-
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] font-sans perspective-container overflow-x-hidden">
 
   <section class="relative min-h-[100vh] flex items-center justify-center py-20 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#d8e2ef] overflow-hidden">
@@ -75,8 +70,17 @@
     <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-16 items-center relative z-10 w-full">
 
       <div class="lg:col-span-6 space-y-8 text-left" style="transform: translateY({parallaxHeroY}px)">
+        <img
+          src="/ftc-logo.png"
+          alt="FIRST Tech Challenge"
+          width="744"
+          height="188"
+          fetchpriority="high"
+          class="w-full object-contain max-h-20 object-left"
+        />
+
         <h1 class="text-5xl md:text-7xl font-black text-black leading-[0.95] tracking-tighter uppercase">
-          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FIRST Tech Challenge Logo" width="744" height="188" class="w-full object-contain max-h-32"> <br />
+          FIRST Tech Challenge <br />
           <span class="text-[#2563eb] bg-white border-4 border-black px-3 inline-block my-2 box-shadow-flat transform rotate-1">Right Here in Connecticut!</span>
         </h1>
 

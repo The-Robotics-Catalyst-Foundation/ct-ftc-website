@@ -2,6 +2,8 @@
     import { onMount } from 'svelte';
     import { CircleHelp, X } from '@lucide/svelte';
 
+    let { data } = $props();
+
     // --- SVELTE 5 STATE RUNES ---
     let isLoaded = $state(false);
     let scrollY = $state(0);
@@ -119,6 +121,30 @@
         </div>
     </section>
 
+    {#if data.teams.length}
+        <section class="relative z-20 mx-auto max-w-7xl px-6 pb-16">
+            <h2 class="mb-6 text-3xl font-black tracking-tighter text-black uppercase md:text-4xl">
+                All {data.teams.length} Connecticut teams
+            </h2>
+
+            <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {#each data.teams as team (team.teamNumber)}
+                    <li
+                        class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-3"
+                    >
+                        <span class="text-xs font-black tracking-widest text-[#2563eb] uppercase"
+                            >Team {team.teamNumber}</span
+                        >
+                        <p class="text-sm font-black text-slate-900">{team.name}</p>
+                        {#if team.city}
+                            <p class="text-xs font-bold text-slate-600">{team.city}, CT</p>
+                        {/if}
+                    </li>
+                {/each}
+            </ul>
+        </section>
+    {/if}
+
 </main>
 
 <style>
@@ -152,5 +178,9 @@
     /* Flat Brutalist Static Shadow Trims */
     .box-shadow-flat {
         box-shadow: 6px 6px 0px 0px #000000;
+    }
+
+    .box-shadow-mini {
+        box-shadow: 3px 3px 0px 0px #000000;
     }
 </style>

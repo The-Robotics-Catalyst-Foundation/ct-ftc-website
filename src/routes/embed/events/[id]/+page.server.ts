@@ -27,6 +27,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			dateTime: record.date_time || '',
 			volunteersNeeded: record.volunteersNeeded ?? 0
 		},
+		title: record.name || 'Untitled Event',
 		showName: url.searchParams.get('name') !== '0'
 	};
 };

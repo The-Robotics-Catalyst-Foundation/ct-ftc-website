@@ -4,6 +4,7 @@
   import { enhance } from '$app/forms';
   import Head from '$lib/components/head.svelte';
   import { Wrench, Scale, ClipboardList, Coffee, Mail, Calendar, MapPin, ChevronLeft, ChevronRight } from '@lucide/svelte';
+  import { Wrench, Scale, ClipboardList, Coffee, Mail } from '@lucide/svelte';
 
   let { data, form: newsletterForm } = $props();
 
@@ -87,21 +88,12 @@
 
 <svelte:window bind:scrollY />
 
-<svelte:head>
-  <title>Volunteer Registration | Connecticut FTC</title>
-</svelte:head>
-
-<Head 
-  title="Volunteer Opportunities" 
-  description="Join our team of dedicated volunteers making a difference in the lives of young robotics enthusiasts across Connecticut." 
-/>
-
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
   <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none" style="background-position: {backgroundScrollX}px 0px;"></div>
 
   <section class="relative min-h-[50vh] flex items-center justify-center pt-24 pb-16 px-6 border-b-4 border-black bg-gradient-to-br from-[#eef2f7] to-[#e2ebf5]">
     <div class="max-w-4xl mx-auto text-center space-y-6 z-10" style="transform: translateY({parallaxHeroY}px)">
-      
+
       <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black bg-[#facc15] border-2 border-black px-4 py-2 box-shadow-flat transform -rotate-1">
         Volunteer in Connecticut
       </span>
@@ -325,28 +317,28 @@
 <style>
   .bg-grid-pattern {
     background-size: 40px 40px;
-    background-image: 
+    background-image:
       linear-gradient(to right, #000000 1px, transparent 1px),
       linear-gradient(to bottom, #000000 1px, transparent 1px);
   }
 
   .shadow-neumorphic-outer {
-    box-shadow: 
-      12px 12px 28px #bebebe, 
+    box-shadow:
+      12px 12px 28px #bebebe,
       -12px -12px 28px #ffffff,
       inset 1px 1px 0px rgba(255,255,255,0.9);
   }
 
   .shadow-neumorphic-inner {
-    box-shadow: 
-      inset 6px 6px 12px #d1d9e6, 
+    box-shadow:
+      inset 6px 6px 12px #d1d9e6,
       inset -6px -6px 12px #ffffff;
   }
 
   .shadow-skeuo {
     box-shadow: 0px 4px 0px #1d4ed8, 4px 8px 16px rgba(0, 0, 0, 0.15);
   }
-  
+
   .skeuo-button:hover {
     box-shadow: 0px 3px 0px #1d4ed8, 2px 6px 12px rgba(0, 0, 0, 0.12);
   }

@@ -6,19 +6,28 @@ const STATIC_PATHS = ['/', '/events', '/teams', '/volunteer', '/contact', '/faq'
 export const GET: RequestHandler = async ({ url }) => {
 	const origin = url.origin;
 
-	let eventPaths: string[] = [];
+	let entries: { path: string; lastmod?: string }[] = STATIC_PATHS.map((path) => ({ path }));
+
 	try {
-		const events = await pb.collection('events').getFullList({ fields: 'id,slug' });
-		eventPaths = events.map((e) => `/events/${e.slug || e.id}`);
+		const events = await pb.collection('events').getFullList({ fields: 'id,slug,updated' });
+		entries = entries.concat(
+			events.map((e) => ({
+				path: `/events/${e.slug || e.id}`,
+				lastmod: e.updated ? new Date(e.updated).toISOString() : undefined
+			}))
+		);
 	} catch (err) {
 		console.error('Failed to load events for sitemap:', err);
 	}
 
-	const urls = [...STATIC_PATHS, ...eventPaths];
-
 	const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((path) => `  <url><loc>${origin}${path}</loc></url>`).join('\n')}
+${entries
+	.map(
+		({ path, lastmod }) =>
+			`  <url><loc>${origin}${path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`
+	)
+	.join('\n')}
 </urlset>
 `;
 

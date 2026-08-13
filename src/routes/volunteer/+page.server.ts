@@ -26,6 +26,11 @@ export const load: PageServerLoad = async () => {
 
 	return { events };
 };
+export const load: PageServerLoad = () => ({
+	title: 'Volunteer Opportunities',
+	description:
+		'Volunteer at Connecticut FIRST Tech Challenge events - referee, judge, inspector, or event support. No robotics experience needed, training provided.'
+});
 
 export const actions: Actions = {
 	subscribe: async ({ request, getClientAddress }) => {

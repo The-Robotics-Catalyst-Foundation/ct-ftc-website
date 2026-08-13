@@ -4,10 +4,6 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>{data.name} - Photos | CT FTC</title>
-</svelte:head>
-
 <div class="min-h-screen bg-[#f8fafc]">
 	<header class="border-b-2 border-black bg-white px-6 py-4">
 		<a href="/" class="mx-auto flex max-w-5xl items-center gap-3 no-underline">

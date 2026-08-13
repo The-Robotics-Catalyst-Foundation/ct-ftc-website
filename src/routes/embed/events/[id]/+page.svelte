@@ -6,10 +6,6 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>{data.event.name} | CT FTC</title>
-</svelte:head>
-
 <div class="mx-auto max-w-sm p-3">
 	<EmbedHeader />
 	<EventCard

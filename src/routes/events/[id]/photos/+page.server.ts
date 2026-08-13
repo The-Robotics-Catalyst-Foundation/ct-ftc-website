@@ -24,6 +24,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	return {
 		name: record.name || 'Untitled Event',
+		title: `${record.name || 'Untitled Event'} - Photos`,
 		eventPath: `/events/${record.slug || record.id}`,
 		pics
 	};
