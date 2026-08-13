@@ -1,7 +1,6 @@
 <script>
   import { browser } from '$app/environment';
   import { pb } from '$lib/pocketbase';
-  import Head from '$lib/components/head.svelte';
   import Carousel from '$lib/components/carousel.svelte';
   import TeamMap from '$lib/components/team-map.svelte';
   import { Calendar, ChartColumn, Handshake, Wrench, Megaphone, Users, Share2 } from '@lucide/svelte';

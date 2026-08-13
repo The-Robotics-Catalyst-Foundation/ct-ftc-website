@@ -2,9 +2,7 @@
   import { onMount } from 'svelte';
   import { slide, fly } from 'svelte/transition';
   import { enhance } from '$app/forms';
-  import Head from '$lib/components/head.svelte';
   import { Wrench, Scale, ClipboardList, Coffee, Mail, Calendar, MapPin, ChevronLeft, ChevronRight } from '@lucide/svelte';
-  import { Wrench, Scale, ClipboardList, Coffee, Mail } from '@lucide/svelte';
 
   let { data, form: newsletterForm } = $props();
 
