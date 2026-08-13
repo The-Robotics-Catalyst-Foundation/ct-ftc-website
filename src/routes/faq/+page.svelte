@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Head from '$lib/components/head.svelte';
-
   const faqs = [
     {
       question: 'How do I volunteer for a CT FTC event?',
@@ -44,14 +42,8 @@
 </script>
 
 <svelte:head>
-  <title>Frequently Asked Questions | Connecticut FTC</title>
   {@html `<script type="application/ld+json">${faqJsonLd}</script>`}
 </svelte:head>
-
-<Head
-  title="Frequently Asked Questions"
-  description="Answers to common questions about volunteering, joining a team, and FIRST Tech Challenge in Connecticut."
-/>
 
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 pt-28 overflow-x-hidden relative">
   <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none"></div>

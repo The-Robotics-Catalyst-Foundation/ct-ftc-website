@@ -30,10 +30,15 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 
 function buildData(event: Record<string, any>) {
 	const dateLabel = event.date_time ? new Date(event.date_time).toLocaleDateString() : 'TBD';
+	// Events answer on both the record id and the slug - point both at the slug
+	// so the two URLs don't compete as duplicates.
+	const path = `/events/${event.slug || event.id}`;
 	return {
 		event,
 		title: event.name,
 		description: `${event.name} - ${event.location || 'Connecticut FTC event'} on ${dateLabel}.`,
-		image: `/events/${event.slug || event.id}/og.png`
+		image: `${path}/og.png`,
+		imageAlt: `${event.name} - Connecticut FTC event`,
+		canonical: path
 	};
 }

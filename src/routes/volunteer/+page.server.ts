@@ -1,9 +1,15 @@
 import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { pb } from '$lib/pocketbase';
 import { checkRateLimit } from '$lib/server/rate-limit';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const load: PageServerLoad = () => ({
+	title: 'Volunteer Opportunities',
+	description:
+		'Volunteer at Connecticut FIRST Tech Challenge events - referee, judge, inspector, or event support. No robotics experience needed, training provided.'
+});
 
 export const actions: Actions = {
 	subscribe: async ({ request, getClientAddress }) => {

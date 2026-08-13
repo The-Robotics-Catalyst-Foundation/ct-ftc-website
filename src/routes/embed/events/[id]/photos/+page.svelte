@@ -6,10 +6,6 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-	<title>{data.name} - Photos | CT FTC</title>
-</svelte:head>
-
 <div class="p-4">
 	{#if data.showNav}
 		<EmbedHeader title={data.name} showName={data.showName} />

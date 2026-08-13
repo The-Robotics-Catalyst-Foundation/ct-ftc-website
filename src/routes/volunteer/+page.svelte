@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import { slide, fly } from 'svelte/transition';
   import { enhance } from '$app/forms';
-  import Head from '$lib/components/head.svelte';
   import { Wrench, Scale, ClipboardList, Coffee, Mail } from '@lucide/svelte';
 
   let { form: newsletterForm } = $props();
@@ -71,15 +70,6 @@
 </script>
 
 <svelte:window bind:scrollY />
-
-<svelte:head>
-  <title>Volunteer Registration | Connecticut FTC</title>
-</svelte:head>
-
-<Head 
-  title="Volunteer Opportunities" 
-  description="Join our team of dedicated volunteers making a difference in the lives of young robotics enthusiasts across Connecticut." 
-/>
 
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] pb-24 overflow-x-hidden relative">
   <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none" style="background-position: {backgroundScrollX}px 0px;"></div>

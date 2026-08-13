@@ -15,10 +15,6 @@
 
 <svelte:window bind:scrollY />
 
-<svelte:head>
-  <title>Page Not Found | Connecticut FTC</title>
-</svelte:head>
-
 <main class="bg-[#eef2f7] min-h-screen text-[#1a1a1a] flex items-center justify-center p-6 overflow-x-hidden relative">
   <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none"></div>
 
