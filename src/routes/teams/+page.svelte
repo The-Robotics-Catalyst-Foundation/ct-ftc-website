@@ -112,15 +112,6 @@
         </div>
     </section>
 
-    <section class="relative z-20 mx-auto max-w-7xl px-6 py-16">
-        <div class="box-shadow-flat overflow-hidden rounded-[2.5rem] border-4 border-black bg-white p-6">
-            <div data-robolyst-embed="https://robolyst.org/e/up37jdf" data-height="600">
-                <a href="https://robolyst.org/location/Connecticut">Robolyst — Connecticut</a>
-            </div>
-            <script src="https://robolyst.org/embed.js" async></script>
-        </div>
-    </section>
-
     {#if data.teams.length}
         <section class="relative z-20 mx-auto max-w-7xl px-6 pb-16">
             <h2 class="mb-6 text-3xl font-black tracking-tighter text-black uppercase md:text-4xl">

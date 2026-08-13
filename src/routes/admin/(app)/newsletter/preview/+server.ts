@@ -16,6 +16,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 	const message = String(body.message ?? '').trim() || 'Your message will appear here.';
 	const templateId = String(body.template ?? 'simple');
 	const eventId = String(body.eventId ?? '');
+	const imageUrl = typeof body.imageDataUrl === 'string' && body.imageDataUrl ? body.imageDataUrl : null;
 
 	let eventInfo = null;
 	if (eventId) {
@@ -32,6 +33,6 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 		}
 	}
 
-	const { html } = getTemplate(templateId).render({ message: composeMessage(message), event: eventInfo, origin: url.origin });
+	const { html } = getTemplate(templateId).render({ message: composeMessage(message), event: eventInfo, origin: url.origin, imageUrl });
 	return json({ html });
 };

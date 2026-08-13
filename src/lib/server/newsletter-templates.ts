@@ -9,6 +9,9 @@ export interface RenderNewsletterOpts {
 	message: string;
 	event?: NewsletterEventInfo | null;
 	origin: string;
+	// `cid:...` when actually sending (matches the inline Resend attachment),
+	// or a `data:` URL for the live preview - either renders fine in an <img>.
+	imageUrl?: string | null;
 }
 
 export interface NewsletterTemplate {
@@ -66,6 +69,15 @@ const WRAPPER_OPEN = `
 				<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;">
 `;
 
+const bannerImage = (imageUrl?: string | null) =>
+	imageUrl
+		? `<tr>
+				<td style="padding:0;">
+					<img src="${imageUrl}" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;">
+				</td>
+			</tr>`
+		: '';
+
 const WRAPPER_CLOSE = `
 				</table>
 			</td>
@@ -79,10 +91,11 @@ const simple: NewsletterTemplate = {
 	id: 'simple',
 	name: 'Simple Update',
 	description: 'Clean, minimal letter format. Best for quick reminders and short notes.',
-	render({ message, origin }) {
+	render({ message, origin, imageUrl }) {
 		return {
 			subject: 'CT FTC Volunteer Update',
 			html: `${WRAPPER_OPEN}
+				${bannerImage(imageUrl)}
 				<tr>
 					<td style="padding:32px 32px 8px;font-family:Arial,Helvetica,sans-serif;">
 						<p style="margin:0;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">CT FIRST Tech Challenge</p>
@@ -104,11 +117,12 @@ const eventAnnouncement: NewsletterTemplate = {
 	id: 'event',
 	name: 'Event Announcement',
 	description: 'Highlights one event in a card with a register button. Best when you pick an event above.',
-	render({ message, event, origin }) {
+	render({ message, event, origin, imageUrl }) {
 		const link = event?.link || `${origin}/volunteer`;
 		return {
 			subject: event ? `Volunteers needed: ${event.name}` : 'CT FTC Volunteer Update',
 			html: `${WRAPPER_OPEN}
+				${bannerImage(imageUrl)}
 				<tr>
 					<td style="padding:32px 32px 0;font-family:Arial,Helvetica,sans-serif;">
 						<p style="margin:0;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">CT FIRST Tech Challenge</p>
@@ -157,11 +171,12 @@ const bold: NewsletterTemplate = {
 	id: 'bold',
 	name: 'Bold Announcement',
 	description: 'High-contrast, brand-matched design with a black header and yellow accent. Best for big calls to action.',
-	render({ message, event, origin }) {
+	render({ message, event, origin, imageUrl }) {
 		const link = event?.link || `${origin}/volunteer`;
 		return {
 			subject: event ? `${event.name} needs volunteers!` : 'CT FTC Volunteer Update',
 			html: `${WRAPPER_OPEN}
+				${bannerImage(imageUrl)}
 				<tr>
 					<td style="padding:28px 32px;background:#0f172a;">
 						<p style="margin:0;font-size:12px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#facc15;font-family:Arial,Helvetica,sans-serif;">CT First Tech Challenge</p>

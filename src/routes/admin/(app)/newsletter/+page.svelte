@@ -14,6 +14,25 @@
 	let previewLoading = $state(false);
 	let previewTimeout: ReturnType<typeof setTimeout> | null = null;
 
+	let imageInput: HTMLInputElement | undefined = $state();
+	let imageDataUrl = $state<string | null>(null);
+
+	function handleImageChange() {
+		const file = imageInput?.files?.[0];
+		if (!file) {
+			imageDataUrl = null;
+			return;
+		}
+		const reader = new FileReader();
+		reader.onload = () => (imageDataUrl = reader.result as string);
+		reader.readAsDataURL(file);
+	}
+
+	function removeImage() {
+		if (imageInput) imageInput.value = '';
+		imageDataUrl = null;
+	}
+
 	function formatDate(value: string) {
 		if (!value) return 'TBD';
 		return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -34,7 +53,10 @@
 
 	function applyEvent() {
 		const event = data.events.find((e) => e.id === selectedEventId);
-		if (!event) return;
+		if (!event) {
+			message = data.defaultTemplate;
+			return;
+		}
 		const eventLink = `${data.origin}/events/${event.slug || event.id}`;
 		message = data.defaultTemplate
 			.replace('{Event Name}', event.name)
@@ -50,7 +72,7 @@
 			const res = await fetch('/admin/newsletter/preview', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message, template: selectedTemplate, eventId: selectedEventId })
+				body: JSON.stringify({ message, template: selectedTemplate, eventId: selectedEventId, imageDataUrl })
 			});
 			if (res.ok) {
 				const payload = await res.json();
@@ -72,6 +94,7 @@
 		message;
 		selectedTemplate;
 		selectedEventId;
+		imageDataUrl;
 		schedulePreview();
 	});
 </script>
@@ -133,17 +156,12 @@
 		<div class="glass-panel space-y-4 p-6">
 			<div>
 				<label for="event" class="admin-label">Fill in from an upcoming event</label>
-				<div class="flex gap-2">
-					<select id="event" bind:value={selectedEventId} class="glass-input">
-						<option value="">Choose an event…</option>
-						{#each data.events as event (event.id)}
-							<option value={event.id}>{event.name}</option>
-						{/each}
-					</select>
-					<button type="button" class="btn-secondary shrink-0" onclick={applyEvent} disabled={!selectedEventId}>
-						Fill in
-					</button>
-				</div>
+				<select id="event" bind:value={selectedEventId} onchange={applyEvent} class="glass-input">
+					<option value="">Choose an event…</option>
+					{#each data.events as event (event.id)}
+						<option value={event.id}>{event.name}</option>
+					{/each}
+				</select>
 			</div>
 
 			<div>
@@ -168,6 +186,7 @@
 			<form
 				method="POST"
 				action="?/send"
+				enctype="multipart/form-data"
 				use:enhance={() => {
 					busy = true;
 					return async ({ update }) => {
@@ -182,6 +201,26 @@
 				<div>
 					<label for="message" class="admin-label">Message</label>
 					<textarea id="message" name="message" rows="6" class="glass-input" bind:value={message}></textarea>
+				</div>
+				<div>
+					<label for="image" class="admin-label">Banner image (optional)</label>
+					<input
+						id="image"
+						name="image"
+						type="file"
+						accept="image/*"
+						bind:this={imageInput}
+						onchange={handleImageChange}
+						class="glass-input"
+					/>
+					{#if imageDataUrl}
+						<div class="mt-2 flex items-center gap-3">
+							<img src={imageDataUrl} alt="" class="h-16 w-28 rounded-lg border-2 border-black/10 object-cover" />
+							<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={removeImage}>
+								Remove
+							</button>
+						</div>
+					{/if}
 				</div>
 				<button type="submit" disabled={busy || !data.subscriberCount} class="btn-primary">
 					{busy ? 'Sending…' : `Send to ${data.subscriberCount} subscriber${data.subscriberCount === 1 ? '' : 's'}`}

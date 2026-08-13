@@ -168,11 +168,11 @@
                         </div>
 
                         <div class="mt-8 flex gap-2">
-                            {#if robolystUrl}
+                            {#if robolystUrl && currentTab === 'past'}
                                 <button
                                     type="button"
                                     onclick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(robolystUrl, '_blank', 'noopener,noreferrer'); }}
-                                    class="flex shrink-0 items-center justify-center gap-1.5 bg-white text-slate-900 font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg shadow-[3px_3px_0_0_rgba(15,23,42,1)] hover:bg-slate-100 active:translate-x-[1px] active:translate-y-[1px] active:shadow-[2px_2px_0_0_rgba(15,23,42,1)] transition-all duration-150"
+                                    class="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 bg-white text-slate-900 font-black uppercase tracking-widest py-3 px-4 border-2 border-slate-900 rounded-lg shadow-[3px_3px_0_0_rgba(15,23,42,1)] hover:bg-slate-100 active:translate-x-[1px] active:translate-y-[1px] active:shadow-[2px_2px_0_0_rgba(15,23,42,1)] transition-all duration-150"
                                     aria-label="View on Robolyst"
                                     title="View on Robolyst"
                                 >

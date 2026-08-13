@@ -51,6 +51,15 @@ export const actions: Actions = {
 		const eventId = String(form.get('eventId') ?? '');
 		if (!message) return fail(400, { error: 'Write a message first.' });
 
+		const image = form.get('image');
+		let attachments: { content: string; filename: string; contentType?: string; contentId?: string }[] = [];
+		let imageUrl: string | null = null;
+		if (image instanceof File && image.size > 0) {
+			const content = Buffer.from(await image.arrayBuffer()).toString('base64');
+			attachments = [{ content, filename: image.name || 'banner', contentType: image.type, contentId: 'newsletter-banner' }];
+			imageUrl = 'cid:newsletter-banner';
+		}
+
 		const subscribers = await locals.pb.collection('volunteer_newsletter').getFullList();
 		const recipients = subscribers.map((s) => s.email as string).filter(Boolean);
 
@@ -74,11 +83,11 @@ export const actions: Actions = {
 
 		const fullMessage = composeMessage(message);
 		const template = getTemplate(templateId);
-		const { subject, html } = template.render({ message: fullMessage, event: eventInfo, origin: url.origin });
+		const { subject, html } = template.render({ message: fullMessage, event: eventInfo, origin: url.origin, imageUrl });
 
 		let resendIds: string[];
 		try {
-			resendIds = await sendBulkEmail({ subject, text: fullMessage, html, recipients });
+			resendIds = await sendBulkEmail({ subject, text: fullMessage, html, recipients, attachments });
 		} catch (err: any) {
 			return fail(500, { error: err?.message ?? 'Failed to send the broadcast.' });
 		}

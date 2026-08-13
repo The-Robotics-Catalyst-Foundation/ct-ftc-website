@@ -49,10 +49,6 @@
         ].filter((item) => item.roles.includes(data.role))
     );
 
-    // Events stays reachable on mobile via the logo tap - dropping it from
-    // the dock frees a slot for the profile picture on small screens.
-    const mobileNavItems = $derived(navItems.filter((item) => item.href !== '/admin/events'));
-
     const roleLabel: Record<string, string> = {
         admin: 'Admin',
         event_manager: 'Event Manager',
@@ -178,7 +174,7 @@
     </main>
 
     <nav class="admin-dock" aria-label="Primary">
-        {#each mobileNavItems as item (item.href)}
+        {#each navItems as item (item.href)}
             {@const Icon = item.icon}
             {@const active = $page.url.pathname.startsWith(item.href)}
             <a href={item.href} class="admin-dock-item dock-tap" aria-current={active ? 'page' : undefined}>

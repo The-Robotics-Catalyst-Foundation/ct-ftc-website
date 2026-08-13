@@ -20,6 +20,7 @@ export async function sendBulkEmail(opts: {
 	text: string;
 	html?: string;
 	recipients: string[];
+	attachments?: { content: string; filename: string; contentType?: string; contentId?: string }[];
 }): Promise<string[]> {
 	const ids: string[] = [];
 	for (const to of opts.recipients) {
@@ -28,7 +29,8 @@ export async function sendBulkEmail(opts: {
 			to,
 			subject: opts.subject,
 			text: opts.text,
-			...(opts.html ? { html: opts.html } : {})
+			...(opts.html ? { html: opts.html } : {}),
+			...(opts.attachments?.length ? { attachments: opts.attachments } : {})
 		});
 		if (error) {
 			throw new Error(`Failed to send to ${to}: ${error.message}`);
