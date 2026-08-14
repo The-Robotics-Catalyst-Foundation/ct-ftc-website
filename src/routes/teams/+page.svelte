@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
-    import { CircleHelp, X } from '@lucide/svelte';
+    import { CircleHelp, Search, X } from '@lucide/svelte';
+    import TeamMap from '$lib/components/team-map.svelte';
 
     let { data } = $props();
 
@@ -9,9 +10,29 @@
     let scrollY = $state(0);
     let helpOpen = $state(false);
     let helpWrapper = $state();
+    let searchQuery = $state('');
+    let cityFilter = $state('all');
 
     // --- DERIVED PARALLAX RUNES ---
     let parallaxHeaderY = $derived(scrollY * 0.25);
+
+    // --- DERIVED SEARCH + FILTER RUNES ---
+    let cities = $derived(
+        Array.from(new Set(data.teams.map((t) => t.city).filter(Boolean))).sort()
+    );
+
+    let filteredTeams = $derived.by(() => {
+        const q = searchQuery.trim().toLowerCase();
+        return data.teams.filter((team) => {
+            if (cityFilter !== 'all' && team.city !== cityFilter) return false;
+            if (!q) return true;
+            return (
+                team.name.toLowerCase().includes(q) ||
+                String(team.teamNumber).includes(q) ||
+                (team.city ?? '').toLowerCase().includes(q)
+            );
+        });
+    });
 
     onMount(() => {
         setTimeout(() => (isLoaded = true), 50);
@@ -36,7 +57,7 @@
 
 <svelte:window bind:scrollY onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
-<main class="relative min-h-screen overflow-x-hidden bg-[#eef2f7] pb-24 text-[#1a1a1a]">
+<main class="relative min-h-screen overflow-x-clip bg-[#eef2f7] pb-24 text-[#1a1a1a]">
     <div class="bg-grid-pattern pointer-events-none absolute inset-0 opacity-[0.03]"></div>
 
     <section
@@ -112,27 +133,70 @@
         </div>
     </section>
 
+    {#if data.teamGroups.length}
+        <section class="relative z-10 mx-auto max-w-7xl px-6 pt-12">
+            <div class="h-[32rem] w-full md:h-[42rem]">
+                <TeamMap teamGroups={data.teamGroups} />
+            </div>
+        </section>
+    {/if}
+
     {#if data.teams.length}
-        <section class="relative z-20 mx-auto max-w-7xl px-6 pb-16">
+        <section class="relative z-20 mx-auto max-w-7xl px-6 pt-16 pb-16">
             <h2 class="mb-6 text-3xl font-black tracking-tighter text-black uppercase md:text-4xl">
                 All {data.teams.length} Connecticut teams
             </h2>
 
-            <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {#each data.teams as team (team.teamNumber)}
-                    <li
-                        class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-3"
-                    >
-                        <span class="text-xs font-black tracking-widest text-[#2563eb] uppercase"
-                            >Team {team.teamNumber}</span
+            <div
+                class="sticky top-20 z-30 mb-6 flex flex-col gap-3 rounded-2xl border-2 border-black bg-[#eef2f7]/90 p-3 backdrop-blur-md sm:flex-row"
+            >
+                <label class="relative flex-1">
+                    <Search
+                        class="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400"
+                        strokeWidth={2.5}
+                    />
+                    <input
+                        type="text"
+                        bind:value={searchQuery}
+                        placeholder="Search by team #, name, or city..."
+                        aria-label="Search teams"
+                        class="box-shadow-mini w-full rounded-2xl border-2 border-black bg-white py-3 pr-4 pl-11 text-sm font-bold text-black outline-none placeholder:font-semibold placeholder:text-slate-400"
+                    />
+                </label>
+
+                <select
+                    bind:value={cityFilter}
+                    aria-label="Filter by city"
+                    class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-3 text-xs font-black tracking-wider text-black uppercase outline-none sm:w-56"
+                >
+                    <option value="all">All cities</option>
+                    {#each cities as city}
+                        <option value={city}>{city}</option>
+                    {/each}
+                </select>
+            </div>
+
+            {#if filteredTeams.length}
+                <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {#each filteredTeams as team (team.teamNumber)}
+                        <li
+                            class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-3"
                         >
-                        <p class="text-sm font-black text-slate-900">{team.name}</p>
-                        {#if team.city}
-                            <p class="text-xs font-bold text-slate-600">{team.city}, CT</p>
-                        {/if}
-                    </li>
-                {/each}
-            </ul>
+                            <span class="text-xs font-black tracking-widest text-[#2563eb] uppercase"
+                                >Team {team.teamNumber}</span
+                            >
+                            <p class="text-sm font-black text-slate-900">{team.name}</p>
+                            {#if team.city}
+                                <p class="text-xs font-bold text-slate-600">{team.city}, CT</p>
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {:else}
+                <p class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-6 text-center text-sm font-bold text-slate-600">
+                    No teams match your search{searchQuery ? ` "${searchQuery}"` : ''}.
+                </p>
+            {/if}
         </section>
     {/if}
 

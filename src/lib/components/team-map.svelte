@@ -26,15 +26,23 @@
   onMount(async () => {
     if (!teamGroups.length) return;
 
-    const [maplibregl, { feature }, countriesTopo, statesTopo] = await Promise.all([
+    const [maplibregl, { feature }, countriesTopo, statesTopo, countiesTopo] = await Promise.all([
       import('maplibre-gl').then((m) => m.default),
       import('topojson-client'),
       import('world-atlas/countries-110m.json').then((m) => m.default as any),
-      import('us-atlas/states-10m.json').then((m) => m.default as any)
+      import('us-atlas/states-10m.json').then((m) => m.default as any),
+      import('us-atlas/counties-10m.json').then((m) => m.default as any)
     ]);
 
     const countries = feature(countriesTopo, countriesTopo.objects.countries);
     const states = feature(statesTopo, statesTopo.objects.states);
+    const allCounties = feature(countiesTopo, countiesTopo.objects.counties) as any;
+    // Connecticut FIPS prefix "09" - only CT's county lines are drawn, so the
+    // detail reads as "this state, up close" rather than a busy national mesh.
+    const ctCounties = {
+      type: 'FeatureCollection',
+      features: allCounties.features.filter((f: any) => String(f.id).startsWith('09'))
+    };
 
     map = new maplibregl.Map({
       container,
@@ -42,7 +50,8 @@
         version: 8,
         sources: {
           countries: { type: 'geojson', data: countries as any },
-          states: { type: 'geojson', data: states as any }
+          states: { type: 'geojson', data: states as any },
+          ctCounties: { type: 'geojson', data: ctCounties as any }
         },
         layers: [
           // Ocean: brand blue, not a muted/washed tone - land needs to read against it.
@@ -64,7 +73,7 @@
             type: 'line',
             source: 'states',
             filter: ['!=', ['get', 'name'], 'Connecticut'],
-            paint: { 'line-color': '#0a0a0a', 'line-width': 0.5, 'line-opacity': 0.3 }
+            paint: { 'line-color': '#0a0a0a', 'line-width': 1, 'line-opacity': 0.55 }
           },
           {
             id: 'ct-fill',
@@ -72,6 +81,12 @@
             source: 'states',
             filter: ['==', ['get', 'name'], 'Connecticut'],
             paint: { 'fill-color': '#facc15', 'fill-opacity': 0.35 }
+          },
+          {
+            id: 'ct-county-borders',
+            type: 'line',
+            source: 'ctCounties',
+            paint: { 'line-color': '#0a0a0a', 'line-width': 1, 'line-opacity': 0.45 }
           },
           {
             id: 'ct-outline',
