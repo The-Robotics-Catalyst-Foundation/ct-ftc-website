@@ -13,12 +13,17 @@
   let isPhotosShareRoute = $derived(/\/events\/[^/]+\/photos\/?$/.test($page.url.pathname));
   let hideNav = $derived(
     $page.url.pathname.startsWith('/admin') ||
+      $page.url.pathname.startsWith('/superadmin') ||
       $page.url.pathname.startsWith('/embed/') ||
       isPhotosShareRoute
   );
   // The photo-share view keeps the standard site Footer even though it
   // replaces Nav with its own top bar - only admin/embed hide it entirely.
-  let hideFooter = $derived($page.url.pathname.startsWith('/admin') || $page.url.pathname.startsWith('/embed/'));
+  let hideFooter = $derived(
+    $page.url.pathname.startsWith('/admin') ||
+      $page.url.pathname.startsWith('/superadmin') ||
+      $page.url.pathname.startsWith('/embed/')
+  );
 
   let pageTitle = $derived($page.status >= 400 ? 'Page Not Found' : $page.data.title);
   let title = $derived(
@@ -32,7 +37,12 @@
   let isHome = $derived($page.url.pathname === '/');
   // Embed widgets and the photo-share view duplicate content that already has a
   // canonical home under /events, so they stay out of the index entirely.
-  let noIndex = $derived(isAdminRoute || $page.url.pathname.startsWith('/embed/') || isPhotosShareRoute);
+  let noIndex = $derived(
+    isAdminRoute ||
+      $page.url.pathname.startsWith('/superadmin') ||
+      $page.url.pathname.startsWith('/embed/') ||
+      isPhotosShareRoute
+  );
 
   // Pages can override the canonical path when the same content is reachable at
   // more than one URL (e.g. an event served by both record id and slug).

@@ -19,15 +19,37 @@ export interface FtcEvent {
 }
 
 interface RawEvent {
+	eventId?: string;
 	code: string;
+	divisionCode?: string | null;
 	name?: string;
+	remote?: boolean;
+	hybrid?: boolean;
+	fieldCount?: number;
+	published?: boolean;
+	type?: string;
 	typeName?: string;
+	regionCode?: string;
+	leagueCode?: string | null;
+	districtCode?: string;
 	venue?: string;
+	address?: string;
 	city?: string;
 	stateprov?: string;
+	country?: string;
+	website?: string | null;
+	liveStreamUrl?: string | null;
+	coordinates?: { type: string; coordinates: [number, number] } | null;
+	webcasts?: unknown;
+	timezone?: string;
 	dateStart?: string;
 	dateEnd?: string;
 }
+
+// Every field the API returns for an event, unfiltered - used by the
+// superadmin events table, unlike `FtcEvent` above which only keeps the
+// handful of fields the season-import flow actually needs.
+export type DetailedFtcEvent = RawEvent;
 
 interface EventsResponse {
 	events: RawEvent[];
@@ -134,7 +156,7 @@ export async function getCtTeams(seasonsBack = 3): Promise<FtcTeam[]> {
 	return teams;
 }
 
-export async function getCtEvents(season: number): Promise<FtcEvent[]> {
+async function fetchCtEventsRaw(season: number): Promise<RawEvent[]> {
 	const token = Buffer.from(`${FTC_API_USERNAME}:${FTC_API_KEY}`).toString('base64');
 	// Unlike /teams, the /events endpoint's `state` query param is silently
 	// ignored by the FTC API - it always returns every event worldwide for
@@ -153,8 +175,12 @@ export async function getCtEvents(season: number): Promise<FtcEvent[]> {
 	}
 
 	const data: EventsResponse = await res.json();
+	return data.events.filter((e) => e.stateprov === 'CT');
+}
 
-	return data.events.filter((e) => e.stateprov === 'CT').map((e) => ({
+export async function getCtEvents(season: number): Promise<FtcEvent[]> {
+	const events = await fetchCtEventsRaw(season);
+	return events.map((e) => ({
 		code: e.code,
 		name: e.name || e.code,
 		typeName: e.typeName ?? '',
@@ -164,4 +190,10 @@ export async function getCtEvents(season: number): Promise<FtcEvent[]> {
 		dateStart: e.dateStart ?? '',
 		dateEnd: e.dateEnd ?? ''
 	}));
+}
+
+// Unfiltered event data straight from the API, for the superadmin events
+// table - every field the API exposes, not just the season-import subset.
+export async function getCtEventsDetailed(season: number): Promise<DetailedFtcEvent[]> {
+	return fetchCtEventsRaw(season);
 }

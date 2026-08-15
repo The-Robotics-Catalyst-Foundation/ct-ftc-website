@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { enhance, deserialize } from '$app/forms';
+	import { invalidateAll, beforeNavigate } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
 	import { ExternalLink, LayoutGrid, Table2, ArrowUp, ArrowDown } from '@lucide/svelte';
 	import { robolystEventUrl } from '$lib/robolyst';
@@ -132,6 +132,102 @@
 	let dateTo = $state('');
 	let sortBy = $state<'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' | 'volunteers-needed'>('date-desc');
 	let viewMode = $state<'cards' | 'sheet'>('cards');
+
+	// --- Sheet-view inline editing: cells are freely editable, but nothing is
+	// persisted until "Save changes" - edits are tracked per event id/field so
+	// unmodified cells keep reading straight from `data.events`. ---
+	let sheetEdits = $state<Record<string, Record<string, string>>>({});
+	let sheetSaving = $state(false);
+	let sheetSaveError = $state('');
+
+	const dirtyEventIds = $derived(Object.keys(sheetEdits).filter((id) => Object.keys(sheetEdits[id] ?? {}).length > 0));
+	const hasUnsavedSheetChanges = $derived(dirtyEventIds.length > 0);
+
+	function setSheetEdit(id: string, field: string, value: string) {
+		sheetEdits[id] = { ...(sheetEdits[id] ?? {}), [field]: value };
+	}
+
+	function sheetValue(event: any, field: string): string {
+		const override = sheetEdits[event.id]?.[field];
+		if (override !== undefined) return override;
+		switch (field) {
+			case 'name':
+				return event.name ?? '';
+			case 'type':
+				return event.type || 'scrimmage';
+			case 'location':
+				return event.location ?? '';
+			case 'date_time':
+				return toLocalInput(event.date_time);
+			case 'volunteersNeeded':
+				return String(event.volunteersNeeded ?? 0);
+			case 'eventCode':
+				return event.eventCode ?? '';
+			case 'imgLink':
+				return event.imgLink ?? '';
+			default:
+				return '';
+		}
+	}
+
+	function discardSheetChanges() {
+		if (!confirm('Discard all unsaved changes?')) return;
+		sheetEdits = {};
+		sheetSaveError = '';
+	}
+
+	async function saveSheetChanges() {
+		sheetSaving = true;
+		sheetSaveError = '';
+
+		for (const id of dirtyEventIds) {
+			const event = data.events.find((e) => e.id === id);
+			if (!event) continue;
+
+			const fd = new FormData();
+			fd.append('id', id);
+			fd.append('name', sheetValue(event, 'name'));
+			fd.append('type', sheetValue(event, 'type'));
+			fd.append('location', sheetValue(event, 'location'));
+			fd.append('date_time', sheetValue(event, 'date_time'));
+			fd.append('volunteersNeeded', sheetValue(event, 'volunteersNeeded'));
+			fd.append('eventCode', sheetValue(event, 'eventCode'));
+			fd.append('imgLink', sheetValue(event, 'imgLink'));
+
+			try {
+				const res = await fetch('?/updateEvent', { method: 'POST', body: fd });
+				const result: any = deserialize(await res.text());
+				if (result.type === 'failure' || result.type === 'error') {
+					sheetSaveError = `Failed to save "${event.name}": ${result.data?.error ?? result.error?.message ?? 'Unknown error'}`;
+					break;
+				}
+				const { [id]: _saved, ...rest } = sheetEdits;
+				sheetEdits = rest;
+			} catch (err: any) {
+				sheetSaveError = `Failed to save "${event.name}": ${err?.message ?? 'Network error'}`;
+				break;
+			}
+		}
+
+		sheetSaving = false;
+		await invalidateAll();
+	}
+
+	beforeNavigate(({ cancel }) => {
+		if (hasUnsavedSheetChanges && !confirm('You have unsaved changes to the events sheet. Leave without saving?')) {
+			cancel();
+		}
+	});
+
+	onMount(() => {
+		function handleBeforeUnload(e: BeforeUnloadEvent) {
+			if (!hasUnsavedSheetChanges) return;
+			e.preventDefault();
+			e.returnValue = '';
+		}
+		window.addEventListener('beforeunload', handleBeforeUnload);
+		return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+	});
 
 	// Clicking a sheet-view column header sorts by that column, flipping
 	// direction on a second click of the same column (like a spreadsheet).
@@ -506,22 +602,108 @@
 									</span>
 								</th>
 								<th class="px-4 py-2.5">Code</th>
+								<th class="px-4 py-2.5">Photos link</th>
 								<th class="px-4 py-2.5 text-right">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each filteredEvents as event (event.id)}
-								<tr class="border-b border-black/10 hover:bg-[#eef2f7]/60">
-									<td class="px-4 py-2.5 font-semibold text-text-main">{event.name}</td>
-									<td class="px-4 py-2.5">
-										<span class="role-badge border border-black/20 bg-white text-text-main">{event.type || 'scrimmage'}</span>
+								<tr class="border-b border-black/10 hover:bg-[#eef2f7]/60 {sheetEdits[event.id] && Object.keys(sheetEdits[event.id]).length ? 'bg-amber-50/60' : ''}">
+									<td class="px-2 py-1 font-semibold text-text-main">
+										{#if canManage}
+											<input
+												class="w-full min-w-[9rem] rounded border border-transparent bg-transparent px-2 py-1.5 text-sm font-semibold text-text-main focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'name')}
+												oninput={(e) => setSheetEdit(event.id, 'name', e.currentTarget.value)}
+												disabled={sheetSaving}
+											/>
+										{:else}
+											<span class="px-2 py-1.5">{event.name}</span>
+										{/if}
 									</td>
-									<td class="max-w-[14rem] truncate px-4 py-2.5 text-text-muted">{event.location || '—'}</td>
-									<td class="whitespace-nowrap px-4 py-2.5 text-text-muted">
-										{event.date_time ? new Date(event.date_time).toLocaleDateString() : 'TBD'}
+									<td class="px-2 py-1">
+										{#if canManage}
+											<select
+												class="rounded border border-transparent bg-transparent px-2 py-1.5 text-xs font-semibold text-text-main focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'type')}
+												onchange={(e) => setSheetEdit(event.id, 'type', e.currentTarget.value)}
+												disabled={sheetSaving}
+											>
+												{#each TYPE_OPTIONS as opt}
+													<option value={opt.value}>{opt.label}</option>
+												{/each}
+											</select>
+										{:else}
+											<span class="role-badge border border-black/20 bg-white text-text-main">{event.type || 'scrimmage'}</span>
+										{/if}
 									</td>
-									<td class="px-4 py-2.5 text-text-muted">{event.volunteersNeeded ?? 0}</td>
-									<td class="px-4 py-2.5 font-mono text-xs text-text-muted">{event.eventCode || '—'}</td>
+									<td class="max-w-[14rem] px-2 py-1 text-text-muted">
+										{#if canManage}
+											<input
+												class="w-full rounded border border-transparent bg-transparent px-2 py-1.5 text-sm text-text-muted focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'location')}
+												oninput={(e) => setSheetEdit(event.id, 'location', e.currentTarget.value)}
+												disabled={sheetSaving}
+											/>
+										{:else}
+											<span class="px-2 py-1.5">{event.location || '—'}</span>
+										{/if}
+									</td>
+									<td class="whitespace-nowrap px-2 py-1 text-text-muted">
+										{#if canManage}
+											<input
+												type="datetime-local"
+												class="rounded border border-transparent bg-transparent px-2 py-1.5 text-xs text-text-muted focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'date_time')}
+												oninput={(e) => setSheetEdit(event.id, 'date_time', e.currentTarget.value)}
+												disabled={sheetSaving}
+											/>
+										{:else}
+											<span class="px-2 py-1.5">{event.date_time ? new Date(event.date_time).toLocaleDateString() : 'TBD'}</span>
+										{/if}
+									</td>
+									<td class="px-2 py-1 text-text-muted">
+										{#if canManage}
+											<input
+												type="number"
+												min="0"
+												class="w-20 rounded border border-transparent bg-transparent px-2 py-1.5 text-sm text-text-muted focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'volunteersNeeded')}
+												oninput={(e) => setSheetEdit(event.id, 'volunteersNeeded', e.currentTarget.value)}
+												disabled={sheetSaving}
+											/>
+										{:else}
+											<span class="px-2 py-1.5">{event.volunteersNeeded ?? 0}</span>
+										{/if}
+									</td>
+									<td class="px-2 py-1 font-mono text-xs text-text-muted">
+										{#if canManage}
+											<input
+												class="w-full rounded border border-transparent bg-transparent px-2 py-1.5 font-mono text-xs text-text-muted focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'eventCode')}
+												oninput={(e) => setSheetEdit(event.id, 'eventCode', e.currentTarget.value)}
+												disabled={sheetSaving}
+											/>
+										{:else}
+											<span class="px-2 py-1.5">{event.eventCode || '—'}</span>
+										{/if}
+									</td>
+									<td class="max-w-[12rem] px-2 py-1 text-text-muted">
+										{#if canManage}
+											<input
+												type="url"
+												placeholder="https://..."
+												class="w-full rounded border border-transparent bg-transparent px-2 py-1.5 text-sm text-text-muted focus:border-black/20 focus:bg-white focus:outline-none"
+												value={sheetValue(event, 'imgLink')}
+												oninput={(e) => setSheetEdit(event.id, 'imgLink', e.currentTarget.value)}
+												disabled={sheetSaving}
+											/>
+										{:else if event.imgLink}
+											<a href={event.imgLink} target="_blank" rel="noreferrer" class="truncate text-[#2563eb] underline">{event.imgLink}</a>
+										{:else}
+											<span class="px-2 py-1.5">—</span>
+										{/if}
+									</td>
 									<td class="px-4 py-2.5">
 										<div class="flex items-center justify-end gap-1.5">
 											<a
@@ -535,7 +717,6 @@
 												<ExternalLink class="h-3.5 w-3.5" strokeWidth={2.5} />
 											</a>
 											{#if canManage}
-												<button type="button" class="btn-secondary px-2 py-1 text-xs" onclick={() => (editingId = event.id)}>Edit</button>
 												<form
 													method="POST"
 													action="?/deleteEvent"
@@ -552,7 +733,7 @@
 													}}
 												>
 													<input type="hidden" name="id" value={event.id} />
-													<button type="submit" disabled={busy} class="btn-danger px-2 py-1 text-xs">Delete</button>
+													<button type="submit" disabled={busy || sheetSaving} class="btn-danger px-2 py-1 text-xs">Delete</button>
 												</form>
 											{/if}
 										</div>
@@ -560,7 +741,7 @@
 								</tr>
 							{:else}
 								<tr>
-									<td colspan="7" class="px-4 py-6 text-center text-sm text-text-muted">
+									<td colspan="8" class="px-4 py-6 text-center text-sm text-text-muted">
 										{data.events.length === 0 ? 'No events yet.' : 'No events match your filters.'}
 									</td>
 								</tr>
@@ -568,6 +749,25 @@
 						</tbody>
 					</table>
 				</div>
+
+				{#if canManage && hasUnsavedSheetChanges}
+					<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 rounded-xl border-2 border-black bg-amber-50 px-4 py-3 text-sm shadow-[4px_4px_0px_0px_#000]">
+						<span class="font-black text-amber-900">
+							Unsaved changes to {dirtyEventIds.length} event{dirtyEventIds.length === 1 ? '' : 's'}
+						</span>
+						<div class="flex gap-2">
+							<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={discardSheetChanges} disabled={sheetSaving}>
+								Discard
+							</button>
+							<button type="button" class="btn-primary px-3 py-1.5 text-xs" onclick={saveSheetChanges} disabled={sheetSaving}>
+								{sheetSaving ? 'Saving…' : 'Save changes'}
+							</button>
+						</div>
+						{#if sheetSaveError}
+							<p class="max-w-xs text-xs font-semibold text-rose-700">{sheetSaveError}</p>
+						{/if}
+					</div>
+				{/if}
 			{:else}
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				{#each filteredEvents as event (event.id)}
