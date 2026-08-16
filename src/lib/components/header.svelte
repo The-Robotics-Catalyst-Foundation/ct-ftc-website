@@ -3,7 +3,7 @@
   import { slide } from 'svelte/transition';
 
   let logo = '/ctftc.png';
-  let ftcLogo = 'https://wpafbstem.com/FTC/img/FTC_logo.png';
+  let ftcLogo = '/ftc-logo.png';
   let isMobileMenuOpen = $state(false);
   let scrollY = $state(0);
   let atTop = $derived(scrollY <= 4);
@@ -45,16 +45,16 @@
         class="flex items-center gap-3 shrink-0 transition-transform hover:-translate-y-0.5"
       >
         <span class="flex items-center justify-center w-18 h-12 md:w-14 md:h-14 rounded-full bg-white border-2 border-black shadow-skeuo shrink-0">
-          <img src={logo} alt="CT FIRST Tech Challenge logo" class="w-[70%] h-[70%] object-contain invert" />
+          <img src={logo} alt="CT FIRST Tech Challenge logo" width="400" height="272" fetchpriority="high" class="w-[70%] h-[70%] object-contain invert" />
         </span>
-        <img src={ftcLogo} alt="FIRST Tech Challenge logo" class="hidden sm:block h-10 md:h-8 object-contain" />
+        <img src={ftcLogo} alt="FIRST Tech Challenge logo" width="744" height="188" class="hidden sm:block h-10 md:h-8 object-contain" />
       </a>
 
       <button
         onclick={toggleMenu}
         aria-label="Toggle Core Navigation Menu"
         aria-expanded={isMobileMenuOpen}
-        class="md:hidden w-10 h-10 rounded-xl bg-white border-2 border-black flex flex-col items-center justify-center gap-1 shadow-skeuo active:translate-y-[2px] transition-all"
+        class="md:hidden w-11 h-11 rounded-xl bg-white border-2 border-black flex flex-col items-center justify-center gap-1 shadow-skeuo active:translate-y-[2px] transition-all"
       >
         {#if isMobileMenuOpen}
           <span class="font-mono text-xs font-black text-black">&times;</span>

@@ -29,7 +29,11 @@ self.addEventListener('push', (event) => {
 			body: payload.body,
 			icon: '/logo.png',
 			badge: '/logo.png',
-			data: { url: payload.url }
+			data: { url: payload.url },
+			// Unsupported platforms (e.g. iOS Safari) just ignore this and fall
+			// back to the notification itself being fully clickable, per the
+			// notificationclick handler below.
+			actions: [{ action: 'view', title: 'View in CTFTC' }]
 		})
 	);
 });

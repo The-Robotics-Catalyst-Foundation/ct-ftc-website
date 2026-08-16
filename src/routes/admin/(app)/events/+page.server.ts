@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { requireRole } from '$lib/server/auth';
-import { getCtEvents } from '$lib/server/ftc-events';
+import { getCtEvents, getVolunteerSearchInfo } from '$lib/server/ftc-events';
+import { ftcSeasonForDate } from '$lib/robolyst';
 import type { PageServerLoad, Actions } from './$types';
 
 const CAN_MANAGE = ['admin', 'event_manager'] as const;
@@ -19,14 +20,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return { events };
 };
 
-function slugify(input: string): string {
-	return input
-		.toLowerCase()
-		.trim()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '');
-}
-
 function randomSlug(): string {
 	return crypto.randomUUID().slice(0, 8);
 }
@@ -43,7 +36,23 @@ function describeError(err: any): string {
 	return message;
 }
 
-function eventFormData(form: FormData) {
+// Looks up the FIRST search index for the event's volunteer-dashboard
+// deeplink so admins never have to paste it in by hand. Best-effort - a
+// lookup failure (or no matching event) just leaves volunteerLink unset
+// rather than blocking the save.
+async function lookupVolunteerLink(eventCode: string, dateTime: string): Promise<string> {
+	if (!eventCode) return '';
+	const season = ftcSeasonForDate(dateTime ? new Date(dateTime) : new Date());
+	try {
+		const info = await getVolunteerSearchInfo(eventCode, season);
+		return info?.dashboardVolunteerDeeplink ?? '';
+	} catch (err) {
+		console.error(`Failed to look up volunteer deeplink for event ${eventCode}:`, err);
+		return '';
+	}
+}
+
+async function eventFormData(form: FormData) {
 	const out = new FormData();
 	out.append('name', String(form.get('name') ?? ''));
 	out.append('type', String(form.get('type') ?? 'scrimmage'));
@@ -61,7 +70,13 @@ function eventFormData(form: FormData) {
 
 	const eventCode = String(form.get('eventCode') ?? '').trim();
 	out.append('eventCode', eventCode);
-	out.append('slug', eventCode ? slugify(eventCode) : randomSlug());
+	out.append('slug', eventCode || randomSlug());
+
+	// Only overwrite volunteerLink when the lookup actually finds something -
+	// on update, a transient lookup failure or a not-yet-listed event must
+	// not wipe out a previously-found link.
+	const volunteerLink = await lookupVolunteerLink(eventCode, dateTime);
+	if (volunteerLink) out.append('volunteer_link', volunteerLink);
 
 	return out;
 }
@@ -76,7 +91,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await locals.pb.collection('events').create(eventFormData(form));
+			await locals.pb.collection('events').create(await eventFormData(form));
 		} catch (err: any) {
 			return fail(400, { error: err?.message ?? 'Failed to create event.' });
 		}
@@ -89,7 +104,7 @@ export const actions: Actions = {
 		if (!id) return fail(400, { error: 'Missing event id.' });
 
 		try {
-			await locals.pb.collection('events').update(id, eventFormData(form));
+			await locals.pb.collection('events').update(id, await eventFormData(form));
 		} catch (err: any) {
 			return fail(400, { error: err?.message ?? 'Failed to update event.' });
 		}
@@ -125,6 +140,10 @@ export const actions: Actions = {
 		const errors: string[] = [];
 		for (const ev of ftcEvents) {
 			try {
+				const volunteerInfo = await getVolunteerSearchInfo(ev.code, season).catch((err) => {
+					console.error(`Failed to look up volunteer deeplink for event ${ev.code}:`, err);
+					return null;
+				});
 				await locals.pb.collection('events').create({
 					name: ev.name,
 					type: mapEventType(ev.typeName),
@@ -132,7 +151,8 @@ export const actions: Actions = {
 					date_time: ev.dateStart ? new Date(ev.dateStart).toISOString() : undefined,
 					volunteersNeeded: 0,
 					eventCode: ev.code,
-					slug: slugify(ev.code)
+					slug: ev.code,
+					volunteer_link: volunteerInfo?.dashboardVolunteerDeeplink ?? ''
 				});
 				imported += 1;
 			} catch (err: any) {

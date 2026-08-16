@@ -33,6 +33,11 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 		}
 	}
 
-	const { html } = getTemplate(templateId).render({ message: composeMessage(message), event: eventInfo, origin: url.origin, imageUrl });
+	const { html } = getTemplate(templateId).render({
+		message: composeMessage(message),
+		event: eventInfo,
+		origin: url.origin,
+		imageUrl
+	});
 	return json({ html });
 };

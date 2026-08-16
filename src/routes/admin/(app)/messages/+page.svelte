@@ -53,7 +53,7 @@
 							{#if !msg.responded}
 								<span class="role-badge admin">New</span>
 							{/if}
-							<h3 class="font-semibold text-text-main">{msg.name}</h3>
+							<h2 class="font-semibold text-text-main">{msg.name}</h2>
 							<span class="role-badge event_manager">{CATEGORY_LABELS[msg.category] ?? msg.category}</span>
 						</div>
 						<a href="mailto:{msg.email}" class="text-sm text-[#1d4ed8] hover:underline">{msg.email}</a>

@@ -17,7 +17,8 @@
 		description,
 		volunteersNeeded,
 		showName = true,
-		showActions = true
+		showActions = true,
+		headingLevel = 3
 	}: {
 		id: string;
 		slug?: string;
@@ -30,6 +31,10 @@
 		volunteersNeeded?: number;
 		showName?: boolean;
 		showActions?: boolean;
+		// Lets callers that embed this card as their document's only heading
+		// (e.g. the standalone /embed/events/[id] widget) start at h1 instead
+		// of always nesting as if under some other page's h1/h2.
+		headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	} = $props();
 
 	// Exact brand mapping per event type - badge text flips to white on the
@@ -98,7 +103,7 @@
 
 	<div class="event-card-body">
 		{#if showName}
-			<h3 class="event-card-title">{name}</h3>
+			<svelte:element this={`h${headingLevel}`} class="event-card-title">{name}</svelte:element>
 		{/if}
 
 		<div class="mt-3 space-y-2 text-sm font-bold text-slate-700">

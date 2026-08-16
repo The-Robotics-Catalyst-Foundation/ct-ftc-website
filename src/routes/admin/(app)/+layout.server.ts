@@ -24,6 +24,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 		email: user?.email as string,
 		userId: user?.id as string,
 		name: user?.name as string | undefined,
+		emailVisibility: (user?.emailVisibility as boolean | undefined) ?? true,
 		avatarUrl,
 		unrespondedCount
 	};

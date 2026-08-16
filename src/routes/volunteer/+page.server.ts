@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => {
 	try {
 		const records = await pb.collection('events').getFullList({
 			filter: 'date_time >= @now',
-			sort: 'date_time'
+		sort: 'date_time'
 		});
 		events = records.map((record) => ({
 			id: record.id,

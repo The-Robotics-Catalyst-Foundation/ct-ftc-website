@@ -3,6 +3,18 @@ import type { RequestHandler } from './$types';
 
 const STATIC_PATHS = ['/', '/events', '/teams', '/volunteer', '/contact', '/faq'];
 
+// `slug` is admin-controlled free text (the event code, e.g. "USCTCMP") with
+// no character restrictions - escape it before it lands in this public,
+// unauthenticated XML response.
+function escapeXml(input: string): string {
+	return input
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&apos;');
+}
+
 export const GET: RequestHandler = async ({ url }) => {
 	const origin = url.origin;
 
@@ -25,7 +37,7 @@ export const GET: RequestHandler = async ({ url }) => {
 ${entries
 	.map(
 		({ path, lastmod }) =>
-			`  <url><loc>${origin}${path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`
+			`  <url><loc>${escapeXml(origin + path)}</loc>${lastmod ? `<lastmod>${escapeXml(lastmod)}</lastmod>` : ''}</url>`
 	)
 	.join('\n')}
 </urlset>

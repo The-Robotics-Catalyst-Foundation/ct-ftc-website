@@ -6,7 +6,7 @@
     import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
     import { CalendarDays, MessageSquare, Mail, Users, Handshake, Bell, BellOff, Plus } from '@lucide/svelte';
     import Modal from '$lib/components/modal.svelte';
-    import { subscribeToPush, syncPushSubscription } from '$lib/client/push';
+    import { subscribeToPush, syncPushSubscription, unsubscribeFromPush } from '$lib/client/push';
     import { adminCreateAction } from '$lib/client/adminCreate';
     import type { LayoutData } from './$types';
 
@@ -27,16 +27,35 @@
     let settingsOpen = $state(false);
     let settingsBusy = $state(false);
     let settingsError = $state('');
+    let deleteBusy = $state(false);
+    // Notification.permission alone isn't enough to know if push is "on" -
+    // it stays "granted" forever once the browser allows it, even after the
+    // user turns notifications off here (browsers don't let a page revoke
+    // its own permission). Actual on/off state is confirmed by checking for
+    // a live subscription in the onMount below.
     let pushState = $state<'granted' | 'denied' | 'unsupported' | 'error' | 'idle'>(
-        typeof Notification !== 'undefined' ? (Notification.permission as 'granted' | 'denied' | 'idle') : 'idle'
+        typeof Notification !== 'undefined' && Notification.permission === 'denied' ? 'denied' : 'idle'
     );
+    let pushBusy = $state(false);
 
     onMount(() => {
-        if (data.role === 'admin') syncPushSubscription();
+        if (data.role !== 'admin') return;
+        syncPushSubscription().then((active) => {
+            if (active) pushState = 'granted';
+        });
     });
 
     async function enablePush() {
+        pushBusy = true;
         pushState = await subscribeToPush(PUBLIC_VAPID_PUBLIC_KEY);
+        pushBusy = false;
+    }
+
+    async function disablePush() {
+        pushBusy = true;
+        await unsubscribeFromPush();
+        pushState = 'idle';
+        pushBusy = false;
     }
 
     const navItems = $derived(
@@ -123,7 +142,7 @@
         class:mt-0={scrolled}
     >
         <a href="/admin/events" class="flex shrink-0 items-center gap-2">
-            <img src="/ctftc.png" alt="CT FIRST Tech Challenge" class="h-12 w-18 rounded-full border-2 border-white  object-contain p-1 invert" />
+            <img src="/ctftc.png" alt="CT FIRST Tech Challenge" width="400" height="272" class="h-12 w-18 rounded-full border-2 border-white  object-contain p-1 invert" />
             <span class="hidden text-sm font-black uppercase tracking-wide text-text-main sm:inline">CT FTC Admin</span>
         </a>
 
@@ -249,6 +268,13 @@
             <label for="name" class="admin-label">Name</label>
             <input id="name" name="name" class="glass-input" value={data.name ?? ''} />
         </div>
+        <label class="flex items-center justify-between gap-3 rounded-lg border-2 border-border-subtle p-3">
+            <span>
+                <span class="block text-sm font-bold text-text-main">Show my email publicly</span>
+                <span class="block text-xs text-text-muted">Turn off to hide your email address from public listings.</span>
+            </span>
+            <input type="checkbox" name="emailVisibility" checked={data.emailVisibility} class="h-5 w-5 shrink-0 accent-[#1d4ed8]" />
+        </label>
         <button type="submit" disabled={settingsBusy} class="btn-primary w-full">
             {settingsBusy ? 'Saving…' : 'Save changes'}
         </button>
@@ -258,10 +284,20 @@
         <div class="mt-5 border-t-2 border-border-subtle pt-4">
             <p class="admin-label mb-2">Notifications</p>
             {#if pushState === 'granted'}
-                <p class="flex items-center gap-2 text-sm font-bold text-text-main">
-                    <Bell class="h-4 w-4 text-emerald-600" strokeWidth={2.5} />
-                    Push notifications are on for new contact messages.
-                </p>
+                <label class="flex items-center justify-between gap-3 rounded-lg border-2 border-border-subtle p-3">
+                    <span class="flex items-center gap-2 text-sm font-bold text-text-main">
+                        <Bell class="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} />
+                        Push notifications are on for new contact messages.
+                    </span>
+                    <input
+                        type="checkbox"
+                        checked
+                        disabled={pushBusy}
+                        onchange={disablePush}
+                        class="h-5 w-5 shrink-0 accent-[#1d4ed8]"
+                        aria-label="Turn off push notifications"
+                    />
+                </label>
             {:else if pushState === 'denied'}
                 <p class="flex items-center gap-2 text-sm font-bold text-rose-600">
                     <BellOff class="h-4 w-4" strokeWidth={2.5} />
@@ -275,17 +311,44 @@
                         <BellOff class="h-4 w-4" strokeWidth={2.5} />
                         Couldn't save your subscription - try again.
                     </p>
-                    <button type="button" class="btn-secondary w-full" onclick={enablePush}>
+                    <button type="button" disabled={pushBusy} class="btn-secondary w-full" onclick={enablePush}>
                         <Bell class="h-4 w-4" strokeWidth={2.5} />
                         Retry
                     </button>
                 </div>
             {:else}
-                <button type="button" class="btn-secondary w-full" onclick={enablePush}>
+                <button type="button" disabled={pushBusy} class="btn-secondary w-full" onclick={enablePush}>
                     <Bell class="h-4 w-4" strokeWidth={2.5} />
-                    Enable push notifications
+                    {pushBusy ? 'Enabling…' : 'Enable push notifications'}
                 </button>
             {/if}
         </div>
     {/if}
+
+    <div class="mt-5 border-t-2 border-border-subtle pt-4">
+        <p class="admin-label mb-2 text-rose-600">Danger zone</p>
+        <form
+            method="POST"
+            action="/admin/settings?/deleteAccount"
+            use:enhance={({ cancel }) => {
+                if (!confirm('Delete your account? This cannot be undone.')) {
+                    cancel();
+                    return;
+                }
+                deleteBusy = true;
+                settingsError = '';
+                return async ({ result, update }) => {
+                    deleteBusy = false;
+                    if (result.type === 'failure') {
+                        settingsError = (result.data?.error as string) ?? 'Failed to delete account.';
+                    }
+                    await update();
+                };
+            }}
+        >
+            <button type="submit" disabled={deleteBusy} class="btn-danger w-full">
+                {deleteBusy ? 'Deleting…' : 'Delete my account'}
+            </button>
+        </form>
+    </div>
 </Modal>

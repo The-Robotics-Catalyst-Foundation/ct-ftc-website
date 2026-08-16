@@ -42,7 +42,7 @@
 	</p>
 
 	<div class="glass-panel mt-2 overflow-x-auto p-0">
-		<table class="w-full min-w-[2600px] border-collapse text-xs">
+		<table class="w-full min-w-[2900px] border-collapse text-xs">
 			<thead>
 				<tr class="border-b-2 border-black bg-[#eef2f7] text-left font-black uppercase tracking-wide text-text-muted">
 					<th class="px-3 py-2">Code</th>
@@ -69,6 +69,9 @@
 					<th class="px-3 py-2">Livestream</th>
 					<th class="px-3 py-2">Coordinates</th>
 					<th class="px-3 py-2">Webcasts</th>
+					<th class="px-3 py-2">VIMS ID</th>
+					<th class="px-3 py-2">Volunteer Deeplink</th>
+					<th class="px-3 py-2">Event Count (season, worldwide)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -112,10 +115,24 @@
 						<td class="max-w-[10rem] truncate px-3 py-2 font-mono text-text-muted">
 							{event.webcasts ? JSON.stringify(event.webcasts) : '—'}
 						</td>
+						<td class="px-3 py-2 font-mono text-text-muted">{event.vimsId ?? '—'}</td>
+						<td class="max-w-[10rem] truncate px-3 py-2 text-text-muted">
+							{#if event.dashboardVolunteerDeeplink}
+								<a
+									href={event.dashboardVolunteerDeeplink}
+									target="_blank"
+									rel="noreferrer"
+									class="text-[#2563eb] underline">{event.dashboardVolunteerDeeplink}</a
+								>
+							{:else}
+								—
+							{/if}
+						</td>
+						<td class="px-3 py-2 text-text-muted">{data.seasonEventCount ?? '—'}</td>
 					</tr>
 				{:else}
 					<tr>
-						<td colspan="24" class="px-4 py-6 text-center text-sm text-text-muted">No upcoming CT events found.</td>
+						<td colspan="27" class="px-4 py-6 text-center text-sm text-text-muted">No upcoming CT events found.</td>
 					</tr>
 				{/each}
 			</tbody>

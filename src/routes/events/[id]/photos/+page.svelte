@@ -7,7 +7,7 @@
 <div class="min-h-screen bg-[#f8fafc]">
 	<header class="border-b-2 border-black bg-white px-6 py-4">
 		<a href="/" class="mx-auto flex max-w-5xl items-center gap-3 no-underline">
-			<img src="/ctftc.png" alt="CT FIRST Tech Challenge" class="h-10 w-10 rounded-full border-2 border-black bg-white object-contain p-1" />
+			<img src="/ctftc.png" alt="CT FIRST Tech Challenge" width="400" height="272" class="h-10 w-10 rounded-full border-2 border-black bg-white object-contain p-1" />
 			<span class="text-lg font-black uppercase tracking-tight text-slate-900">{data.name}</span>
 		</a>
 	</header>
@@ -23,6 +23,8 @@
 				<span class="text-[10px] font-mono font-black text-slate-400">/</span>
 				<span class="max-w-[150px] truncate text-xs font-black uppercase tracking-wider text-[#2563eb] sm:max-w-xs" aria-current="page">Photos</span>
 			</nav>
+
+			<h1 class="mb-6 text-2xl font-black uppercase tracking-tight text-slate-900">{data.name} Photos</h1>
 
 			{#if data.pics.length}
 				<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">

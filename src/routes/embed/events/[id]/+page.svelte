@@ -19,5 +19,6 @@
 		volunteersNeeded={data.event.volunteersNeeded}
 		showName={data.showName}
 		showActions={false}
+		headingLevel={1}
 	/>
 </div>

@@ -267,8 +267,10 @@
 		!!searchQuery.trim() || seasonFilter !== 'all' || typeFilter.length > 0 || !!dateFrom || !!dateTo
 	);
 
+	// Sheet view has no search/filter UI of its own - only the tab (upcoming
+	// vs past) still narrows it down; everything else only applies in cards.
 	const filteredEvents = $derived.by(() => {
-		const query = searchQuery.trim().toLowerCase();
+		const query = viewMode === 'cards' ? searchQuery.trim().toLowerCase() : '';
 
 		let list = data.events.filter((event) => {
 			if (query) {
@@ -279,12 +281,14 @@
 			if (activeTab === 'upcoming' && !isUpcoming(event)) return false;
 			if (activeTab === 'past' && isUpcoming(event)) return false;
 
-			if (typeFilter.length > 0 && !typeFilter.includes(event.type || 'scrimmage')) return false;
+			if (viewMode === 'cards') {
+				if (typeFilter.length > 0 && !typeFilter.includes(event.type || 'scrimmage')) return false;
 
-			if (seasonFilter !== 'all' && (!event.date_time || seasonOf(event.date_time) !== seasonFilter)) return false;
+				if (seasonFilter !== 'all' && (!event.date_time || seasonOf(event.date_time) !== seasonFilter)) return false;
 
-			if (dateFrom && (!event.date_time || new Date(event.date_time) < new Date(dateFrom))) return false;
-			if (dateTo && (!event.date_time || new Date(event.date_time) > new Date(`${dateTo}T23:59:59`))) return false;
+				if (dateFrom && (!event.date_time || new Date(event.date_time) < new Date(dateFrom))) return false;
+				if (dateTo && (!event.date_time || new Date(event.date_time) > new Date(`${dateTo}T23:59:59`))) return false;
+			}
 
 			return true;
 		});
@@ -482,6 +486,7 @@
 	</div>
 
 	<div class="flex flex-col gap-6 md:flex-row">
+		{#if viewMode === 'cards'}
 		<aside class="glass-panel h-fit w-full shrink-0 space-y-5 p-5 md:w-60">
 			<div>
 				<label for="event-search" class="admin-label">Search</label>
@@ -546,6 +551,7 @@
 				{/if}
 			</div>
 		</aside>
+		{/if}
 
 		<div class="min-w-0 flex-1">
 			<div class="mb-3 flex items-center justify-between">
@@ -577,7 +583,7 @@
 			</div>
 
 			{#if viewMode === 'sheet'}
-				<div class="glass-panel overflow-x-auto p-0">
+				<div class="glass-panel max-w-[70rem] overflow-x-auto p-0">
 					<table class="w-full min-w-[760px] border-collapse text-sm">
 						<thead>
 							<tr class="border-b-2 border-black bg-[#eef2f7] text-left text-[11px] font-black uppercase tracking-wide text-text-muted">
@@ -603,13 +609,14 @@
 								</th>
 								<th class="px-4 py-2.5">Code</th>
 								<th class="px-4 py-2.5">Photos link</th>
+								<th class="px-4 py-2.5">Volunteer link</th>
 								<th class="px-4 py-2.5 text-right">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each filteredEvents as event (event.id)}
 								<tr class="border-b border-black/10 hover:bg-[#eef2f7]/60 {sheetEdits[event.id] && Object.keys(sheetEdits[event.id]).length ? 'bg-amber-50/60' : ''}">
-									<td class="px-2 py-1 font-semibold text-text-main">
+									<td class="max-w-[14rem] px-2 py-1 font-semibold text-text-main">
 										{#if canManage}
 											<input
 												class="w-full min-w-[9rem] rounded border border-transparent bg-transparent px-2 py-1.5 text-sm font-semibold text-text-main focus:border-black/20 focus:bg-white focus:outline-none"
@@ -676,7 +683,7 @@
 											<span class="px-2 py-1.5">{event.volunteersNeeded ?? 0}</span>
 										{/if}
 									</td>
-									<td class="px-2 py-1 font-mono text-xs text-text-muted">
+									<td class="max-w-[9rem] px-2 py-1 font-mono text-xs text-text-muted">
 										{#if canManage}
 											<input
 												class="w-full rounded border border-transparent bg-transparent px-2 py-1.5 font-mono text-xs text-text-muted focus:border-black/20 focus:bg-white focus:outline-none"
@@ -700,6 +707,13 @@
 											/>
 										{:else if event.imgLink}
 											<a href={event.imgLink} target="_blank" rel="noreferrer" class="truncate text-[#2563eb] underline">{event.imgLink}</a>
+										{:else}
+											<span class="px-2 py-1.5">—</span>
+										{/if}
+									</td>
+									<td class="max-w-[12rem] px-2 py-1 text-text-muted">
+										{#if event.volunteer_link}
+											<a href={event.volunteer_link} target="_blank" rel="noreferrer" class="truncate text-[#2563eb] underline">{event.volunteer_link}</a>
 										{:else}
 											<span class="px-2 py-1.5">—</span>
 										{/if}
@@ -741,7 +755,7 @@
 								</tr>
 							{:else}
 								<tr>
-									<td colspan="8" class="px-4 py-6 text-center text-sm text-text-muted">
+									<td colspan="9" class="px-4 py-6 text-center text-sm text-text-muted">
 										{data.events.length === 0 ? 'No events yet.' : 'No events match your filters.'}
 									</td>
 								</tr>
@@ -827,6 +841,11 @@
 							{#if event.imgLink}
 								<a href={event.imgLink} target="_blank" rel="noreferrer" class="btn-secondary px-3 py-2 text-xs">
 									Photos
+								</a>
+							{/if}
+							{#if event.volunteer_link}
+								<a href={event.volunteer_link} target="_blank" rel="noreferrer" class="btn-secondary px-3 py-2 text-xs">
+									Volunteer link
 								</a>
 							{/if}
 						</div>

@@ -1,4 +1,5 @@
 import { redirect, fail } from '@sveltejs/kit';
+import { pbErrorMessage } from '$lib/server/pb-error';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -16,17 +17,29 @@ export const actions: Actions = {
 		const payload = new FormData();
 		if (name) payload.append('name', name);
 		if (avatar instanceof File && avatar.size > 0) payload.append('avatar', avatar);
-
-		if (![...payload.keys()].length) {
-			return fail(400, { error: 'Nothing to update.' });
-		}
+		// Checkbox - present in the form data only when checked, so its
+		// absence means the user turned visibility off.
+		payload.append('emailVisibility', form.has('emailVisibility') ? 'true' : 'false');
 
 		try {
 			await locals.pb.collection('users').update(locals.user.id, payload);
 		} catch (err: any) {
-			return fail(400, { error: err?.message ?? 'Failed to update profile.' });
+			return fail(400, { error: pbErrorMessage(err, 'Failed to update profile.') });
 		}
 
 		return { success: true };
+	},
+
+	deleteAccount: async ({ locals }) => {
+		if (!locals.user) return fail(401, { error: 'Not signed in.' });
+
+		try {
+			await locals.pb.collection('users').delete(locals.user.id);
+		} catch (err: any) {
+			return fail(400, { error: pbErrorMessage(err, 'Failed to delete account.') });
+		}
+
+		locals.pb.authStore.clear();
+		throw redirect(303, '/admin');
 	}
 };

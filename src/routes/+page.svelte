@@ -1,4 +1,4 @@
-<script>
+3r<script>
   import { browser } from '$app/environment';
   import { pb } from '$lib/pocketbase';
   import Carousel from '$lib/components/carousel.svelte';
@@ -30,6 +30,18 @@
   let mouseX = $state(0);
   let mouseY = $state(0);
   let townInput = $state('');
+
+  // Repeats the sponsor list enough times that the reel is wider than the
+  // viewport even with just one or two sponsors - otherwise it's mostly
+  // empty space with a single card drifting in a small corner instead of a
+  // continuous row of cards.
+  const MIN_SPONSOR_CHIPS = 10;
+  const sponsorChips = $derived.by(() => {
+    const sponsors = data.sponsors ?? [];
+    if (!sponsors.length) return [];
+    const repeats = Math.max(1, Math.ceil(MIN_SPONSOR_CHIPS / sponsors.length));
+    return Array.from({ length: repeats }, () => sponsors).flat();
+  });
 
   /** @param {SubmitEvent} e */
   function searchTown(e) {
@@ -276,21 +288,21 @@
   </section>
 
   {#if data.sponsors?.length}
-    <section class="py-16 px-6 border-t-4 border-black bg-white overflow-hidden">
+    <section class="py-8 px-6 border-t-4 border-black bg-white overflow-hidden">
       <div class="max-w-7xl mx-auto text-center mb-8">
         <span class="text-xs font-black text-[#2563eb] bg-[#eef2f7] border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Thank You</span>
         <h3 class="text-2xl font-black text-black uppercase tracking-tight mt-3">Our Sponsors</h3>
       </div>
       <div class="sponsor-marquee">
-        <div class="sponsor-track" style="animation-duration: {Math.max(data.sponsors.length * 8, 20)}s">
-          {#each [...data.sponsors, ...data.sponsors] as sponsor, i (sponsor.id + '-' + i)}
+        <div class="sponsor-track" style="animation-duration: {Math.max(sponsorChips.length * 3, 12)}s">
+          {#each [...sponsorChips, ...sponsorChips] as sponsor, i (sponsor.id + '-' + i)}
             {#if sponsor.Website}
               <a
                 href={sponsor.Website}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="sponsor-chip"
-                tabindex={i < data.sponsors.length ? 0 : -1}
+                tabindex={i < sponsorChips.length ? 0 : -1}
               >
                 {#if sponsor.Logo}
                   <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
@@ -298,7 +310,7 @@
                 <span class="sponsor-name">{sponsor.Name}</span>
               </a>
             {:else}
-              <div class="sponsor-chip" aria-hidden={i >= data.sponsors.length}>
+              <div class="sponsor-chip" aria-hidden={i >= sponsorChips.length}>
                 {#if sponsor.Logo}
                   <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
                 {/if}

@@ -1,0 +1,17 @@
+# Connecticut FTC
+
+> Connecticut FTC (CT FTC) is the hub for FIRST Tech Challenge in Connecticut - a statewide robotics competition for students in grades 7-12, where teams design, build, and program a robot to compete head-to-head in an alliance format. This site lists CT events, the CT team directory, volunteer information, and sponsor/contact info.
+
+## Key pages
+
+- [Events](https://connecticutftc.org/events): Upcoming and past FTC qualifiers, scrimmages, and the state championship in Connecticut, with dates, locations, and registration links.
+- [Team Directory](https://connecticutftc.org/teams): Every registered FTC team in Connecticut, with match history, awards, and stats (powered by Robolyst).
+- [Volunteer](https://connecticutftc.org/volunteer): How to volunteer at a CT FTC event - roles, registration steps, and upcoming events needing volunteers. No robotics experience required.
+- [FAQ](https://connecticutftc.org/faq): Answers to common questions about volunteering, events, joining a team, and what FIRST Tech Challenge is.
+- [Contact](https://connecticutftc.org/contact): Reach the CT FTC team directly for team support, volunteering, or sponsorship questions.
+
+## Notes
+
+- FIRST Tech Challenge (FTC) is a program of FIRST (For Inspiration and Recognition of Science and Technology), a global nonprofit founded by Dean Kamen in 1989.
+- CT FTC is not a public sign-up service - team registration happens through the official FIRST platform at firstinspires.org; this site is the Connecticut-specific hub for events, teams, and volunteering.
+- The `/admin` and `/embed/` paths are internal/embeddable tooling, not informational content - see robots.txt.

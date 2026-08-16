@@ -28,29 +28,29 @@
       <div class="md:col-span-4 space-y-6 text-left">
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-full glass-tile flex items-center justify-center bg-white border border-slate-200">
-            <img src={logo} alt="CT Logo" class="w-[70%] h-[70%] object-contain invert" />
+            <img src={logo} alt="CT Logo" width="400" height="272" class="w-[70%] h-[70%] object-contain invert" />
           </div>
-          <img src="https://wpafbstem.com/FTC/img/FTC_logo.png" alt="FTC Logo" loading="lazy" class="h-10 object-contain">
+          <img src="/ftc-logo.png" alt="FTC Logo" width="744" height="188" loading="lazy" class="h-10 object-contain">
         </div>
 
         <p class="text-sm font-bold text-slate-700 leading-relaxed max-w-xs">
           Inspiring Connecticut student networks through high-caliber competitive robotics engineering. Part of New England FIRST.
         </p>
 
-        <div class="flex items-center gap-3 bg-[#eef2f7] shadow-neumorphic-inner px-3 py-2 rounded-xl w-max border border-slate-300/40">
+        <div class="flex items-center gap-2.5 bg-[#eef2f7] shadow-neumorphic-inner px-3 py-2 rounded-xl w-max border border-slate-300/40">
           {#each socials as social}
-            <a href={social.href} class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label={social.name}>
+            <a href={social.href} class="w-11 h-11 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label={social.name}>
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d={social.icon}/></svg>
             </a>
           {/each}
-          <a href="mailto:robcormier@firstpartners.org" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label="Email Support">
+          <a href="mailto:robcormier@firstpartners.org" class="w-11 h-11 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:text-[#2563eb] hover:border-black transition-all hover:scale-105" aria-label="Email Support">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           </a>
         </div>
       </div>
 
       <div class="md:col-span-2 text-left md:pl-4">
-        <h4 class="font-black text-black uppercase text-xs tracking-widest bg-white border border-black/10 px-2 py-1 inline-block rounded mb-6">Resources</h4>
+        <p class="font-black text-black uppercase text-xs tracking-widest bg-white border border-black/10 px-2 py-1 inline-block rounded mb-6">Resources</p>
         <ul class="space-y-4 text-sm font-bold text-slate-600">
           <li><a href="/events" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Event Schedule</a></li>
           <li><a href="/teams" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; Team Directory</a></li>
@@ -60,7 +60,7 @@
       </div>
 
       <div class="md:col-span-2 text-left">
-        <h4 class="font-black text-black uppercase text-xs tracking-widest bg-white border border-black/10 px-2 py-1 inline-block rounded mb-6">Affiliates</h4>
+        <p class="font-black text-black uppercase text-xs tracking-widest bg-white border border-black/10 px-2 py-1 inline-block rounded mb-6">Affiliates</p>
         <ul class="space-y-4 text-sm font-bold text-slate-600">
           <li><a href="https://nefirst.org" target="_blank" rel="noopener noreferrer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; NE FIRST</a></li>
           <li><a href="https://firstinspires.org" target="_blank" rel="noopener noreferrer" class="hover:text-[#2563eb] transition-colors flex items-center gap-1.5">&rarr; FIRST Global</a></li>
@@ -78,14 +78,14 @@
           <p class="text-sm md:text-base font-bold text-slate-700">
             Made by <a href="https://singul.tech" target="_blank" rel="noopener noreferrer" class="text-[#2563eb] hover:underline font-black">Singularity Technology #7034</a>
           </p>
-          <img src="https://singul.tech/logo.png" alt="Singularity Technology Logo" class="w-10 h-10 object-contain invert">
+          <img src="/singultech.png" alt="Singularity Technology Logo" width="500" height="500" loading="lazy" class="w-10 h-10 object-contain invert">
         </div>
 
         <div class="flex items-center gap-3">
           <p class="text-sm md:text-base font-bold text-slate-700">
             Hosted by <a href="https://robolyst.org" target="_blank" rel="noopener noreferrer" class="text-[#2563eb] hover:underline font-black">Robolyst</a>
           </p>
-          <img src="https://robolyst.org/icon.svg" alt="Robotics-Catalyst Logo" class="w-10 h-10 object-contain">
+          <img src="/robolyst-icon.svg" alt="Robotics-Catalyst Logo" width="40" height="40" loading="lazy" class="w-10 h-10 object-contain">
         </div>
       </div>
     </div>

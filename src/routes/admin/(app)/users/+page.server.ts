@@ -19,20 +19,22 @@ export const actions: Actions = {
 		const form = await request.formData();
 
 		const email = String(form.get('email') ?? '').trim();
+		const name = String(form.get('name') ?? '').trim();
 		const authLevel = form.get('authLevel');
 
 		if (!email) return fail(400, { error: 'Email is required.' });
 		if (!isValidRole(authLevel)) return fail(400, { error: 'Invalid role.' });
 
 		// PocketBase requires a password to create the account, but the
-		// invitee never sees it - they set their own via the emailed
-		// password-reset link (see /admin/set-password). A single UUID (36
-		// chars) is plenty of entropy and stays under PocketBase's 71-char
+		// invitee never sees it - they set their own later via "Forgot
+		// password" on the admin login page. A single UUID (36 chars) is
+		// plenty of entropy and stays under PocketBase's 71-char
 		// (bcrypt-backed) password length limit.
 		const tempPassword = crypto.randomUUID();
 
 		const out = new FormData();
 		out.append('email', email);
+		out.append('name', name);
 		out.append('password', tempPassword);
 		out.append('passwordConfirm', tempPassword);
 		out.append('authLevel', authLevel);
@@ -44,13 +46,15 @@ export const actions: Actions = {
 			return fail(400, { error: pbErrorMessage(err, 'Failed to create account.') });
 		}
 
-		// The account exists even if the invite email fails to send (e.g. mail
-		// isn't configured in PocketBase yet) - surface that separately so an
-		// admin doesn't think account creation itself failed.
+		// The account exists even if the verification email fails to send
+		// (e.g. mail isn't configured in PocketBase yet) - surface that
+		// separately so an admin doesn't think account creation itself failed.
+		// PocketBase's own confirmVerification() flips `verified` to true once
+		// they click the link - see /admin/verify-email.
 		try {
-			await locals.pb.collection('users').requestPasswordReset(email);
+			await locals.pb.collection('users').requestVerification(email);
 		} catch (err: any) {
-			return fail(500, { error: `Account created, but the invite email failed to send: ${pbErrorMessage(err, 'unknown error')}. Ask them to use "Forgot password" on the admin login page instead.` });
+			return fail(500, { error: `Account created, but the verification email failed to send: ${pbErrorMessage(err, 'unknown error')}.` });
 		}
 	},
 

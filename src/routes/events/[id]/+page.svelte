@@ -309,9 +309,9 @@
                 </div>
 
                 <a
-                  href={event.volunteerLink || '/volunteer'}
-                  target={event.volunteerLink ? '_blank' : undefined}
-                  rel={event.volunteerLink ? 'noopener noreferrer' : undefined}
+                  href={event.volunteer_link || '/volunteer'}
+                  target={event.volunteer_link ? '_blank' : undefined}
+                  rel={event.volunteer_link ? 'noopener noreferrer' : undefined}
                   class="skeuo-button flex items-center justify-center gap-2 px-6 py-3 bg-[#2563eb] text-white text-sm font-black uppercase tracking-wider text-center rounded-xl border-2 border-[#1d4ed8] shadow-skeuo hover:translate-y-[1px] active:translate-y-[3px] transition-all"
                 >
                   Register to Volunteer on FIRST ↗
@@ -376,13 +376,14 @@
           <object
             data={`${pdfUrl}#toolbar=1&navpanes=0`}
             type="application/pdf"
+            title="Event guide and rules PDF"
             class="w-full h-full"
           >
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-slate-50">
               <svg class="w-12 h-12 text-slate-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
               </svg>
-              <h4 class="text-xl font-black uppercase text-black">Unable to preview PDF directly</h4>
+              <h3 class="text-xl font-black uppercase text-black">Unable to preview PDF directly</h3>
               <p class="text-xs text-slate-500 font-bold max-w-sm mt-2 mb-6 uppercase tracking-tight">
                 Your device or browser doesn't support interactive inline embeds. Click below to read easily!
               </p>

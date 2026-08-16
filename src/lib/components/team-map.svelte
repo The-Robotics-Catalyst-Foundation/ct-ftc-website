@@ -234,8 +234,8 @@
 {#if teamGroups.length}
   <div class="relative h-full w-full overflow-hidden rounded-[2.5rem]" bind:this={container}>
     {#if !ready}
-      <div class="absolute inset-0 flex items-center justify-center bg-[#eef2f7] text-xs font-black uppercase tracking-widest text-slate-400">
-        Loading team map…
+      <div class="map-skeleton absolute inset-0" role="status" aria-live="polite">
+        <span class="sr-only">Loading team map…</span>
       </div>
     {/if}
 
@@ -250,10 +250,34 @@
     {/if}
   </div>
 {:else}
-  <img src="map.png" alt="CT Map" class="w-full h-full object-cover rounded-[2.5rem] shadow-neumorphic-inner border border-slate-200/50" />
+  <div class="map-skeleton h-full w-full rounded-[2.5rem]" role="status" aria-live="polite">
+    <span class="sr-only">Team map unavailable</span>
+  </div>
 {/if}
 
 <style>
+  .map-skeleton {
+    background: linear-gradient(100deg, #e2e8f0 30%, #eef2f7 45%, #eef2f7 55%, #e2e8f0 70%);
+    background-size: 200% 100%;
+    animation: map-skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+
+  @keyframes map-skeleton-shimmer {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -50% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .map-skeleton {
+      animation: none;
+      background: #e2e8f0;
+    }
+  }
+
   :global(.team-map-pin) {
     width: 2rem;
     height: 2rem;

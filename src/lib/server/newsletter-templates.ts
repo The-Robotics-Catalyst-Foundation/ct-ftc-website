@@ -69,11 +69,13 @@ const WRAPPER_OPEN = `
 				<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;">
 `;
 
-const bannerImage = (imageUrl?: string | null) =>
+// Shown as a regular attached image within the body - not a full-bleed
+// banner - so it sits below the header/message and above the footer.
+const attachmentImage = (imageUrl?: string | null) =>
 	imageUrl
 		? `<tr>
-				<td style="padding:0;">
-					<img src="${imageUrl}" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;">
+				<td style="padding:0 32px 32px;">
+					<img src="${imageUrl}" alt="" style="display:block;width:100%;max-width:100%;height:auto;border-radius:10px;border:2px solid #e2e8f0;">
 				</td>
 			</tr>`
 		: '';
@@ -95,7 +97,6 @@ const simple: NewsletterTemplate = {
 		return {
 			subject: 'CT FTC Volunteer Update',
 			html: `${WRAPPER_OPEN}
-				${bannerImage(imageUrl)}
 				<tr>
 					<td style="padding:32px 32px 8px;font-family:Arial,Helvetica,sans-serif;">
 						<p style="margin:0;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">CT FIRST Tech Challenge</p>
@@ -107,6 +108,7 @@ const simple: NewsletterTemplate = {
 						${messageToHtml(message)}
 					</td>
 				</tr>
+				${attachmentImage(imageUrl)}
 				${FOOTER(origin)}
 			${WRAPPER_CLOSE}`
 		};
@@ -122,7 +124,6 @@ const eventAnnouncement: NewsletterTemplate = {
 		return {
 			subject: event ? `Volunteers needed: ${event.name}` : 'CT FTC Volunteer Update',
 			html: `${WRAPPER_OPEN}
-				${bannerImage(imageUrl)}
 				<tr>
 					<td style="padding:32px 32px 0;font-family:Arial,Helvetica,sans-serif;">
 						<p style="margin:0;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">CT FIRST Tech Challenge</p>
@@ -161,6 +162,7 @@ const eventAnnouncement: NewsletterTemplate = {
 						</table>
 					</td>
 				</tr>
+				${attachmentImage(imageUrl)}
 				${FOOTER(origin)}
 			${WRAPPER_CLOSE}`
 		};
@@ -176,7 +178,6 @@ const bold: NewsletterTemplate = {
 		return {
 			subject: event ? `${event.name} needs volunteers!` : 'CT FTC Volunteer Update',
 			html: `${WRAPPER_OPEN}
-				${bannerImage(imageUrl)}
 				<tr>
 					<td style="padding:28px 32px;background:#0f172a;">
 						<p style="margin:0;font-size:12px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#facc15;font-family:Arial,Helvetica,sans-serif;">CT First Tech Challenge</p>
@@ -200,6 +201,7 @@ const bold: NewsletterTemplate = {
 						</table>
 					</td>
 				</tr>
+				${attachmentImage(imageUrl)}
 				${FOOTER(origin)}
 			${WRAPPER_CLOSE}`
 		};

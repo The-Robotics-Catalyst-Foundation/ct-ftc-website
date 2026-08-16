@@ -62,8 +62,8 @@
     <div class="space-y-3">
       {#each faqs as faq}
         <details class="bg-white border-3 border-black rounded-2xl box-shadow-flat overflow-hidden group">
-          <summary class="p-4 flex items-center justify-between gap-4 cursor-pointer font-black text-sm text-black uppercase tracking-wide list-none [&::-webkit-details-marker]:hidden">
-            {faq.question}
+          <summary class="p-4 flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <h2 class="font-black text-sm text-black uppercase tracking-wide">{faq.question}</h2>
             <span class="shrink-0 text-lg font-black transition-transform duration-200 group-open:rotate-180">⌄</span>
           </summary>
           <p class="px-4 pb-4 text-sm font-semibold text-slate-700 leading-relaxed">{faq.answer}</p>

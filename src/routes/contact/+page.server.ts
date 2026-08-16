@@ -54,7 +54,7 @@ export const actions: Actions = {
 		}
 
 		notifyAdmins({
-			title: `New contact message from ${name}`,
+			title: `1 new notification from ${name}`,
 			body: message.length > 120 ? `${message.slice(0, 117)}...` : message,
 			url: '/admin/messages'
 		}).catch((err) => console.error('Failed to push-notify admins of new contact message:', err));

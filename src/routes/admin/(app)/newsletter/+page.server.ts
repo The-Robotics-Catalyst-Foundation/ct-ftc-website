@@ -56,8 +56,8 @@ export const actions: Actions = {
 		let imageUrl: string | null = null;
 		if (image instanceof File && image.size > 0) {
 			const content = Buffer.from(await image.arrayBuffer()).toString('base64');
-			attachments = [{ content, filename: image.name || 'banner', contentType: image.type, contentId: 'newsletter-banner' }];
-			imageUrl = 'cid:newsletter-banner';
+			attachments = [{ content, filename: image.name || 'attachment', contentType: image.type, contentId: 'newsletter-attachment' }];
+			imageUrl = 'cid:newsletter-attachment';
 		}
 
 		const subscribers = await locals.pb.collection('volunteer_newsletter').getFullList();

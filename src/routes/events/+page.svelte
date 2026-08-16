@@ -100,7 +100,7 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="font-black text-slate-900 text-xl uppercase">No events found</h3>
+                    <h2 class="font-black text-slate-900 text-xl uppercase">No events found</h2>
                     <p class="text-base font-bold text-slate-600 mt-2">There are currently no events listed under the {currentTab} tab.</p>
                 </div>
             </div>
@@ -131,9 +131,9 @@
 
                         <div class="p-6 flex flex-col justify-between flex-1">
                         <div>
-                            <h3 class="text-2xl font-black text-slate-900 leading-tight border-b-2 border-transparent group-hover:border-slate-900 transition-colors inline-block mb-1">
+                            <h2 class="text-2xl font-black text-slate-900 leading-tight border-b-2 border-transparent group-hover:border-slate-900 transition-colors inline-block mb-1">
                                 {event.name}
-                            </h3>
+                            </h2>
 
                             <div class="mt-4 space-y-3 text-sm font-bold text-slate-700">
                                 <div class="flex items-center gap-3">

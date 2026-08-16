@@ -11,10 +11,14 @@
 <div class="admin-shell flex items-center justify-center px-4 py-16 font-sans">
 	<div class="glass-panel w-full max-w-md p-8 md:p-10">
 		<h1 class="text-2xl font-bold tracking-tight text-text-main">Set your password</h1>
-		<p class="mt-1 mb-6 text-sm text-text-muted">Choose a password to activate your CT FTC admin account.</p>
+		<p class="mt-1 mb-6 text-sm text-text-muted">Choose a password for your CT FTC admin account.</p>
 
 		{#if !data.token}
-			<div class="error-banner">This invite link is missing its token. Ask an admin to resend your invite.</div>
+			<div class="error-banner">
+				This link is missing its token. Request a new one from
+				<a href="/admin/forgot-password" class="underline">Forgot password</a>
+				or <a href="/admin/create-password" class="underline">Create password</a>.
+			</div>
 		{:else if form?.success}
 			<div class="success-banner">Password set! You can now <a href="/admin" class="underline">sign in</a>.</div>
 		{:else}

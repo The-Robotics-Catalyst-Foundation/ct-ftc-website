@@ -86,14 +86,14 @@
                         type="button"
                         onclick={toggleHelp}
                         aria-label="Close"
-                        class="absolute top-4 right-4 text-slate-400 transition-colors hover:text-black"
+                        class="absolute top-2 right-2 flex h-11 w-11 items-center justify-center text-slate-400 transition-colors hover:text-black"
                     >
                         <X class="h-4 w-4" strokeWidth={2.5} />
                     </button>
 
-                    <h3 class="pr-6 text-lg font-black tracking-tight text-black uppercase">
+                    <p class="pr-6 text-lg font-black tracking-tight text-black uppercase">
                         Didn't find your team?
-                    </h3>
+                    </p>
                     <p class="mt-2 text-sm leading-relaxed font-semibold text-slate-600">
                         Ensure your team information registration fields are completely processed on the
                         central <span class="text-[#2563eb]">FIRST Dashboard</span>

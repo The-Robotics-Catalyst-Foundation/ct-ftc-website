@@ -203,7 +203,7 @@
 					<textarea id="message" name="message" rows="6" class="glass-input" bind:value={message}></textarea>
 				</div>
 				<div>
-					<label for="image" class="admin-label">Banner image (optional)</label>
+					<label for="image" class="admin-label">Attachment image (optional)</label>
 					<input
 						id="image"
 						name="image"

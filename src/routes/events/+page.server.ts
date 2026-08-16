@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
                 location: record.location || 'Location Pending',
                 startDate: record.date_time || '', // Maps 'date_time' to frontend
                 registerLink: record.registerLink || '#',
-                volunteerLink: record.volunteerLink || '#',
+                volunteerLink: record.volunteer_link || '#',
                 volunteersNeeded: record.volunteersNeeded ?? 0
             })),
             past: pastRecords.map(record => ({
@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
                 location: record.location || 'Location Pending',
                 startDate: record.date_time || '',
                 registerLink: record.registerLink || '#',
-                volunteerLink: record.volunteerLink || '#',
+                volunteerLink: record.volunteer_link || '#',
                 volunteersNeeded: record.volunteersNeeded ?? 0
             }))
         };

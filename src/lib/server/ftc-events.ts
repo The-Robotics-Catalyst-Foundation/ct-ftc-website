@@ -104,24 +104,26 @@ async function fetchPage(season: number, page: number): Promise<TeamsResponse> {
 	return res.json();
 }
 
-async function fetchSeasonTeams(season: number): Promise<FtcTeam[]> {
-	const teams: FtcTeam[] = [];
-	let page = 1;
-	let pageTotal = 1;
+function toFtcTeam(t: TeamsResponse['teams'][number]): FtcTeam {
+	return {
+		teamNumber: t.teamNumber,
+		name: t.nameShort || t.nameFull || `Team ${t.teamNumber}`,
+		city: t.city ?? '',
+		schoolName: t.schoolName ?? ''
+	};
+}
 
-	do {
-		const data = await fetchPage(season, page);
-		for (const t of data.teams) {
-			teams.push({
-				teamNumber: t.teamNumber,
-				name: t.nameShort || t.nameFull || `Team ${t.teamNumber}`,
-				city: t.city ?? '',
-				schoolName: t.schoolName ?? ''
-			});
-		}
-		pageTotal = data.pageTotal || 1;
-		page += 1;
-	} while (page <= pageTotal);
+async function fetchSeasonTeams(season: number): Promise<FtcTeam[]> {
+	const first = await fetchPage(season, 1);
+	const teams = first.teams.map(toFtcTeam);
+	const pageTotal = first.pageTotal || 1;
+
+	if (pageTotal > 1) {
+		const rest = await Promise.all(
+			Array.from({ length: pageTotal - 1 }, (_, i) => fetchPage(season, i + 2))
+		);
+		for (const data of rest) teams.push(...data.teams.map(toFtcTeam));
+	}
 
 	return teams;
 }
@@ -139,21 +141,55 @@ export async function getCtTeams(seasonsBack = 3): Promise<FtcTeam[]> {
 
 	const seasons = Array.from({ length: seasonsBack }, (_, i) => latestSeason - i);
 
+	// Fetch every season concurrently - order no longer matters for the
+	// merge below since each result carries its own season alongside it.
+	const results = await Promise.all(
+		seasons.map(async (season) => {
+			try {
+				return { season, teams: await fetchSeasonTeams(season) };
+			} catch (err) {
+				console.error(`Failed to fetch FTC teams for season ${season}:`, err);
+				return { season, teams: [] as FtcTeam[] };
+			}
+		})
+	);
+
 	// Oldest season first so that when a team appears in more than one
 	// season, the most recent season's name/city overwrites older data.
 	const byTeamNumber = new Map<number, FtcTeam>();
-	for (const season of [...seasons].reverse()) {
-		try {
-			const teams = await fetchSeasonTeams(season);
-			for (const team of teams) byTeamNumber.set(team.teamNumber, team);
-		} catch (err) {
-			console.error(`Failed to fetch FTC teams for season ${season}:`, err);
-		}
+	for (const { teams } of [...results].sort((a, b) => a.season - b.season)) {
+		for (const team of teams) byTeamNumber.set(team.teamNumber, team);
 	}
 
 	const teams = Array.from(byTeamNumber.values());
 	cache = { key: cacheKey, teams, fetchedAt: Date.now() };
 	return teams;
+}
+
+export interface SeasonInfo {
+	eventCount: number;
+	teamCount: number;
+	gameName: string;
+	kickoff: string;
+}
+
+// GET /v2.0/{season} (the root season endpoint, distinct from /events) -
+// its `eventCount`/`teamCount` are worldwide season totals, not tied to any
+// single event.
+export async function getSeasonInfo(season: number): Promise<SeasonInfo> {
+	const token = Buffer.from(`${FTC_API_USERNAME}:${FTC_API_KEY}`).toString('base64');
+	const res = await fetch(`${BASE_URL}/${season}`, {
+		headers: {
+			Authorization: `Basic ${token}`,
+			Accept: 'application/json'
+		}
+	});
+
+	if (!res.ok) {
+		throw new Error(`FTC Events API returned ${res.status} for season ${season}`);
+	}
+
+	return res.json();
 }
 
 async function fetchCtEventsRaw(season: number): Promise<RawEvent[]> {
@@ -196,4 +232,83 @@ export async function getCtEvents(season: number): Promise<FtcEvent[]> {
 // table - every field the API exposes, not just the season-import subset.
 export async function getCtEventsDetailed(season: number): Promise<DetailedFtcEvent[]> {
 	return fetchCtEventsRaw(season);
+}
+
+export interface VolunteerSearchInfo {
+	id: string;
+	dashboardVolunteerDeeplink: string;
+}
+
+const FIRST_SEARCH_URL = 'https://yifkx4foih.execute-api.us-east-2.amazonaws.com/prod/first-search';
+
+interface FirstSearchResult {
+	id?: string;
+	dashboard_volunteer_deeplink?: string;
+}
+
+interface FirstSearchResponse {
+	results?: FirstSearchResult[];
+}
+
+// Looks up the FIRST search index (separate from the FTC Events API) for a
+// single event's VIMS id and volunteer-dashboard deeplink.
+export async function getVolunteerSearchInfo(
+	eventCode: string,
+	season: number
+): Promise<VolunteerSearchInfo | null> {
+	const res = await fetch(FIRST_SEARCH_URL, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			index: 'events_*',
+			query: {
+				size: 1,
+				query: {
+					bool: {
+						should: [
+							{ term: { event_code: eventCode } },
+							{ term: { event_season: String(season) } }
+						],
+						minimum_should_match: 2
+					}
+				}
+			}
+		})
+	});
+
+	if (!res.ok) {
+		throw new Error(`first-search API returned ${res.status} for event ${eventCode}`);
+	}
+
+	const data: FirstSearchResponse = await res.json();
+	const hit = data.results?.[0];
+	if (!hit) return null;
+
+	return {
+		id: hit.id ?? '',
+		dashboardVolunteerDeeplink: hit.dashboard_volunteer_deeplink ?? ''
+	};
+}
+
+// Same lookup as getVolunteerSearchInfo, but for a batch of events - fetched
+// one event at a time in parallel; a failure on one event doesn't drop the
+// others.
+export async function getVolunteerSearchInfoForEvents(
+	events: Pick<DetailedFtcEvent, 'code'>[],
+	season: number
+): Promise<Map<string, VolunteerSearchInfo>> {
+	const map = new Map<string, VolunteerSearchInfo>();
+
+	await Promise.all(
+		events.map(async (e) => {
+			try {
+				const info = await getVolunteerSearchInfo(e.code, season);
+				if (info) map.set(e.code, info);
+			} catch (err) {
+				console.error(`Failed to fetch volunteer search info for event ${e.code}:`, err);
+			}
+		})
+	);
+
+	return map;
 }

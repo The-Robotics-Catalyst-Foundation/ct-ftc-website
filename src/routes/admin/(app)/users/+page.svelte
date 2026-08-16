@@ -38,6 +38,10 @@
 		class="grid grid-cols-1 gap-4 sm:grid-cols-2"
 	>
 		<div class="sm:col-span-2">
+			<label for="name" class="admin-label">Name</label>
+			<input id="name" name="name" type="text" required class="glass-input" />
+		</div>
+		<div class="sm:col-span-2">
 			<label for="email" class="admin-label">Email</label>
 			<input id="email" name="email" type="email" required class="glass-input" />
 		</div>
@@ -50,7 +54,8 @@
 			</select>
 		</div>
 		<p class="text-xs text-text-muted sm:col-span-2">
-			They'll get an email with a link to set their own password and activate the account.
+			They'll get an email to verify their address, then an email to create their own password and activate the
+			account.
 		</p>
 		<div class="flex gap-2 sm:col-span-2">
 			<button type="submit" disabled={busy} class="btn-primary">{busy ? 'Sending invite…' : 'Send invite'}</button>

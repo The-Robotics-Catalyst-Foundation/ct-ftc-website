@@ -50,5 +50,11 @@
 				{loading ? 'Signing in…' : 'Sign in'}
 			</button>
 		</form>
+
+		<p class="mt-4 flex items-center justify-center gap-3 text-center text-sm text-text-muted">
+			<a href="/admin/forgot-password" class="underline">Forgot password?</a>
+			<span aria-hidden="true">&middot;</span>
+			<a href="/admin/create-password" class="underline">New account setup</a>
+		</p>
 	</div>
 </div>
