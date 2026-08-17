@@ -30,7 +30,7 @@
           <div class="w-11 h-11 rounded-full glass-tile flex items-center justify-center bg-white border border-slate-200">
             <img src={logo} alt="CT Logo" width="400" height="272" class="w-[70%] h-[70%] object-contain invert" />
           </div>
-          <img src="/ftc-logo.png" alt="FTC Logo" width="744" height="188" loading="lazy" class="h-10 object-contain">
+          <img src="/ftc-logo.png" alt="FTC Logo" width="744" height="188" loading="lazy" class="h-10 w-auto object-contain">
         </div>
 
         <p class="text-sm font-bold text-slate-700 leading-relaxed max-w-xs">

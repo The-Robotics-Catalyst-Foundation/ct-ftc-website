@@ -14,7 +14,6 @@ export const load: PageServerLoad = async () => {
 	}
 
 	return {
-		teams,
 		teamGroups,
 		title: 'Team Directory',
 		description:

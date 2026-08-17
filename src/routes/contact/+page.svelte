@@ -7,6 +7,13 @@
   // Svelte 5 direct destructuring without explicit interface types
   let { form } = $props();
 
+  const CATEGORIES = [
+    { value: 'general', label: 'General Inquiry' },
+    { value: 'team', label: 'Team Support' },
+    { value: 'volunteer', label: 'Volunteering' },
+    { value: 'sponsorship', label: 'Sponsorship' }
+  ];
+
   // State Management (Svelte 5 Runes)
   let category = $state("general");
   let submitted = $state(false);
@@ -169,15 +176,22 @@
               </div>
 
               <div class="space-y-2 text-left">
-                <label for="cat" class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Inquiry Topic</label>
-                <div class="relative">
-                  <select id="cat" name="category" bind:value={category} disabled={isSubmitting} class="w-full bg-white border-2 border-black rounded-xl px-4 py-3.5 text-sm font-bold shadow-inner outline-none appearance-none focus:border-[#2563eb] transition-colors cursor-pointer disabled:opacity-50">
-                    <option value="general">General Inquiry</option>
-                    <option value="team">Team Support</option>
-                    <option value="volunteer">Volunteering</option>
-                    <option value="sponsorship">Sponsorship</option>
-                  </select>
-                  <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none font-black text-xs opacity-60">▼</div>
+                <span class="text-[11px] font-black uppercase tracking-widest text-slate-500 block pl-1">Inquiry Topic</span>
+                <input type="hidden" name="category" value={category} />
+                <div class="flex flex-wrap gap-2" role="group" aria-label="Inquiry Topic">
+                  {#each CATEGORIES as opt (opt.value)}
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onclick={() => (category = opt.value)}
+                      aria-pressed={category === opt.value}
+                      class="px-4 py-3.5 rounded-full border-2 border-black text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 {category === opt.value
+                        ? 'box-shadow-flat bg-[#2563eb] text-white'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'}"
+                    >
+                      {opt.label}
+                    </button>
+                  {/each}
                 </div>
               </div>
 

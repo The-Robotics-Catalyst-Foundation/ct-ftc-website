@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { CircleHelp, Search, X } from '@lucide/svelte';
+    import { CircleHelp, X } from '@lucide/svelte';
     import TeamMap from '$lib/components/team-map.svelte';
 
     let { data } = $props();
@@ -10,32 +10,23 @@
     let scrollY = $state(0);
     let helpOpen = $state(false);
     let helpWrapper = $state();
-    let searchQuery = $state('');
-    let cityFilter = $state('all');
 
     // --- DERIVED PARALLAX RUNES ---
     let parallaxHeaderY = $derived(scrollY * 0.25);
 
-    // --- DERIVED SEARCH + FILTER RUNES ---
-    let cities = $derived(
-        Array.from(new Set(data.teams.map((t) => t.city).filter(Boolean))).sort()
-    );
-
-    let filteredTeams = $derived.by(() => {
-        const q = searchQuery.trim().toLowerCase();
-        return data.teams.filter((team) => {
-            if (cityFilter !== 'all' && team.city !== cityFilter) return false;
-            if (!q) return true;
-            return (
-                team.name.toLowerCase().includes(q) ||
-                String(team.teamNumber).includes(q) ||
-                (team.city ?? '').toLowerCase().includes(q)
-            );
-        });
-    });
-
     onMount(() => {
         setTimeout(() => (isLoaded = true), 50);
+
+        // Robolyst's embed widget expects its own <script> tag to run after
+        // the data-robolyst-embed div is in the DOM - Svelte doesn't execute
+        // <script> tags written directly in markup, so it's added manually.
+        const script = document.createElement('script');
+        script.src = 'https://robolyst.org/embed.js';
+        script.async = true;
+        document.body.appendChild(script);
+        return () => {
+            document.body.removeChild(script);
+        };
     });
 
     function toggleHelp() {
@@ -141,64 +132,12 @@
         </section>
     {/if}
 
-    {#if data.teams.length}
-        <section class="relative z-20 mx-auto max-w-7xl px-6 pt-16 pb-16">
-            <h2 class="mb-6 text-3xl font-black tracking-tighter text-black uppercase md:text-4xl">
-                All {data.teams.length} Connecticut teams
-            </h2>
+    <section class="relative z-20 mx-auto max-w-7xl px-6 pt-16 pb-16">
+        <div data-robolyst-embed="https://robolyst.org/e/5sdnavv" data-height="600">
+          <a href="https://robolyst.org/location/connecticut/ftc">Robolyst — Connecticut</a>
+        </div>
+    </section>
 
-            <div
-                class="sticky top-20 z-30 mb-6 flex flex-col gap-3 rounded-2xl border-2 border-black bg-[#eef2f7]/90 p-3 backdrop-blur-md sm:flex-row"
-            >
-                <label class="relative flex-1">
-                    <Search
-                        class="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400"
-                        strokeWidth={2.5}
-                    />
-                    <input
-                        type="text"
-                        bind:value={searchQuery}
-                        placeholder="Search by team #, name, or city..."
-                        aria-label="Search teams"
-                        class="box-shadow-mini w-full rounded-2xl border-2 border-black bg-white py-3 pr-4 pl-11 text-sm font-bold text-black outline-none placeholder:font-semibold placeholder:text-slate-400"
-                    />
-                </label>
-
-                <select
-                    bind:value={cityFilter}
-                    aria-label="Filter by city"
-                    class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-3 text-xs font-black tracking-wider text-black uppercase outline-none sm:w-56"
-                >
-                    <option value="all">All cities</option>
-                    {#each cities as city}
-                        <option value={city}>{city}</option>
-                    {/each}
-                </select>
-            </div>
-
-            {#if filteredTeams.length}
-                <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {#each filteredTeams as team (team.teamNumber)}
-                        <li
-                            class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-3"
-                        >
-                            <span class="text-xs font-black tracking-widest text-[#2563eb] uppercase"
-                                >Team {team.teamNumber}</span
-                            >
-                            <p class="text-sm font-black text-slate-900">{team.name}</p>
-                            {#if team.city}
-                                <p class="text-xs font-bold text-slate-600">{team.city}, CT</p>
-                            {/if}
-                        </li>
-                    {/each}
-                </ul>
-            {:else}
-                <p class="box-shadow-mini rounded-2xl border-2 border-black bg-white px-4 py-6 text-center text-sm font-bold text-slate-600">
-                    No teams match your search{searchQuery ? ` "${searchQuery}"` : ''}.
-                </p>
-            {/if}
-        </section>
-    {/if}
 
 </main>
 
@@ -233,9 +172,5 @@
     /* Flat Brutalist Static Shadow Trims */
     .box-shadow-flat {
         box-shadow: 6px 6px 0px 0px #000000;
-    }
-
-    .box-shadow-mini {
-        box-shadow: 3px 3px 0px 0px #000000;
     }
 </style>

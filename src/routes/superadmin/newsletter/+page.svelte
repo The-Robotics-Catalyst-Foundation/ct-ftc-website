@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	// This page reuses the admin panel's utility classes (glass-panel,
+	// btn-primary, admin-label, ...) even though it lives outside /admin -
+	// pull in their definitions directly rather than duplicating them.
+	import '../../admin/admin.css';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -13,6 +17,7 @@
 	<title>Superadmin — Newsletter Import | Connecticut FTC</title>
 </svelte:head>
 
+<div class="admin-shell">
 <div class="mx-auto max-w-3xl space-y-6 p-6">
 	<div>
 		<h1 class="text-2xl font-bold tracking-tight text-text-main">Newsletter Import</h1>
@@ -86,4 +91,5 @@
 			{busy ? 'Importing…' : 'Import emails'}
 		</button>
 	</form>
+</div>
 </div>

@@ -142,7 +142,7 @@
         class:mt-0={scrolled}
     >
         <a href="/admin/events" class="flex shrink-0 items-center gap-2">
-            <img src="/ctftc.png" alt="CT FIRST Tech Challenge" width="400" height="272" class="h-12 w-18 rounded-full border-2 border-white  object-contain p-1 invert" />
+            <img src="/ctftc.png" alt="CT FIRST Tech Challenge" width="400" height="272" class="h-12 w-12 rounded-full border-2 border-white object-contain p-1 invert" />
             <span class="hidden text-sm font-black uppercase tracking-wide text-text-main sm:inline">CT FTC Admin</span>
         </a>
 

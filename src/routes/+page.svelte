@@ -1,4 +1,4 @@
-3r<script>
+<script>
   import { browser } from '$app/environment';
   import { pb } from '$lib/pocketbase';
   import Carousel from '$lib/components/carousel.svelte';
@@ -31,17 +31,6 @@
   let mouseY = $state(0);
   let townInput = $state('');
 
-  // Repeats the sponsor list enough times that the reel is wider than the
-  // viewport even with just one or two sponsors - otherwise it's mostly
-  // empty space with a single card drifting in a small corner instead of a
-  // continuous row of cards.
-  const MIN_SPONSOR_CHIPS = 10;
-  const sponsorChips = $derived.by(() => {
-    const sponsors = data.sponsors ?? [];
-    if (!sponsors.length) return [];
-    const repeats = Math.max(1, Math.ceil(MIN_SPONSOR_CHIPS / sponsors.length));
-    return Array.from({ length: repeats }, () => sponsors).flat();
-  });
 
   /** @param {SubmitEvent} e */
   function searchTown(e) {
@@ -293,32 +282,24 @@
         <span class="text-xs font-black text-[#2563eb] bg-[#eef2f7] border-2 border-black px-3 py-1 box-shadow-flat inline-block uppercase tracking-wider">Thank You</span>
         <h3 class="text-2xl font-black text-black uppercase tracking-tight mt-3">Our Sponsors</h3>
       </div>
-      <div class="sponsor-marquee">
-        <div class="sponsor-track" style="animation-duration: {Math.max(sponsorChips.length * 3, 12)}s">
-          {#each [...sponsorChips, ...sponsorChips] as sponsor, i (sponsor.id + '-' + i)}
-            {#if sponsor.Website}
-              <a
-                href={sponsor.Website}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="sponsor-chip"
-                tabindex={i < sponsorChips.length ? 0 : -1}
-              >
-                {#if sponsor.Logo}
-                  <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
-                {/if}
-                <span class="sponsor-name">{sponsor.Name}</span>
-              </a>
-            {:else}
-              <div class="sponsor-chip" aria-hidden={i >= sponsorChips.length}>
-                {#if sponsor.Logo}
-                  <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
-                {/if}
-                <span class="sponsor-name">{sponsor.Name}</span>
-              </div>
-            {/if}
-          {/each}
-        </div>
+      <div class="sponsor-grid">
+        {#each data.sponsors as sponsor (sponsor.id)}
+          {#if sponsor.Website}
+            <a href={sponsor.Website} target="_blank" rel="noopener noreferrer" class="sponsor-chip">
+              {#if sponsor.Logo}
+                <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
+              {/if}
+              <span class="sponsor-name">{sponsor.Name}</span>
+            </a>
+          {:else}
+            <div class="sponsor-chip">
+              {#if sponsor.Logo}
+                <img src={pb.files.getUrl(sponsor, sponsor.Logo, { thumb: '200x200' })} alt="" class="sponsor-logo" loading="lazy" />
+              {/if}
+              <span class="sponsor-name">{sponsor.Name}</span>
+            </div>
+          {/if}
+        {/each}
       </div>
     </section>
   {/if}
@@ -383,34 +364,16 @@
     box-shadow: 10px 10px 0px 0px #000000;
   }
 
-  /* Sponsor Reel - Continuous Left-to-Right Sliding Marquee */
-  .sponsor-marquee {
+  /* Sponsor grid - static, wraps to fit however many sponsors there are. */
+  .sponsor-grid {
     width: 100%;
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-  }
-
-  .sponsor-track {
+    max-width: 80rem;
+    margin: 0 auto;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 2rem;
-    width: max-content;
-    animation-name: sponsor-scroll;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
-
-  .sponsor-track:hover {
-    animation-play-state: paused;
-  }
-
-  @keyframes sponsor-scroll {
-    from {
-      transform: translateX(-50%);
-    }
-    to {
-      transform: translateX(0%);
-    }
+    justify-content: center;
+    gap: 1rem 1.5rem;
   }
 
   .sponsor-chip {
