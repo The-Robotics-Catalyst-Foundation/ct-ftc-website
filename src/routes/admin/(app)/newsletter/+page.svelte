@@ -117,7 +117,10 @@
 					<button type="button" class="btn-secondary px-3 py-1.5 text-xs" onclick={() => (showSubscribers = !showSubscribers)}>
 						{showSubscribers ? 'Hide list' : 'Show list'}
 					</button>
+				{:else}
+				<a href="/superadmin/newsletter" class="text-sm px-3 py-2 bg-amber-100 rounded-xl border-t-fuchsia-50 border-4 text-bold">Import List</a>
 				{/if}
+
 			</div>
 		</div>
 
