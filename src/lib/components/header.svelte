@@ -7,6 +7,11 @@
   let isMobileMenuOpen = $state(false);
   let scrollY = $state(0);
   let atTop = $derived(scrollY <= 4);
+  // Measured from the real nav instead of a hardcoded height - the nav's
+  // fixed positioning takes it out of flow, so this spacer reserves the
+  // matching space below it. A static guess drifts out of sync any time
+  // the nav's padding/size changes; this can't.
+  let navWrapperHeight = $state(0);
 
   const navLinks = [
     { name: 'Events', href: '/events' },
@@ -33,7 +38,10 @@
 
 <svelte:window bind:scrollY />
 
-<div class="fixed left-0 right-0 z-[200] flex justify-center pointer-events-none transition-all duration-300 {atTop ? 'top-0 px-0' : 'top-4 px-4 md:px-6'}">
+<div
+  bind:clientHeight={navWrapperHeight}
+  class="fixed left-0 right-0 z-[200] flex justify-center pointer-events-none transition-all duration-300 {atTop ? 'top-0 px-0' : 'top-4 px-4 md:px-6'}"
+>
   <nav
     id="site-nav"
     class="pointer-events-auto bg-[#eef2f7]/90 backdrop-blur-xl border-3 border-black shadow-neumorphic-nav px-3 py-2.5 md:py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 relative box-shadow-flat transition-all duration-300 {atTop ? 'w-full rounded-none' : 'w-full max-w-5xl rounded-2xl md:rounded-full'}"
@@ -122,7 +130,7 @@
   </div>
 {/if}
 
-<div class="h-28 md:h-24"></div>
+<div style="height: {navWrapperHeight}px"></div>
 
 <style>
   /* Inverted Inner Channel Shadow */
