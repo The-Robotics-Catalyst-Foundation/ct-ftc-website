@@ -4,8 +4,6 @@
 
   // Component Props (Accepts objects or raw string URLs fallback)
   let { images = [
-    { src: 'https://singul.tech/img/16hk3gnuwemftl4', alt: 'CT FTC robotics action' },
-    { src: 'https://singul.tech/img/w8nw2xvh42jpqut', alt: 'CT FTC robotics action' },
     { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-QmfJsw4/0/KWhL6kCnJG3FrNDMhHDM2QWPjLXrkngzzCHSpf4rw/M/WolcottFTC26_01011-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' },
     { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-cTsLWh7/0/LnQ9pTjBgr4nRLV46hqbfqC5Z6VX3h223JDBWbSzq/M/WolcottFTC26_01019-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' },
     { src: 'https://photos.smugmug.com/Robotics/2026-FTC-Wolcott-Qualifier/i-ZNMKNjL/0/LXBxqTqL4QCbCLrHjpVqkh3VGTD4xhc6hKfBFZTWQ/M/WolcottFTC26_01125-M.jpg', alt: '2026 CT FTC Wolcott Qualifier' },
@@ -31,17 +29,17 @@
 </script>
 
 <div class="rounded-xl">
-  
+
   <div class="relative aspect-[16/9] w-full bg-black/5">
     {#each images as img, i}
       {#if currentIndex === i}
         <div class=" w-full h-full" transition:fade={{ duration: 300 }}>
-          <img 
-            src={typeof img === 'string' ? img : img.src} 
-            alt={img.alt || `Slide ${i + 1}`} 
+          <img
+            src={typeof img === 'string' ? img : img.src}
+            alt={img.alt || `Slide ${i + 1}`}
             class="w-full h-full object-cover rounded-xl"
           />
-          
+
           {#if img.caption}
             <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-12 text-left">
               <p class="text-white font-bold text-sm md:text-base tracking-wide">{img.caption}</p>
