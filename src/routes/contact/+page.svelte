@@ -105,7 +105,7 @@
             </div>
             <div class="space-y-1">
               <h4 class="font-black text-black uppercase text-sm tracking-tight">Email Addresses</h4>
-              <p class="text-slate-600 text-xs font-bold"> <a href="mailto:contact@connecticutftc.org" class="text-[#2563eb] hover:underline">contact@connecticutftc.org</a></p>
+              <p class="text-slate-600 text-xs font-bold"> <a href="mailto:robcormier@firstpartners.org" class="text-[#2563eb] hover:underline">robcormier@firstpartners.org</a></p>
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ export const load: PageServerLoad = async () => {
 			name: record.name || 'Untitled Event',
 			location: record.location || 'Location TBD',
 			date_time: record.date_time || '',
-			volunteerLink: record.volunteerLink || ''
+			volunteerLink: record.volunteer_link || ''
 		}));
 	} catch (err) {
 		console.error('Failed to load upcoming events for the volunteer carousel:', err);

@@ -26,7 +26,7 @@
     },
     {
       question: 'How do I start or join a CT FTC team?',
-      answer: 'Use the "Create a Team" link on the homepage, or visit the Team Directory to find an existing team near you.'
+      answer: 'Contact us and we\'ll help you get started, or head to the FIRST Dashboard to register a new team. Visit the Team Directory to find an existing team near you.'
     }
   ];
 

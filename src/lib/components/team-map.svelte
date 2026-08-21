@@ -106,6 +106,7 @@
       },
       center: USA_CENTER,
       zoom: USA_ZOOM,
+      minZoom: USA_ZOOM,
       attributionControl: false,
       cooperativeGestures: true
     });

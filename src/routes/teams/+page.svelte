@@ -117,7 +117,7 @@
                 <p
                     class="max-w-2xl rounded-xl border-2 border-black bg-white/40 p-4 text-sm leading-relaxed font-bold text-slate-800 backdrop-blur-sm md:text-lg"
                 >
-                    Powered by <a href="https://robolyst.org" class="text-black underline">Robolyst</a>, analyze all teams in CT see their match history as well as info
+                    Powered by <a href="https://robolyst.org" class="inline-flex items-center gap-1.5 align-middle text-black underline"><img src="/robolyst-icon.svg" alt="" width="40" height="40" class="h-6 w-6 object-contain" />Robolyst</a>, analyze all teams in CT see their match history as well as info
                     about their team.
                 </p>
             </div>
